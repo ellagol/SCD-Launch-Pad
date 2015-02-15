@@ -1,0 +1,7 @@
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Infrastructure\DragDrop\Infra.DragDrop.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Infrastructure\DragDrop\Infra.DragDrop.pdb
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Infrastructure\DragDrop\Infra.DragDrop.xml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Infrastructure\DragDrop\Infra.DragDrop\obj\Debug\Infra.DragDrop.csprojResolveAssemblyReference.cache
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Infrastructure\DragDrop\Infra.DragDrop\obj\Debug\Infra.DragDrop.g.resources
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Infrastructure\DragDrop\Infra.DragDrop\obj\Debug\Infra.DragDrop.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Infrastructure\DragDrop\Infra.DragDrop\obj\Debug\Infra.DragDrop.pdb

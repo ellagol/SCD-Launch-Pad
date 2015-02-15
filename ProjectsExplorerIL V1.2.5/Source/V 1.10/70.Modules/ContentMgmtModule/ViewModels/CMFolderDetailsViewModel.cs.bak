@@ -1,0 +1,690 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using Infra.MVVM;
+using ATSBusinessObjects;
+using ATSBusinessLogic.ContentMgmtBLL;
+using ATSBusinessLogic;
+using ATSBusinessObjects.ContentMgmtModels;
+using System.Linq;
+using System.Windows.Input;
+using ResourcesProvider;
+using System.Text;
+using System.Data;
+using ATSDomain;
+using System.Data.SqlClient;
+using System.Windows;
+using Infra.DragDrop;
+using TraceExceptionWrapper;
+
+namespace ContentMgmtModule
+{
+    public class CMFolderDetailsViewModel : ViewModelBase
+    {
+
+        #region  Data
+
+        protected MessengerService MessageMediator = new MessengerService();
+
+        private IMessageBoxService MsgBoxService = null;
+
+        private Guid WorkspaceId;
+
+        public int tabIndex { get; set; }
+
+        public CMFolderModel initCmFolder = new CMFolderModel();
+
+        private CMFolderModel _CMFolder;
+        public CMFolderModel CMFolder
+        {
+            get
+            {
+                return _CMFolder;
+            }
+            set
+            {
+                _CMFolder = value;
+            }
+        }
+
+        private CMTreeViewNodeViewModelBase _CMParentFolderModel;
+        public CMTreeViewNodeViewModelBase CMParentFolderModel
+        {
+            get
+            {
+                return _CMParentFolderModel;
+            }
+            set
+            {
+                _CMParentFolderModel = value;
+            }
+        }
+
+        private ObservableCollection<CMUserGroupTypeModel> _UserGroupTypeList;
+        public ObservableCollection<CMUserGroupTypeModel> UserGroupTypeList
+        {
+            get
+            {
+                return _UserGroupTypeList;
+            }
+            set
+            {
+                _UserGroupTypeList = value;
+                RaisePropertyChanged("UserGroupTypeList");
+            }
+        }
+
+
+        #endregion
+
+        #region Presentation Properties
+
+        private CMTreeViewNodeViewModelBase Node;
+       
+        [Required(ErrorMessage = "'Name' field is required."), StringLength(50, ErrorMessage = "Maximum length (50 characters) exceeded.")]
+        public string FolderName
+        {
+            get
+            {
+                if (CMFolder != null)
+                {
+
+                    return CMFolder.Name;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (Node != null)
+                {
+                    CMFolder.Name = value;
+                    RaisePropertyChanged("FolderName");
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", this.Node);
+                }
+            }
+        }
+
+
+        [StringLength(1000, ErrorMessage = "Maximum length (1000 characters) exceeded.")]
+        public string FolderDescription
+        {
+            get
+            {
+                if (CMFolder != null)
+                {
+                    return CMFolder.Description;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (CMFolder != null)
+                {
+                    CMFolder.Description = value;
+                    RaisePropertyChanged("FolderDescription"); MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", this.Node);
+                }
+            }
+        }
+  
+        public string CreationDate
+        {
+            get
+            {
+                if (CMFolder.CreationDate == DateTime.MinValue)
+                {
+                    return "";
+                }
+                else
+                {
+                    return CMFolder.CreationDate.ToString();
+                } 
+            }
+            set
+            {
+            }
+        }
+
+        public string LastUpdateTime
+        {
+            get
+            {
+                if (CMFolder.LastUpdateTime == DateTime.MinValue)
+                {
+                    return "";
+                }
+                else
+                {
+                    return CMFolder.LastUpdateTime.ToString();
+                } 
+            }
+            set
+            {
+            }
+        }
+
+        public string LastUpdateUser
+        {
+            get
+            {
+                if (CMFolder != null)
+                {
+                    return CMFolder.LastUpdateUser;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+            }
+        }
+
+        private bool _ActionMode = false;
+        public bool ActionMode
+        {
+            get
+            {
+                return _ActionMode;
+            }
+            set
+            {
+                _ActionMode = value;
+                RaisePropertyChanged("ActionMode"); 
+            }
+        }
+
+        public bool UpdateMode
+        {
+            get
+            {
+                if (CMFolder != null)
+                {
+                    return CMFolder.UpdateMode;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            set
+            {
+                if (CMFolder != null)
+                {
+                    CMFolder.UpdateMode = value;
+                    RaisePropertyChanged("UpdateMode");
+                }
+            }
+        }
+
+        public bool UserGroupUpdatePermission
+        {
+            get
+            {
+                if (CMFolder != null)
+                {
+                    return ((CMTreeViewFolderNodeViewModel)(Node)).UserGroupUpdatePermission;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            set
+            {
+                if (CMFolder != null)
+                {
+                    ((CMTreeViewFolderNodeViewModel)(Node)).UserGroupUpdatePermission = value;
+                    RaisePropertyChanged("UserGroupUpdatePermission");
+                }
+            }
+        }
+
+        private String _ActionName = "";
+        public String ActionName
+        {
+            get
+            {
+                return _ActionName; 
+            }
+            set
+            {
+                _ActionName = value;
+                RaisePropertyChanged("ActionName");
+            }
+        }
+
+        private bool _updateModeProperty;
+        public bool UpdateModeProperty
+        {
+            get
+            {
+                return _updateModeProperty;
+            }
+            set
+            {
+                _updateModeProperty = value;
+                RaisePropertyChanged("UpdateModeProperty");
+            }
+        }
+
+        private CMUserGroupTypeModel _SelectedUserGroup;
+        public CMUserGroupTypeModel SelectedUserGroup
+        {
+            get
+            {
+                return _SelectedUserGroup;
+            }
+            set
+            {
+                _SelectedUserGroup = value;
+                RaisePropertyChanged("SelectedUserGroup");
+            }
+        }
+
+
+        #endregion
+
+        #region Constructor
+
+        public CMFolderDetailsViewModel(Guid workspaceId, CMTreeViewNodeViewModelBase TV)
+        {
+            tabIndex = 0;
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+            //init workscpace
+            this.WorkspaceId = workspaceId;
+            //init folder node
+            Node = TV;
+
+            CMContentsReaderBLL contentsReader = new CMContentsReaderBLL();
+            contentsReader.UpdateReferenceList();
+
+            initCmFolder = CMFolderBLL.GetFolderRow(Node.ID);
+            if (initCmFolder.Id == -1) //the folder doesn't exists anymore
+            {
+                displayErrorMessage();
+            }
+
+            initCmFolder.UserGroupTypePermission = contentsReader.GetFolderUserGroupType((int)Node.ID);
+
+            //init folder details
+            CMFolder = new CMFolderModel();
+
+            if (Node.IsView == true) //view action
+            {
+                ActionName = "";
+            }
+            else if (Node.IsUpdate) //update action
+            {
+                ActionName = "Update";
+                ActionMode = true;
+
+                MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", null);
+
+                UpdateModeProperty = Node.IsUpdate && ((CMFolderModel)(Node.TreeNode)).ExistPermission("UpdateProperty");
+                UserGroupUpdatePermission = Node.IsUpdate && UpdateModeProperty && ((CMTreeViewFolderNodeViewModel)(Node)).UserGroupUpdatePermission;
+                Node.IsUpdate = UpdateModeProperty;  //for source drag & drop permissions
+                UpdateModeProperty = true;
+            }
+            else if (Node.ID == -1) //add action
+            {
+                ActionName = "Add";
+                Node.IsUpdate = true;
+                Node.IsView = true;
+                ActionMode = true;
+
+                CMFolder.UpdateMode = true;
+            }
+
+            CMFolder.Id = initCmFolder.Id;
+            CMFolder.Name = initCmFolder.Name;
+            CMFolder.Description = initCmFolder.Description;
+            CMFolder.LastUpdateUser = initCmFolder.LastUpdateUser;
+            CMFolder.CreationDate = initCmFolder.CreationDate;
+            //CMFolder.LastUpdateApplication = initCmFolder.LastUpdateApplication;
+            //CMFolder.LastUpdateComputer = initCmFolder.LastUpdateComputer;
+            CMFolder.LastUpdateTime = ((CMFolderModel)(TV.TreeNode)).LastUpdateTime;
+            CMFolder.UserGroupTypePermission = initCmFolder.UserGroupTypePermission;
+            CMFolder.UpdateMode = Node.IsUpdate;
+            CMFolder.ParentId = Node.Parent.ID;
+
+            InitFolderUserGroup(CMFolder);
+            
+        }
+
+        public CMFolderDetailsViewModel(Guid workspaceId, CMTreeViewNodeViewModelBase currTV, CMTreeViewNodeViewModelBase parentTV)
+        {
+            tabIndex = 0;
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+            //init workscpace
+            this.WorkspaceId = workspaceId;
+            //init folder details
+            Node = currTV;
+            CMFolder = new CMFolderModel();
+            CMFolder.Id = Node.ID;
+            CMParentFolderModel = parentTV;
+            CMFolder.ParentId = CMParentFolderModel.ID;
+
+            ActionName = "Add";
+            Node.IsUpdate = false;
+            Node.IsView = true;
+            ActionMode = true;
+            CMFolder.UpdateMode = true;
+            UpdateModeProperty = true;
+
+            //Assign new folder permissions
+            CMUpdatePermissionBLL upPer = new CMUpdatePermissionBLL();
+            UserGroupUpdatePermission = ((CMTreeViewFolderNodeViewModel)(Node)).UserGroupUpdatePermission;
+            upPer.GetContentTreesPermission(Node.TreeNode);
+
+            InitFolderUserGroup();
+        }
+        
+        #endregion
+
+        #region Commands
+
+            #region  Save Command
+
+            private RelayCommand _SaveCommand;
+            public RelayCommand SaveCommand
+            {
+                get
+                {
+                    if (_SaveCommand == null)
+                    {
+                        _SaveCommand = new RelayCommand(ExecuteSaveCommand, CanExecuteSaveCommand);
+                    }
+                    return _SaveCommand;
+                }
+            }
+
+            private bool CanExecuteSaveCommand()
+            {
+                if ((String.IsNullOrEmpty(FolderName) || FolderName.Length > 50 || FolderDescription.Length > 1000 || !((CMTreeViewFolderNodeViewModel)(Node)).TreeNode.ExistPermission("Update")))
+                    return false;
+
+                return true;
+            }
+
+            private void ExecuteSaveCommand()
+            {
+                MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", null);
+                //Work variables
+                Collection<string> StatusBarParameters = new Collection<string>();
+                List<String> parameters = new List<string>();
+                CMFolderModel f;
+                String errorId;
+                string displayMessage;
+                var SB = new StringBuilder(string.Empty);
+
+                f = CMFolder;
+
+                if (CMFolder.Id == -1 && Node.IsUpdate == false) //Add new folder
+                {
+
+                    if (CMFolderBLL.CheckFolderName(ref f).Equals("Adding existing folder"))
+                    {
+                        errorId = "Adding existing folder";
+                        SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + errorId + "';");
+                        MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                        displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                        parameters.Add(f.Name);
+                        displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+                        object[] ArgMessageParam = { parameters[0] };
+                        CMContentManagementViewModel.ShowErrorAndInfoMessage(errorId, ArgMessageParam);
+                        return;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            UpdateUserGroupTypeTypes(ref f);
+                            CMFolderBLL.AddNewFolder(ref f);
+                            AddTreeNode();
+                        }
+                        catch (Exception e)
+                        {
+                            String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                            Domain.SaveGeneralErrorLog(logMessage);
+                            errorId = "Parent folder deleted";
+                            SB.Clear();
+                            SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + errorId + "';");
+                            MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                            displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                            CMContentManagementViewModel.ShowErrorAndInfoMessage(errorId, null);
+                            MessageMediator.NotifyColleagues(WorkspaceId + "RefreshTree", this.CMParentFolderModel); //Will be returned to the MainWindow signed for this message
+                        }
+                    }
+                }
+                else //Update folder
+                {
+                    if (CMFolderBLL.CheckExistingFolderName(ref f).Equals("Update folder name to existing"))
+                    {
+                        errorId = "Update folder name to existing";
+                        SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + errorId + "';");
+                        MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                        displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                        parameters.Add(f.Name);
+                        displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+                        object[] ArgMessageParam = { parameters[0] };
+                        CMContentManagementViewModel.ShowErrorAndInfoMessage(errorId, ArgMessageParam);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            CMFolderBLL.CompareUpdateTime(f.LastUpdateTime, f.Id);
+                            UpdateUserGroupTypeTypes(ref f);
+                            CMFolderBLL.UpdateExistingFolder(ref f);                      
+                            // Refresh the relevant TreeView node
+                            StatusBarParameters.Clear();
+                            MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                            Collection<object> MessageParameters = new Collection<object>();
+                            Node.Name = f.Name;
+                            ((CMFolderModel)(Node.TreeNode)).LastUpdateTime = f.LastUpdateTime;
+                            MessageParameters.Add(Node);
+                            MessageMediator.NotifyColleagues(this.WorkspaceId + "UpdateNode", MessageParameters); //Send message to the CM
+
+                            // Update permission
+                            ((CMFolderModel)(Node.TreeNode)).UserGroupTypePermission = f.UserGroupTypePermission;
+                            CMContentManagementViewModel.UpdatePermissionUpdateNode(Node);                   
+
+                            MessageMediator.NotifyColleagues(this.WorkspaceId + "ShowAndUpdateFolderDetails", Node); //Will be returned to the CM Main signed for this message
+
+                            StatusBarParameters.Clear();
+                            StatusBarParameters.Add("Data Saved Successfully"); //Message
+                            StatusBarParameters.Add("White"); //Foreground
+                            StatusBarParameters.Add("Green"); //Background
+                            MessageMediator.NotifyColleagues("StatusBarParameters", StatusBarParameters); //Send message to the MainViewModel
+
+                        }
+                        catch (TraceException te)
+                        {
+                            String logMessage = te.Message + "\n" + "Source: " + te.Source + "\n" + te.StackTrace;
+                            Domain.SaveGeneralErrorLog(logMessage);
+                            SB.Clear();
+                            SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + te.ApplicationErrorID + "';");
+                            MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                            displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                            parameters.Clear();
+                            parameters.Add(f.Name);
+                            object[] ArgMessageParam = null;
+                            if (te.ApplicationErrorID == "Folder changed")
+                            {
+                                parameters.Add(f.LastUpdateUser);
+                                object[] tempArgMessageParam = { parameters[0], parameters[1] };
+                                ArgMessageParam = tempArgMessageParam;
+                            }
+                            else if (te.ApplicationErrorID == "Folder deleted")
+                            {
+                                object[] tempArgMessageParam = { parameters[0] };
+                                ArgMessageParam = tempArgMessageParam;
+                            }
+                           
+                            displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+
+                            CMContentManagementViewModel.ShowErrorAndInfoMessage(te.ApplicationErrorID, ArgMessageParam);
+                            MessageMediator.NotifyColleagues(WorkspaceId + "RefreshTree", this); //Will be returned to the MainWindow signed for this message
+                        }
+                    }
+                }
+            }
+
+            #endregion
+    
+            #region  Cancel Command
+
+            private RelayCommand _CancelCommand;
+            public RelayCommand CancelCommand
+            {
+                get
+                {
+                    if (_CancelCommand == null)
+                    {
+                        _CancelCommand = new RelayCommand(ExecuteCancelCommand, CanExecuteCancelCommand);
+                    }
+                    return _CancelCommand;
+                }
+            }
+
+            private bool CanExecuteCancelCommand()
+            {
+                return true;
+            }
+
+            private void ExecuteCancelCommand()
+            {
+                 //MessageMediator.NotifyColleagues(WorkspaceId + "CloseDetailsView", this); //Will be returned to the MainWindow signed for this message, to remove the node from the TreeView
+            }
+     
+            #endregion
+            
+        #endregion
+
+        #region Methods
+
+            #region Folder User Group
+
+            public void InitFolderUserGroup()
+            {
+                UserGroupTypeList = CMFolderBLL.GetGroupTypesList();
+                foreach (CMUserGroupTypeModel userGroupType in UserGroupTypeList)
+                    userGroupType.Checked = false;
+            }
+
+            public void InitFolderUserGroup(CMFolderModel folder)
+            {
+                ObservableCollection<CMUserGroupTypeModel> tempUserGroupTypeList = new ObservableCollection<CMUserGroupTypeModel>();
+                tempUserGroupTypeList = CMFolderBLL.GetGroupTypesList();
+                foreach (CMUserGroupTypeModel userGroupType in tempUserGroupTypeList)
+                    userGroupType.Checked = folder.UserGroupTypePermission.ContainsKey(userGroupType.ID);
+
+                UserGroupTypeList = tempUserGroupTypeList;
+            }
+
+            public void UpdateUserGroupTypeTypes(ref CMFolderModel folder)
+            {
+                folder.UserGroupTypePermission.Clear();
+                foreach (CMUserGroupTypeModel ugt in UserGroupTypeList)
+                {
+                    if (ugt.Checked == true)
+                    {
+                        folder.UserGroupTypePermission.Add(ugt.ID, new CMFolderUserGroupTypeModel() { UserGroupType = ugt });
+                    }
+                }
+            }
+
+            #endregion
+
+            #region  Add Tree Node
+
+            private void AddTreeNode()
+            {
+                //Work variables
+                Collection<string> StatusBarParameters = new Collection<string>();
+                List<String> parameters = new List<string>();
+                CMTreeViewNodeViewModelBase CurrdNode = null;
+                CMFolderModel FN = new CMFolderModel();
+
+                FN.ID = (int)CMFolder.Id;
+                FN.Name = CMFolder.Name;
+                FN.Description = CMFolder.Description;
+                FN.LastUpdateTime = CMFolder.LastUpdateTime;
+                FN.CreationDate = CMFolder.CreationDate;
+
+                CMUserGroupTypeModel NewUserGroupType = new CMUserGroupTypeModel();
+
+                CurrdNode = new CMTreeViewFolderNodeViewModel(this.WorkspaceId, FN, CMParentFolderModel);
+                CMParentFolderModel.Children.Add(CurrdNode);
+     
+                //Position the view to the newly created node and cleanup
+                CMParentFolderModel.IsExpanded = true;
+                CurrdNode.IsSelected = true;
+
+                if(CMParentFolderModel.ID != 0) //if father isn't root
+                    CMContentManagementViewModel.folders[(int)CMParentFolderModel.ID].Nodes.Add(FN);
+                CMContentManagementViewModel.folders.Add(FN.ID, FN);
+
+                // Update permission
+                CurrdNode.TreeNode.ParentID = (int)CMParentFolderModel.ID;
+                ((CMFolderModel)(CurrdNode.TreeNode)).UserGroupTypePermission = CMFolder.UserGroupTypePermission;
+                CMContentManagementViewModel.UpdatePermissionAddNode(CMParentFolderModel, CurrdNode);
+                CurrdNode.UserGroupUpdatePermission = CMParentFolderModel.UserGroupUpdatePermission;               
+                MessageMediator.NotifyColleagues(this.WorkspaceId + "ShowAndUpdateFolderDetails", CurrdNode); //Will be returned to the CM Main signed for this message
+
+                StatusBarParameters.Clear();
+                StatusBarParameters.Add("Data Saved Successfully"); //Message
+                StatusBarParameters.Add("White"); //Foreground
+                StatusBarParameters.Add("Green"); //Background
+                MessageMediator.NotifyColleagues("StatusBarParameters", StatusBarParameters); //Send message to the MainViewModel 
+            }
+
+            #endregion
+
+            #region display Error Message
+
+            private void displayErrorMessage()
+            {
+                //Work variables
+                Collection<string> StatusBarParameters = new Collection<string>();
+                List<String> parameters = new List<string>();
+                String errorId = "Folder deleted";
+                string displayMessage;
+                var SB = new StringBuilder(string.Empty);
+
+                SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + errorId + "';");
+                MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                parameters.Clear();
+                parameters.Add(Node.Name);
+                object[] ArgMessageParam = { parameters[0] };
+                displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+                CMContentManagementViewModel.ShowErrorAndInfoMessage(errorId, ArgMessageParam);
+                MessageMediator.NotifyColleagues(WorkspaceId + "RefreshTree", this); //Will be returned to the MainWindow signed for this message
+
+                throw new TraceException("Folder deleted", null, "Content manager");
+            }
+
+            #endregion
+
+        #endregion
+    }
+
+} //end of root namespace

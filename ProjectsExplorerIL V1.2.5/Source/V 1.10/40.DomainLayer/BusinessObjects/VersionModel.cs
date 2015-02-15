@@ -1,0 +1,259 @@
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Data;
+using Infra.Domain;
+namespace ATSBusinessObjects
+{
+
+    [Serializable(), Table(TableName = "PE_Version")]
+    public class VersionModel : BusinessObjectBase
+    {
+        #region  State Properties
+
+
+
+        private long _VersionId = -1;
+        [Column(ColName = "VersionId", DbType = DbType.Int32, IsPK = true)]
+        public long VersionId
+        {
+            get
+            {
+                return _VersionId;
+            }
+            set
+            {
+                _VersionId = value;
+            }
+        }
+
+        private long _HierarchyId = -1;
+        [Column(ColName = "HierarchyId", DbType = DbType.Int32)]
+        public long HierarchyId
+        {
+            get
+            {
+                return _HierarchyId;
+            }
+            set
+            {
+                _HierarchyId = value;
+            }
+        }
+
+        private string _VersionName = "New Version";
+        [Column(ColName = "VersionName", DbType = DbType.String)]
+        public String VersionName
+        {
+            get
+            {
+                return _VersionName;
+            }
+            set
+            {
+                _VersionName = value.Trim();
+
+            }
+        }
+
+
+
+
+        private int _VersionSeqNo = 10;
+        [Column(ColName = "VersionSeqNo", DbType = DbType.Int16)]
+        public int Sequence
+        {
+            get
+            {
+                return _VersionSeqNo;
+            }
+            set
+            {
+                _VersionSeqNo = value;
+            }
+        }
+
+
+
+        private string _Description = "New Version";
+        [Column(ColName = "Description", DbType = DbType.String)]
+        public string Description
+        {
+            get
+            {
+                return _Description;
+            }
+            set
+            {
+                _Description = value.Trim();
+            }
+        }
+
+        private string _TargetPath = " " ;
+        [Column(ColName = "TargetPath", DbType = DbType.String)]
+        public string TargetPath
+        {
+            get
+            {
+                return _TargetPath;
+            }
+            set
+            {
+                _TargetPath = value;
+            }
+        }
+
+        private string _VersionStatus = "" ;
+        [Column(ColName = "VersionStatus", DbType = DbType.String)]
+        public string VersionStatus
+        {
+            get
+            {
+                return _VersionStatus;
+            }
+            set
+            {
+                _VersionStatus = value;
+            }
+        }
+
+        private DateTime _CreationDate;
+        [Column(ColName = "CreationDate", DbType = DbType.DateTime)]
+        public DateTime CreationDate
+        {
+            get
+            {
+                return _CreationDate;
+            }
+            set
+            {
+                _CreationDate = value;
+            }
+        }
+
+        private DateTime _LastUpdateTime;
+        [Column(ColName = "LastUpdateTime", DbType = DbType.DateTime)]
+        public DateTime LastUpdateTime
+        {
+            get
+            {
+                return _LastUpdateTime;
+            }
+            set
+            {
+                _LastUpdateTime = value;
+            }
+        }
+
+        private string _LastUpdateUser = "";
+        [Column(ColName = "LastUpdateUser", DbType = DbType.String)]
+        public string LastUpdateUser
+        {
+            get
+            {
+                return _LastUpdateUser;
+            }
+            set
+            {
+                _LastUpdateUser = value;
+            }
+        }
+
+        private string _LastUpdateComputer = "";
+        [Column(ColName = "LastUpdateComputer", DbType = DbType.String)]
+        public string LastUpdateComputer
+        {
+            get
+            {
+                return _LastUpdateComputer;
+            }
+            set
+            {
+                _LastUpdateComputer = value;
+            }
+        }
+
+        private string _LastUpdateApplication = "";
+        [Column(ColName = "LastUpdateApplication", DbType = DbType.String)]
+        public string LastUpdateApplication
+        {
+            get
+            {
+                return _LastUpdateApplication;
+            }
+            set
+            {
+                _LastUpdateApplication = value;
+            }
+        }
+
+
+        private Boolean _DefaultTargetPathInd = true;
+        [Column(ColName = "DefaultTargetPathInd", DbType = DbType.Boolean)]
+        public Boolean DefaultTargetPathInd
+        {
+            get
+            {
+                return _DefaultTargetPathInd;
+            }
+            set
+            {
+                _DefaultTargetPathInd = value;
+            }
+        }
+
+
+        private ObservableCollection<ContentModel> _Contents = new ObservableCollection<ContentModel>();
+        public ObservableCollection<ContentModel> Contents
+        {
+            get
+            {
+                return _Contents;
+            }
+            set
+            {
+                _Contents = value;
+            }
+        }
+
+
+        private Boolean _IsClosed = false;
+        public Boolean IsClosed
+        {
+            get
+            {
+                return _IsClosed;
+            }
+            set
+            {
+                _IsClosed = value;
+            }
+        }
+
+        private string _EcrId = "";
+        [Column(ColName = "ECRId", DbType = DbType.String)]
+        public String EcrId
+        {
+            get
+            {
+                return _EcrId;
+            }
+            set
+            {
+                _EcrId = value.Trim();
+
+            }
+        }
+
+        #endregion State Properties
+
+        #region  Constructor
+
+        public VersionModel()
+        {
+        }
+
+        #endregion
+    }
+}// end of namespace ATSBusinessObjects
+
+

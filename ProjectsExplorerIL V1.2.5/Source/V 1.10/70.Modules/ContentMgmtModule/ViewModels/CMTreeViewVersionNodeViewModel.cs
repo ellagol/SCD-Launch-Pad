@@ -1,0 +1,244 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
+using System.Windows.Documents;
+using System.Windows.Input;
+using ATSBusinessLogic.ContentMgmtBLL;
+using ATSBusinessObjects.ContentMgmtModels;
+using ATSDomain;
+using Infra.MVVM;
+using TraceExceptionWrapper;
+
+namespace ContentMgmtModule
+{
+    public class CMTreeViewVersionNodeViewModel : CMTreeViewNodeViewModelBase
+    {
+
+        #region  Data
+
+        private IMessageBoxService MsgBoxService = null;
+
+        #endregion
+
+        #region Constructor
+
+        public CMTreeViewVersionNodeViewModel(Guid workspaceId, CMTreeNode TN)
+            : this(workspaceId, TN, null)
+        {
+            this.ID = ((CMVersionModel)(TN)).Id;
+            this.TreeNode.TreeNodeType = ATSBusinessObjects.ContentMgmtModels.TreeNodeObjectType.ContentVersion;
+        }
+
+        public CMTreeViewVersionNodeViewModel(Guid workspaceId, CMTreeNode TN, CMTreeViewNodeViewModelBase ParentNode)
+            : base(workspaceId, TN, ParentNode)
+        {
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //The messageMediator is registered in the ViewModelBase - Generally you have 1 mediator; Hence, the restricted access to the constructor
+            MessageMediator = GetService<MessengerService>();
+            this.TreeNode.TreeNodeType = ATSBusinessObjects.ContentMgmtModels.TreeNodeObjectType.ContentVersion;
+
+            ((CMVersionModel)(this.TreeNode)).id_ContentVersionStatus = ((ATSBusinessObjects.ContentMgmtModels.CMVersionModel)(TN)).id_ContentVersionStatus;
+            
+            //Performance#6 - uncomment to reverse
+            //this.IsDelete = CMVersionBLL.CheckIfThereAreLinkedVesrionsToVersion(TN.ID); //check if there linked versions to this version for "Delete" view content menu
+            if (!CMContentsReaderBLL.listOfUsedContentVersionsPE.Contains(TN.ID) && !CMContentsReaderBLL.listOfUsedContentVersionsCM.Contains(TN.ID))
+            {
+                this.IsDelete = true;
+            }
+            else
+            {
+                this.IsDelete = false;
+            }
+            //end #6
+        }
+
+        #endregion
+
+        #region Node Data
+
+        public override string NodeData
+        {
+            get
+            {
+                return this.Name; //Here you can place any content you want to see in the Tree for this node...
+            }
+        }
+
+        #endregion
+
+        #region Other Methods
+
+        public override void Refresh()
+        {
+            this.Children.Clear();
+            this.LoadChildren();
+            RaisePropertyChanged("NodeData");
+        }
+
+        public override void LoadChildren()
+        {
+        }
+
+        //Sends a message to the MainWindow with the required information to display a details view of the currently selected node
+        protected override void DisplayDetailsView()
+        {
+            MessageMediator.NotifyColleagues(WorkSpaceId + "ShowAndUpdateVersionDetails", this); //Will be returned to the Explorer Main signed for this message
+        }
+
+        #endregion
+
+        #region  Context Menu Commands (Specific to this Node Type; others appear in the Base Class)
+
+            #region  Delete Version Command
+
+            private RelayCommand _DeleteVersionCommand;
+            public ICommand DeleteVersionCommand
+            {
+                get
+                {
+                    if (_DeleteVersionCommand == null)
+                    {
+                        _DeleteVersionCommand = new RelayCommand(ExecuteDeleteVersionCommand, CanExecuteDeleteVersionCommand);
+                    }
+                    return _DeleteVersionCommand;
+                }
+            }
+
+            private bool CanExecuteDeleteVersionCommand()
+            {
+                return true;
+            }
+
+            private void ExecuteDeleteVersionCommand()
+            {
+                /* to check alon */
+                //Dirty
+
+                if (this.IsSelectedDirtyNode != null)
+                {
+                    if (MsgBoxService.ShowOkCancel(ATSBusinessLogic.HierarchyBLL.GetMessage(), DialogIcons.Question) == DialogResults.Cancel) {
+                        return;
+                    }
+                    //if ok clicked , and "yes" to delete , Dirty set to false
+                }
+                List<String> parameters = new List<string>();
+                var SB = new StringBuilder(string.Empty);
+                String errorId = "Delete";
+
+                SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + errorId + "';");
+
+                MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                string displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                parameters.Add("Version");
+                parameters.Add(this.TreeNode.Name);
+                displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+
+                if (MsgBoxService.ShowYesNo(displayMessage, DialogIcons.Question) == DialogResults.Yes)
+                {
+                    try
+                    {
+                        object[] ArgMessageParam = { parameters[0], parameters[1] };
+                        ((CMVersionModel)(this.TreeNode)).Id = this.TreeNode.ID;
+                        CMContentManagementViewModel.cmImp.Logon();
+
+                        CMVersionBLL.SelectContentVersion((CMVersionModel)this.TreeNode);
+                        CMVersionBLL.DeleteVersion(this.TreeNode.ID);
+						
+                        CMContentManagementViewModel.cmImp.Dispose();
+                        MessageMediator.NotifyColleagues(WorkSpaceId + "DeleteNode", this); //Will be returned to the MainWindow signed for this message, to remove the node from the TreeView
+                        CMContentManagementViewModel.ShowErrorAndInfoMessage(errorId, ArgMessageParam);
+                        // Update permission
+                        List<CMTreeNode> treeNodesList = CMVersionBLL.GetChangedLinkedVersion(((CMVersionModel)(this.TreeNode)));
+                        // Update permission
+                        CMContentManagementViewModel.UpdatePermissionDeleteNode(this.Parent);
+                        //CMContentManagementViewModel.UpdatePermissionTreeNodeList(treeNodesList);
+                        MessageMediator.NotifyColleagues(this.WorkSpaceId + "OnIsDirtyNodeReceived", null);
+                    }
+                    catch (TraceException te)
+                    {
+                        String logMessage = te.Message + "\n" + "Source: " + te.Source + "\n" + te.StackTrace;
+                        Domain.SaveGeneralErrorLog(logMessage);
+                        SB.Clear();
+                        SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + te.ApplicationErrorID + "';");
+                        MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                        displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                        parameters.Clear();
+                        parameters.Add(this.TreeNode.Name);
+                        displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+
+                        object[] ArgMessageParam = null;
+                        if (te.ApplicationErrorID == "Version changed")
+                        {
+                            //parameters.Add(((CMVersionModel)(this.TreeNode)).LastUpdateUser);
+                            parameters.Add(te.Parameters[1]);
+                            object[] tempArgMessageParam = { parameters[0], parameters[1] };
+                            ArgMessageParam = tempArgMessageParam;
+                        }
+                        else if (te.ApplicationErrorID == "Version deleted")
+                        {
+                            object[] tempArgMessageParam = { parameters[0] };
+                            ArgMessageParam = tempArgMessageParam;
+                        }
+                        else if (te.ApplicationErrorID == "Version linked deleted")
+                        {
+                            parameters.Clear();
+                            parameters.Add(te.Parameters[0]);
+                            parameters.Add(te.Parameters[1]);
+                            object[] tempArgMessageParam = { parameters[0], parameters[1] };
+                            ArgMessageParam = tempArgMessageParam;
+                        }
+
+                        CMContentManagementViewModel.ShowErrorAndInfoMessage(te.ApplicationErrorID, ArgMessageParam);
+                        MessageMediator.NotifyColleagues(WorkSpaceId + "RefreshTree", this); //Will be returned to the MainWindow signed for this message
+
+                    }
+                }
+                MessageMediator.NotifyColleagues(this.WorkSpaceId + "ShowAndUpdateContentDetails", this.Parent); //Will be returned to the CM Main signed for this message
+            }
+
+            #endregion
+
+            #region  Where Used Command
+
+            private RelayCommand _WhereUsedCommand;
+            public ICommand WhereUsedCommand
+            {
+                get
+                {
+                    if (_WhereUsedCommand == null)
+                    {
+                        _WhereUsedCommand = new RelayCommand(ExecuteWhereUsedCommand, CanExecuteWhereUsedCommand);
+                    }
+                    return _WhereUsedCommand;
+                }
+            }
+
+            private bool CanExecuteWhereUsedCommand()
+            {
+                return true;
+            }
+
+            private void ExecuteWhereUsedCommand()
+            {
+                if(this.IsSelectedDirtyNode != null)
+                {
+                    if (MsgBoxService.ShowOkCancel(ATSBusinessLogic.HierarchyBLL.GetMessage(), DialogIcons.Question) == DialogResults.Cancel)
+                    {
+                        return;
+                    }
+                    else
+                    { //OK Clicked 
+                        MessageMediator.NotifyColleagues(this.WorkSpaceId + "OnIsDirtyNodeReceived", null);
+                    }
+                }
+                MessageMediator.NotifyColleagues(WorkSpaceId + "ShowWhereUsedDetails", this); //Will be returned to the MainWindow signed for this message, to remove the node from the TreeView
+            }
+
+            #endregion
+
+        #endregion
+  
+    }
+} 

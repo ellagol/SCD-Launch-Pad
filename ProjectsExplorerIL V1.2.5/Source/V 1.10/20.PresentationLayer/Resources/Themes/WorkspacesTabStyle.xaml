@@ -1,0 +1,282 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:ATSUI.CustomControls"
+                    xmlns:mvvm="clr-namespace:Infra.MVVM;assembly=Infra.MVVM"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+
+    <!--******** Stuff for the TabItemCloseButton ************-->
+    <sys:Double x:Key="CloseButtonWidthAndHeight">14</sys:Double>
+    <Geometry x:Key="X_CloseButton">M0,0 L10,10 M0,10 L10,0</Geometry>
+    
+    <SolidColorBrush x:Key="TabItemCloseButtonNormalForegroundBrush" Color="#4971A3"/>
+    <SolidColorBrush x:Key="TabItemCloseButtonHoverForegroundBrush" Color="White"/>
+    <SolidColorBrush x:Key="TabItemCloseButtonPressedForegroundBrush" Color="#EEEE"/>
+
+    <LinearGradientBrush x:Key="TabItemCloseButtonNormalBackgroundBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#5FFF" Offset="0.0"/>
+                <GradientStop Color="#5CCC" Offset="1.0"/>
+            </GradientStopCollection>
+        </GradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="TabItemCloseButtonNormalBorderBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#5CCC" Offset="0.0"/>
+                <GradientStop Color="#5444" Offset="1.0"/>
+            </GradientStopCollection>
+        </GradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="TabItemCloseButtonHoverBackgroundBrush" StartPoint="0,1" EndPoint="1,0">
+        <GradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#FFDF2B1E" Offset="0.0"/>
+                <GradientStop Color="#FFA41F00" Offset="1.0"/>
+            </GradientStopCollection>
+        </GradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="TabItemCloseButtonPressedBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#FFA41F00" Offset="0.0"/>
+                <GradientStop Color="#FFDF2B1E" Offset="1.0"/>
+            </GradientStopCollection>
+        </GradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="TabItemCloseButtonPressedBorderBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#5444" Offset="0.0"/>
+                <GradientStop Color="#5CCC" Offset="1.0"/>
+            </GradientStopCollection>
+        </GradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <Style x:Key="TabItemCloseButtonStyle" TargetType="{x:Type Button}">
+        <!-- 
+            The default value for SnapsToDevicePixels actually is False
+            (so this setter really wouldn't be required). However, I'm 
+            adding this nevertheless in order to explicitly point out that,
+            in this case, it is required (see below).
+         -->
+        <Setter Property="SnapsToDevicePixels" Value="False"/>
+        <Setter Property="Height" Value="{StaticResource CloseButtonWidthAndHeight}"/>
+        <Setter Property="Width" Value="{StaticResource CloseButtonWidthAndHeight}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="OverridesDefaultStyle" Value="true"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="ButtonBorder" CornerRadius="2" BorderThickness="1"
+                          Background="{StaticResource TabItemCloseButtonNormalBackgroundBrush}"
+                          BorderBrush="{StaticResource TabItemCloseButtonNormalBorderBrush}">
+                        <Grid>
+                            <!-- The Path below will render the button's X. -->
+                            <Path x:Name="ButtonPath" Margin="2" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Uniform"
+                              Data="{StaticResource X_CloseButton}"
+                              Stroke="{StaticResource TabItemCloseButtonNormalForegroundBrush}" 
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center"/>
+                            <!-- We don't really need the ContentPresenter, but what the heck ... -->
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource TabItemCloseButtonHoverBackgroundBrush}" />
+                            <Setter TargetName="ButtonPath" Property="Stroke" Value="{StaticResource TabItemCloseButtonHoverForegroundBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter TargetName="ButtonBorder" 
+                                Property="Background" Value="{StaticResource TabItemCloseButtonPressedBackgroundBrush}" />
+                            <Setter TargetName="ButtonBorder" 
+                                Property="BorderBrush" Value="{StaticResource TabItemCloseButtonPressedBorderBrush}" />
+                            <Setter TargetName="ButtonPath" Property="Stroke" 
+                                Value="{StaticResource TabItemCloseButtonPressedForegroundBrush}"/>
+                            <!-- 
+                           Simulate a pressed-effect by moving the contents down and to the right.
+                           Since the button is pretty small, the trick here is to only shift things
+                           just a tiny little bit, hence the fractional values below.
+                           Note that, in order for this to work as expected, SnapsToDevicePixels
+                           must be set to "false" (see the setter at the top of this style).
+                        -->
+                            <Setter TargetName="ButtonPath" Property="Margin" Value="2.5,2.5,1.5,1.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--******** <- Stuff for the TabItemCloseButton ************-->
+
+    <!--******** <- Stuff for the TabControl ************-->
+    <ControlTemplate x:Key="WorkspacesTabControl" TargetType="{x:Type controls:TabControlEx}">
+        <ControlTemplate.Resources>
+            <ToolTip x:Key="ThumbTooltip">
+                <Grid Background="{DynamicResource WorkspacesBackgroundBrush}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Row="0" Grid.Column="0" Source="{Binding Path=Thumb}" />
+                </Grid>
+            </ToolTip>
+            <Style TargetType="{x:Type TabItem}">
+                <!--<Setter Property="ToolTip" Value="{StaticResource ThumbTooltip}" />-->
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TabItem}">
+                            <Grid SnapsToDevicePixels="True">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup Name="CommonStates">
+                                        <VisualState Name="MouseOver">
+                                            <Storyboard>
+                                                <DoubleAnimation 
+                                                    Storyboard.TargetName="hoverShape" 
+                                                    Storyboard.TargetProperty="Opacity" 
+                                                    To="1" 
+                                                    Duration="0:0:.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState Name="Normal">
+                                            <Storyboard>
+                                                <DoubleAnimation 
+                                                    Storyboard.TargetName="hoverShape" 
+                                                    Storyboard.TargetProperty="Opacity" 
+                                                    To="0"
+                                                    Duration="0:0:.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup Name="SelectionStates">
+                                        <VisualState Name="Selected">
+                                            <Storyboard>
+                                                <DoubleAnimation 
+                                                    Storyboard.TargetName="buttonShape" Storyboard.TargetProperty="Opacity" 
+                                                    To="1" Duration="0:0:.3"/>
+                                                <DoubleAnimation 
+                                                    Storyboard.TargetName="buttonBackgroundShape" 
+                                                    Storyboard.TargetProperty="Opacity" To="1" Duration="0"/>
+                                                <DoubleAnimation 
+                                                    Storyboard.TargetName="hoverShape" Storyboard.TargetProperty="Opacity" 
+                                                    To="0" Duration="0:0:.1"/>
+                                                <ColorAnimation 
+                                                    Storyboard.TargetName="buttonText" 
+                                                    Storyboard.TargetProperty="(TextBlock.Foreground).Color" 
+                                                    To="White" Duration="0:0:.1" />
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState Name="Unselected">
+                                            <Storyboard>
+                                                <DoubleAnimation 
+                                                    Storyboard.TargetName="buttonShape" 
+                                                    Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:.1"/>
+                                                <DoubleAnimation 
+                                                    Storyboard.TargetName="buttonBackgroundShape" 
+                                                    Storyboard.TargetProperty="Opacity" To="0" Duration="0"/>
+                                                <DoubleAnimation 
+                                                    Storyboard.TargetName="hoverShape" 
+                                                    Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border Name="hoverShape" Height="40" Margin="0,0,0,0" SnapsToDevicePixels="True" BorderThickness="0" BorderBrush="LightGray">
+                                    <Border BorderBrush="#FFA1B7EA" BorderThickness="0" Background="{DynamicResource PopupBackgroundBrush}" Height="40" SnapsToDevicePixels="True" />
+                                </Border>
+                                <Rectangle Name="buttonBackgroundShape" Stretch="Fill" Opacity="0" Fill="{DynamicResource WorkspacesBackgroundBrush}" Height="40" SnapsToDevicePixels="True" />
+                                <Border Name="buttonShape" Opacity="0" BorderBrush="#FF0343A6" BorderThickness="0,2" Height="40" SnapsToDevicePixels="True">
+                                    <Path 
+                                        Data="M214,108 L346,108 346.125,118.125 337.75,126.125 346.375,134 346.375,143.875 214.25,144.25 z" 
+                                        SnapsToDevicePixels="True" Stretch="Fill" Height="40" Fill="{DynamicResource WindowBackgroundBrush}">
+                                        <!--<Path.Fill>
+                                            <RadialGradientBrush GradientOrigin="0.2,0.5" RadiusX="0.8" RadiusY="0.8">
+                                                <GradientStop Color="#FF5FA3F6" Offset="0" />
+                                                <GradientStop Color="#FF0C55B9" Offset="1" />
+                                            </RadialGradientBrush>
+                                        </Path.Fill>-->
+                                    </Path>
+                                </Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <!-- Text / TabItem's Caption -->
+                                        <ColumnDefinition Width="*"/>
+                                        <!-- Close button -->
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <ContentPresenter Grid.Column="0" x:Name="buttonText" Margin="15,0,0,0" TextBlock.FontFamily="Calibri" TextBlock.FontSize="12pt" 
+                                                      TextBlock.Foreground="{DynamicResource NormalTextForegroundBrush}" Content="{Binding Path=DisplayName}" VerticalAlignment="Center">
+                                    </ContentPresenter>    
+                                    <!--The below was replaced with the Content statement above-->
+                                    <!--Content="{TemplateBinding Header}"-->
+
+                                    <Button Grid.Column="1" x:Name="cmdTabItemCloseButton" Style="{DynamicResource TabItemCloseButtonStyle}" Command="{Binding Path=CloseWorkSpaceCommand}"
+                                            Margin="5,0,25,0"/>
+                                   <!--The below was excluded from the button above--> 
+                                   <!--CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabItem}}}"-->
+                                </Grid>
+                            </Grid>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="true">
+                                    <Setter TargetName="cmdTabItemCloseButton" Property="Visibility" Value="Visible"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="false">
+                                    <Setter TargetName="cmdTabItemCloseButton" Property="Visibility" Value="Hidden"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter TargetName="cmdTabItemCloseButton" Property="Visibility" Value="Visible"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="false">
+                                    <Setter TargetName="cmdTabItemCloseButton" Property="Visibility" Value="Hidden"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ControlTemplate.Resources>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{Binding Path=WorkspacesTabItemWidth}" />
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Border Background="{DynamicResource BackgroundBrush}" 
+                    Grid.Column="0" 
+                    BorderThickness="0,0,0,0" 
+                    SnapsToDevicePixels="True" >
+                <Border.BorderBrush>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0" Opacity="0.8">
+                        <GradientStop Offset="0" Color="Transparent" />
+                        <GradientStop Offset="1" Color="LightGray" />
+                    </LinearGradientBrush>
+                </Border.BorderBrush>
+            </Border>
+            <StackPanel IsItemsHost="True"
+                        Grid.Column="0"
+                        Margin="0,0,0,0" 
+                        SnapsToDevicePixels="True" />
+            <Grid x:Name="PART_SelectedContentHost" Grid.Column="1" Margin="0,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource WorkspacesBackgroundBrush}" >
+                <!--No Content Presenter-->
+            </Grid>
+            <!--The below was excluded, since we are using the TabControlEx control-->
+            <!--<ContentPresenter ContentSource="SelectedContent" Grid.Column="1" Margin="15,0,0,0" />-->
+        </Grid>
+    </ControlTemplate>
+
+</ResourceDictionary>
+    

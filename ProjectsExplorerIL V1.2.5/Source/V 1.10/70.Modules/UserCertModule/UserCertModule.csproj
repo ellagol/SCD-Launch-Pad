@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UserCertModule</RootNamespace>
+    <AssemblyName>UserCertModule</AssemblyName>
+    <OutputType>Library</OutputType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <MyType>Custom</MyType>
+    <ProjectGuid>{AE4420D2-8C42-4898-98E9-47BFBC159C72}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <IncrementalBuild>true</IncrementalBuild>
+    <OutputPath>..\..\..\..\Binaries\</OutputPath>
+    <DocumentationFile>UserCertModule.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <DefineConstants>TRACE</DefineConstants>
+    <IncrementalBuild>false</IncrementalBuild>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>ExplorerModule.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Infra.DAL.DataAccessServiceInterface">
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\DataAccessLayer\Infra.DAL.DataAccessServiceInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.Domain">
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\MVVM\Infra.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.DragDrop">
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\DragDrop\Infra.DragDrop.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.MVVM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\MVVM\Infra.MVVM.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="NavigationPane">
+      <HintPath>..\..\..\..\Dependencies\Bin\Controls\OutlookNavigationPane\NavigationPane.dll</HintPath>
+    </Reference>
+    <Reference Include="ResourcesProvider">
+      <HintPath>..\..\..\..\Dependencies\Bin\SCD\ResourcesProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="TaskDialog">
+      <HintPath>..\..\..\..\Dependencies\Bin\Controls\TaskDialogWrapper\TaskDialog.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows" />
+    <Import Include="System.Windows.Controls" />
+    <Import Include="System.Windows.Data" />
+    <Import Include="System.Windows.Documents" />
+    <Import Include="System.Windows.Input" />
+    <Import Include="System.Windows.Shapes" />
+    <Import Include="System.Windows.Media" />
+    <Import Include="System.Windows.Media.Imaging" />
+    <Import Include="System.Windows.Navigation" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ViewModels\CertificatesDetailsViewModel.cs" />
+    <Compile Include="ViewModels\ScrollIntoViewForListView.cs" />
+    <Compile Include="ViewModels\MouseBehaviours.cs" />
+    <Compile Include="ViewModels\UsersCertificatesViewModel.cs" />
+    <Compile Include="ViewModels\UsersDetailsViewModel.cs" />
+    <Compile Include="Views\CertificatesDetailsView.xaml.cs">
+      <DependentUpon>CertificatesDetailsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserDetailsView.xaml.cs">
+      <DependentUpon>UserDetailsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UsersCertificatesView.xaml.cs">
+      <DependentUpon>UsersCertificatesView.xaml</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicVbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Project.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Root.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Version.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Resources\Themes\MetroTabStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\CertificatesDetailsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserDetailsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UsersCertificatesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\40.DomainLayer\BusinessLogic\ATSBusinessLogic.csproj">
+      <Project>{C359B3F4-760E-45F0-AF1F-C5742DD4437D}</Project>
+      <Name>ATSBusinessLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\40.DomainLayer\BusinessObjects\ATSBusinessObjects.csproj">
+      <Project>{68F3D538-CDE9-40A6-8591-4B1B9D57978E}</Project>
+      <Name>ATSBusinessObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\40.DomainLayer\Domain\ATSDomain.csproj">
+      <Project>{4977DD22-0A82-45A2-B95C-8A59D763F743}</Project>
+      <Name>ATSDomain</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\Folder.png" />
+    <Resource Include="Resources\Icons\256x256\Version.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\Project.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Content.png" />
+    <Resource Include="Resources\Icons\32x32\ContentVersion.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\ProjectDis.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\VersionDis.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\groupClosed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\groupActive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\FolderSpecial.png" />
+    <Resource Include="Resources\Icons\32x32\groupActiveSpecial.png" />
+    <Resource Include="Resources\Icons\32x32\groupClosedSpecial.png" />
+    <Resource Include="Resources\Icons\32x32\ProjectDisSpecial.png" />
+    <Resource Include="Resources\Icons\32x32\ProjectSpecial.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

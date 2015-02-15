@@ -1,0 +1,662 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Reflection;
+using System.Text;
+using ATSBusinessLogic;
+using ATSBusinessObjects;
+using ATSDomain;
+using Infra.MVVM;
+
+
+namespace NotesModule
+{
+    public class NotesControlViewModel : ViewModelBase
+    {
+        #region Data
+
+        protected MessengerService MessageMediator = new MessengerService();
+        private IMessageBoxService MsgBoxService = null;
+
+        public long HierarchyId { get; set; }
+
+        public HierarchyModel initHM = new HierarchyModel();
+
+        public bool isNotCloneRelated { get; set; }
+
+        private Guid WorkspaceId;
+
+        public static string projectStatus;
+
+        private ObservableCollection<NotesModel> _Notes = new ObservableCollection<NotesModel>();
+        public ObservableCollection<NotesModel> Notes
+        {
+            get
+            {
+                return _Notes;
+            }
+            set
+            {
+                _Notes = value;
+                RaisePropertyChanged("Notes");
+            }
+        }
+
+        private List<KeyValuePair<string, string>> _NoteTypesList;
+        public List<KeyValuePair<string, string>> NoteTypesList
+        {
+            get
+            {
+                if (_NoteTypesList == null)
+                {
+                    _NoteTypesList = new List<KeyValuePair<string, string>>();
+                    foreach (NoteTypes NT in Enum.GetValues(typeof(NoteTypes)))
+                    {
+                        string Description;
+                        FieldInfo fieldInfo = NT.GetType().GetField(NT.ToString());
+                        DescriptionAttribute[] attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                        if (attributes != null && attributes.Length > 0)
+                        {
+                            Description = attributes[0].Description;
+                        }
+                        else
+                        {
+                            Description = NT.ToString();
+                        }
+                        KeyValuePair<string, string> TypeKeyValue = new KeyValuePair<string, string>(Description, NT.ToString());
+                        _NoteTypesList.Add(TypeKeyValue);
+                    }
+                }
+                return _NoteTypesList;
+            }
+        }
+
+        private bool _IsListVisible = true;
+        public bool IsListVisible
+        {
+            get
+            {
+                return _IsListVisible;
+            }
+            set
+            {
+                _IsListVisible = value;
+                RaisePropertyChanged("IsListVisible");
+                RaisePropertyChanged("IsEditVisible");
+            }
+        }
+
+        public bool IsEditVisible
+        {
+            get
+            {
+                return !_IsListVisible;
+            }
+        }
+
+        private NotesModel _CurrentNote = null;
+        private NotesModel CurrentNote
+        {
+            get
+            {
+                return _CurrentNote;
+            }
+            set
+            {
+                _CurrentNote = value;
+                RaisePropertyChanged("EditNoteTitle");
+                RaisePropertyChanged("EditNoteText");
+                RaisePropertyChanged("EditNoteType");
+                RaisePropertyChanged("EditSpecialInd");
+            }
+        }
+
+        #endregion
+
+        #region Constructor
+
+        public NotesControlViewModel(long id, string name, ref bool _isNotCloneRelated, ref bool _showNotesSideBar, Guid WsId)
+        {
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+
+            //Initialize fields
+            WorkspaceId = WsId;
+            HierarchyId = id;
+            initHM = HierarchyBLL.GetHierarchyRow(HierarchyId);
+
+            isNotCloneRelated = _isNotCloneRelated;
+            projectStatus = initHM.ProjectStatus;
+            Notes = ReadNotes(id);
+            _showNotesSideBar = ShowNotesSideBar();
+          
+            if (Notes == null)
+            {
+                Object[] ArgsList = new Object[] { 0 };
+                ShowErrorAndInfoMessage(105, ArgsList);
+            }
+        }
+
+        public NotesControlViewModel(long id, Guid WsId)
+        {
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+
+            //Initialize fields
+            WorkspaceId = WsId;
+            HierarchyId = id;
+
+            Notes = ReadNotes(id);
+
+            if (Notes == null)
+            {
+                Object[] ArgsList = new Object[] { 0 };
+                ShowErrorAndInfoMessage(105, ArgsList);
+            }
+        }
+
+        #endregion
+
+        #region Note Commands (within every ListView Item)
+
+        private RelayCommand<object> _EditNoteCommand;
+        public RelayCommand<object> EditNoteCommand
+        {
+            get
+            {
+                if (_EditNoteCommand == null)
+                {
+                    _EditNoteCommand = new RelayCommand<object>(ExecuteEditNoteCommand, CanExecuteEditNoteCommand);
+                }
+                return _EditNoteCommand;
+            }
+        }
+
+        private bool CanExecuteEditNoteCommand(object parameter)
+        {
+            //Verify that user is authorized to edit note
+            if (Domain.IsPermitted("111") || Domain.IsPermitted("999"))
+            {
+                if (isNotCloneRelated == true)
+                    return true;
+            }
+            return false;
+        }
+
+        private void ExecuteEditNoteCommand(object Param)
+        {
+            CurrentNote = (NotesModel)Param;
+            IsListVisible = false;
+        }
+
+        private RelayCommand<object> _EnDisNoteCommand;
+        public RelayCommand<object> EnDisNoteCommand
+        {
+            get
+            {
+                if (_EnDisNoteCommand == null)
+                {
+                    _EnDisNoteCommand = new RelayCommand<object>(ExecuteEnDisNoteCommand, CanExecuteEnDisNoteCommand);
+                }
+                return _EnDisNoteCommand;
+            }
+        }
+
+        private bool CanExecuteEnDisNoteCommand(object parameter)
+        {
+            //Verify that user is authorized to edit note
+            if (Domain.IsPermitted("105") || Domain.IsPermitted("999"))
+            {
+                if (isNotCloneRelated == true)
+                    return true;
+            }
+            return false;
+        }
+
+        private void ExecuteEnDisNoteCommand(object Param)
+        {
+            // Work variables
+            Collection<string> StatusBarParameters = new Collection<string>();
+
+            string Message = null;
+            CurrentNote = (NotesModel)Param;
+            int CurrentNoteIndex = Notes.IndexOf(CurrentNote);
+
+            if (CurrentNoteIndex > -1)
+            {
+                NotesModel n = CurrentNote;
+
+                var SB = new StringBuilder(string.Empty);
+                SB.Append("SELECT Description FROM PE_Messages where id=102;");
+                object messageObj = Domain.PersistenceLayer.FetchDataValue(SB.ToString(), System.Data.CommandType.Text, null);
+                if (messageObj != null)
+                {
+                    Message = messageObj.ToString();
+                }
+                if (n.NoteStatus == NoteStatusTypes.D)
+                {
+                    Message = Message.Replace("disable ", "enable ");
+                }
+                MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                if (MsgBoxService.ShowYesNo(Message, DialogIcons.Question) == DialogResults.Yes)
+                {
+                    long queryStatus = NoteBLL.EnableDisableNote(ref n);
+                    if (queryStatus < 1)
+                    {
+                        StatusBarParameters.Add("Error: " + n.NoteTitle + ". Failed to change Note status"); //Message
+                        StatusBarParameters.Add("White"); //Foreground
+                        StatusBarParameters.Add("Red"); //Background
+                        MessageMediator.NotifyColleagues("StatusBarParameters", StatusBarParameters); //Send message to the MainViewModel
+                    }
+                    else if (queryStatus == 104)
+                    {
+                        Object[] ArgsList = new Object[] { 0 };
+                        ShowErrorAndInfoMessage(104, ArgsList);
+                    }
+                    else
+                    {
+                        StatusBarParameters.Add("Note status changed"); //Message
+                        StatusBarParameters.Add("White"); //Foreground
+                        StatusBarParameters.Add("Green"); //Background
+                        MessageMediator.NotifyColleagues("StatusBarParameters", StatusBarParameters); //Send message to the MainViewModel
+                        Notes = ReadNotes(HierarchyId);
+                        RaisePropertyChanged("Notes");
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region  Add Note
+
+        private RelayCommand _AddNoteCommand;
+        public RelayCommand AddNoteCommand
+        {
+            get
+            {
+                if (_AddNoteCommand == null)
+                {
+                    _AddNoteCommand = new RelayCommand(ExecuteAddNoteCommand, CanExecuteAddNoteCommand);
+                }
+                return _AddNoteCommand;
+            }
+        }
+
+        private bool CanExecuteAddNoteCommand()
+        {
+            //Verify that user is authorized to add note
+            if (Domain.IsPermitted("110") || Domain.IsPermitted("999"))
+            {
+               
+                if (initHM.Id != -1)
+                {
+                    if (isNotCloneRelated == true && !projectStatus.Equals("Disabled"))
+                        return true;
+                }
+                else
+                    return false;
+            }
+            return false;
+        }
+
+        private void ExecuteAddNoteCommand()
+        {
+            CurrentNote = new NotesModel();
+            RaisePropertyChanged("EditNoteTitle"); //Reset DataErrorAdorner
+            RaisePropertyChanged("EditNoteText"); //Reset DataErrorAdorner
+            IsListVisible = false;
+        }
+
+        #endregion
+
+        #region Edit Note Window
+
+        #region Properties
+
+        [Required(ErrorMessage = "'Title' field is required."), StringLength(50, ErrorMessage = "Maximum length (50 characters) exceeded.")]
+        public string EditNoteTitle
+        {
+            get
+            {
+                if (CurrentNote != null)
+                {
+                    return CurrentNote.NoteTitle;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (CurrentNote != null)
+                {
+                    CurrentNote.NoteTitle = value;
+                    RaisePropertyChanged("EditNoteTitle");
+                }
+            }
+        }
+
+        public string EditNoteType
+        {
+            get
+            {
+                if (CurrentNote != null)
+                {
+                    return CurrentNote.NoteType.Trim();
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (CurrentNote != null)
+                {
+                    CurrentNote.NoteType = value;
+                    RaisePropertyChanged("EditNoteType");
+                }
+            }
+        }
+
+        public bool EditSpecialInd
+        {
+            get
+            {
+                if (CurrentNote != null)
+                {
+                    return CurrentNote.SpecialInd;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            set
+            {
+                if (CurrentNote != null)
+                {
+                    CurrentNote.SpecialInd = value;
+                    RaisePropertyChanged("EditSpecialInd");
+                }
+            }
+        }
+
+        [Required(ErrorMessage = "'Text' field is required."), StringLength(2000, ErrorMessage = "Maximum length (2000 characters) exceeded.")]
+        public string EditNoteText
+        {
+            get
+            {
+                if (CurrentNote != null)
+                {
+                    return CurrentNote.NoteText;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (CurrentNote != null)
+                {
+                    CurrentNote.NoteText = value;
+                    RaisePropertyChanged("EditNoteText");
+                }
+            }
+        }
+
+        #endregion
+
+        #region  Commands
+
+        private RelayCommand _CancelEditCommand;
+        public RelayCommand CancelEditCommand
+        {
+            get
+            {
+                if (_CancelEditCommand == null)
+                {
+                    _CancelEditCommand = new RelayCommand(ExecuteCancelEditCommand, CanExecuteCancelEditCommand);
+                }
+                return _CancelEditCommand;
+            }
+        }
+
+        private bool CanExecuteCancelEditCommand()
+        {
+            return true;
+        }
+
+        private void ExecuteCancelEditCommand()
+        {
+            IsListVisible = true;
+        }
+
+        private RelayCommand _SaveNoteCommand;
+        public RelayCommand SaveNoteCommand
+        {
+            get
+            {
+                if (_SaveNoteCommand == null)
+                {
+                    _SaveNoteCommand = new RelayCommand(ExecuteSaveNoteCommand, CanExecuteSaveNoteCommand);
+                }
+                return _SaveNoteCommand;
+            }
+        }
+
+        private bool CanExecuteSaveNoteCommand()
+        {
+            return IsValid;
+        }
+
+        private void ExecuteSaveNoteCommand()
+        {
+            // Work variables
+            Collection<string> StatusBarParameters = new Collection<string>();
+
+            long queryStatus;
+
+            NotesModel n;
+
+            if (CurrentNote.Id == -1) //Add new note
+            {
+                n = CurrentNote;
+                n.HierarchyId = HierarchyId;
+
+                queryStatus = NoteBLL.AddNewNote(ref n);
+
+            }
+            else //Update existing note
+            {
+                int I = Notes.IndexOf(CurrentNote);
+
+                n = Notes[I];
+
+                queryStatus = NoteBLL.SaveNoteChanges(ref n);
+            }
+
+            if (queryStatus < 1)
+            {
+                var SB = new StringBuilder(string.Empty);
+                SB.Append("SELECT Description FROM PE_Messages where id=105;");
+                MsgBoxService.ShowError(Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null).ToString());
+                StatusBarParameters.Add("Error: " + n.NoteTitle + ". Failed to save data"); //Message
+                StatusBarParameters.Add("White"); //Foreground
+                StatusBarParameters.Add("Red"); //Background
+                MessageMediator.NotifyColleagues("StatusBarParameters", StatusBarParameters); //Send message to the MainViewModel
+            }
+            else if (queryStatus == 104)
+            {     
+                Object[] ArgsList = new Object[] { 0 };
+                ShowErrorAndInfoMessage(104, ArgsList);         
+            }
+            else
+            {
+                StatusBarParameters.Add("Data Saved Successfully"); //Message
+                StatusBarParameters.Add("White"); //Foreground
+                StatusBarParameters.Add("Green"); //Background
+                MessageMediator.NotifyColleagues("StatusBarParameters", StatusBarParameters); //Send message to the MainViewModel
+                Notes = ReadNotes(HierarchyId);
+                RaisePropertyChanged("Notes");
+
+
+                //update the UI
+             
+                HierarchyModel hm = HierarchyBLL.GetHierarchyRow(HierarchyId);
+                if (hm.NodeType != NodeTypes.G)
+                {
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "UpdateNode", hm);
+                }
+            }
+
+            CurrentNote = null;
+            IsListVisible = true;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region  Other Methods
+
+        private ObservableCollection<NotesModel> ReadNotes(long HierarchyId)
+        {
+            return ATSBusinessLogic.NoteBLL.GetNotes(HierarchyId);
+        }
+
+        private bool ShowNotesSideBar()
+        {
+            foreach (NotesModel n in Notes)
+            {
+                if(n.NoteType.Trim() == "W" && n.NoteStatus == NoteStatusTypes.A)
+                    return false;               //don't minimize side bar
+            }
+            return true;
+        }
+
+        public static void UpdateProjectStatusFotes(string _projectStatus)
+        {
+            projectStatus = _projectStatus;
+        }
+
+        #endregion
+
+        #region Messages
+
+        //Status bar Error and Info messages
+        public static MessengerService MessageMediatorErrorAndInfo = ServiceProvider.GetService<MessengerService>();
+        public static void ShowErrorAndInfoMessage(int error, object[] Args)
+        {
+            try
+            {
+                Collection<string> StatusBarParameters = new Collection<string>();
+                string Query = "SELECT Description, Type FROM PE_Messages where id=" + error + ";";
+
+                // Fetch the row from the database (retrieving by PK --> 0 or 1 row)
+                DataRow MsgRow = (DataRow)Domain.PersistenceLayer.FetchDataTable(Query, CommandType.Text, null).Rows[0];
+
+                // Verify the message is found
+                if (!string.IsNullOrEmpty((string)MsgRow["Description"]))
+                {
+                    //Message verbiage with parameters, as retrieved from the table
+                    string MsgDescription = (string)MsgRow["Description"];
+
+                    // Arguments substitution, if any
+                    string MsgDescriptionWithParam = SetDescriptionParameters(MsgDescription, Args, error);
+
+                    // Verify message description was successfully formatted 
+
+                    // Message Type - consider defining enum for valid values
+                    string MsgType = (string)MsgRow["Type"];
+
+                    //Set background color based on message type
+                    switch (MsgType.Trim())
+                    {
+                        case "I":
+                            if (!MsgDescriptionWithParam.Equals(ErrorString))
+                            {
+                                StatusBarParameters = SetMessageDescriptionParam(MsgDescriptionWithParam, "White", "Green"); //Background for info messages
+                            }
+                            else
+                            {
+                                MsgDescription = MsgDescription + "(PE_Messages: Invalid number of parameters for Message Id " + error + ")";
+                                StatusBarParameters = SetMessageDescriptionParam(MsgDescription, "White", "Green"); //When PE_Messages record contains invalid number of parameters
+                            }
+                            break;
+                        case "E":
+                            if (!MsgDescriptionWithParam.Equals(ErrorString))
+                            {
+                                StatusBarParameters = SetMessageDescriptionParam(MsgDescriptionWithParam, "White", "Red"); //Background for error messages
+                            }
+                            else
+                            {
+                                MsgDescription = MsgDescription + "(PE_Messages: Invalid number of parameters for Message Id " + error + ")";
+                                StatusBarParameters = SetMessageDescriptionParam(MsgDescription, "White", "Red"); //When PE_Messages record contains invalid number of parameters
+                            }
+                            break;
+                        default:
+                            StatusBarParameters = SetMessageDescriptionParam(MsgDescription, "White", "Red"); //invalid type of message
+                            break;
+                    }
+                    MessageMediatorErrorAndInfo.NotifyColleagues("StatusBarParameters", StatusBarParameters);
+                }
+            }
+            catch (Exception)
+            {
+                ShowGenericErrorMessage(error); //If DB connection failed or no rows selected
+            }
+        }
+
+        //If DB connection failed or no rows selected
+        private static void ShowGenericErrorMessage(int MsgCode)
+        {
+            Collection<string> StatusBarParametersGenericError = new Collection<string>();
+
+            String ErrorMessageText = "Unable to retrieve error message " + MsgCode + ". Please see Data Access log file for more details: Shell->View Log."; //Message
+            StatusBarParametersGenericError = SetMessageDescriptionParam(ErrorMessageText, "White", "Red");
+            MessageMediatorErrorAndInfo.NotifyColleagues("StatusBarParameters", StatusBarParametersGenericError);
+        }
+
+
+        //To catch exception from String.Format function if occurs
+        private static string ErrorString = "ParamError";
+        private static string SetDescriptionParameters(string MessageDescription, object[] ArgList, int MsgCode)
+        {
+            try
+            {
+                string MsgDescriptionWithParam = String.Format(MessageDescription, ArgList);
+
+                return MsgDescriptionWithParam;
+            }
+            catch (Exception)
+            {
+                return ErrorString;
+            }
+        }
+
+        // Set status bar parameters
+        private static Collection<String> SetMessageDescriptionParam(String MessageText, String FgColor, String BgColor)
+        {
+            Collection<string> StatusBarParametersAdd = new Collection<string>();
+
+            StatusBarParametersAdd.Add(MessageText); //Message
+            StatusBarParametersAdd.Add(FgColor); //Foreground
+            StatusBarParametersAdd.Add(BgColor); //Background 
+
+            return StatusBarParametersAdd;
+        }
+
+        #endregion
+    }
+}

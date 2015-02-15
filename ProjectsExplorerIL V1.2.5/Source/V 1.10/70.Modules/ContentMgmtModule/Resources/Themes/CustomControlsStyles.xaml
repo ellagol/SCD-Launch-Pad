@@ -1,0 +1,81 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:ContentMgmtModule">
+
+
+    <!--Horizontal Separator-->
+    <Style x:Key="HorizontalSeparatorStyle" TargetType="{x:Type Separator}">
+        <Setter Property="Background" Value="#7F919191" />
+        <Setter Property="Margin" Value="0,15,0,0" />
+        <Setter Property="Focusable" Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Separator}">
+                    <Grid x:Name="HorizontalTemplate" Height="2" VerticalAlignment="Stretch" SnapsToDevicePixels="True">
+                        <Rectangle Height="1" VerticalAlignment="Top">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Offset="0" Color="#10000000" />
+                                    <GradientStop Offset="0.05" Color="#80000000" />
+                                    <GradientStop Offset="0.95" Color="#80000000" />
+                                    <GradientStop Offset="1" Color="#10000000" />
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <Rectangle Height="1" Margin="0,1,0,0">
+                            <Rectangle.Fill>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Offset="0" Color="#10FFFFFF" />
+                                    <GradientStop Offset="0.05" Color="#50FFFFFF" />
+                                    <GradientStop Offset="0.95" Color="#50FFFFFF" />
+                                    <GradientStop Offset="1" Color="#10FFFFFF" />
+                                </LinearGradientBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Workspaces Style -->
+    <Style x:Key="WorkspaceStyle" TargetType="UserControl">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+
+    <!-- Workspaces Stackpanel with Action Buttons -->
+    <Style x:Key="WorkspaceActionsStackPanelStyle" TargetType="StackPanel">
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Margin" Value="0,10,15,0" />
+        <Setter Property="Grid.Row" Value="2" />
+    </Style>
+
+    <!-- Workspaces Title -->
+    <Style x:Key="WorkspaceTitleStyle" TargetType="Label">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!-- Workspaces Labels -->
+    <Style x:Key="WorkspaceLabelsStyle" TargetType="Label">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Foreground" Value="Black" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+
+</ResourceDictionary>

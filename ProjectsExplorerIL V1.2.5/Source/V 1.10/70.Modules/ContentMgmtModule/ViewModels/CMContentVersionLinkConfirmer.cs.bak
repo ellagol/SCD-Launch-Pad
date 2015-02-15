@@ -1,0 +1,102 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ATSBusinessObjects.ContentMgmtModels;
+using TraceExceptionWrapper;
+using ATSBusinessLogic.ContentMgmtBLL;
+
+namespace ContentMgmtModule
+{
+    public class CMContentVersionLinkConfirmer
+    {
+        #region Properties
+
+        private Dictionary<int, List<int>> VersionLinksToConfirm { get; set; }
+        private Dictionary<int, List<CMVersionKey>> ContentVersionLinks { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        public void ConfirmerContentVersion(CMVersionModel version)
+        {
+
+            ContentVersionLinks = (new CMContentsReaderBLL()).GetContentVersionLinksWithLock(); // Link to content
+
+            foreach (KeyValuePair<int, List<CMVersionKey>> contentVersionLink in ContentVersionLinks)
+            {
+                foreach (CMVersionKey versionKey in contentVersionLink.Value)
+                {
+                    if (versionKey.VersionID == version.Id)
+                        versionKey.ContentID = version.ParentID;
+                }
+            }
+
+            if (version.Id != 0)
+                ContentVersionLinks.Remove((int)version.Id);
+
+            List<CMVersionKey> newVersionLinks = new List<CMVersionKey>();
+
+            foreach (KeyValuePair<int, CMContentVersionSubVersionModel> versionLink in version.ContentVersions)
+            {
+                if (newVersionLinks.Any(versionKey => versionKey.ContentID == versionLink.Value.ContentSubVersion.ParentID))
+                    throw new Exception();
+
+                newVersionLinks.Add(new CMVersionKey() { ContentID = (int)versionLink.Value.ContentSubVersion.ParentID, VersionID = (int)versionLink.Value.ContentSubVersion.ID });
+            }
+
+            ContentVersionLinks.Add((int)version.Id, newVersionLinks);
+            ConfirmerContentVersionsList(version);
+        }
+
+        private void ConfirmerContentVersionsList(CMVersionModel updatedVersion)
+        {
+            VersionLinksToConfirm = new Dictionary<int, List<int>>();
+            AddVersionToConfirm(updatedVersion.ParentID, (int)updatedVersion.Id, updatedVersion);
+
+            foreach (KeyValuePair<int, List<int>> versionToConfirm in VersionLinksToConfirm)
+                ConfirmVersionLinks(versionToConfirm.Key, ContentVersionLinks[versionToConfirm.Key]);
+        }
+
+
+        private void ConfirmVersionLinks(int versionToConfirm, List<CMVersionKey> versionsToAdd)
+        {
+            foreach (CMVersionKey versionKey in versionsToAdd)
+            {
+                if (VersionLinksToConfirm[versionToConfirm].Contains(versionKey.ContentID))
+                    throw new TraceException("Vresion Link loop", true, new List<string>() { CMVersionBLL.GetVersionName(versionToConfirm), CMContentBLL.GetContentName(versionKey.ContentID) }, "Content manager");
+
+                VersionLinksToConfirm[versionToConfirm].Add(versionKey.ContentID);
+
+                if (ContentVersionLinks.ContainsKey(versionKey.VersionID))
+                    ConfirmVersionLinks(versionToConfirm, ContentVersionLinks[versionKey.VersionID]);
+            }
+        }
+
+        private void AddVersionToConfirm(int contentID, int newVersionID, CMVersionModel updatedVersion)
+        {
+
+            if (VersionLinksToConfirm.ContainsKey(newVersionID))
+                return;
+
+            VersionLinksToConfirm.Add(newVersionID, new List<int>() { contentID });
+
+            foreach (KeyValuePair<int, List<CMVersionKey>> versionUseBy in ContentVersionLinks)
+            {
+                foreach (CMVersionKey versionKey in versionUseBy.Value)
+                {
+                    if (versionKey.VersionID == newVersionID)
+                    {
+                        if (versionUseBy.Key == newVersionID)
+                            AddVersionToConfirm(updatedVersion.ParentID, versionUseBy.Key, updatedVersion);
+                        else
+                            AddVersionToConfirm(CMVersionBLL.GetContentIdByVersionId(versionUseBy.Key), versionUseBy.Key, updatedVersion);
+                    }
+                }
+            }
+        }
+
+        #endregion
+    }
+}

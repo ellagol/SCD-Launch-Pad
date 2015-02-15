@@ -1,0 +1,36 @@
+﻿Eli ToDo:
+---------
+(v)	Code reviews (Guy; Rotem; Alon).
+(v) DAL Log Viewer.
+(v) Bugs.
+(v) Control of ExpandersList (to be used for Notes).
+(v) Right Flyout: Width; Colors for CM and Certificates; Scrollbars on the TreeView of CM.
+(*) MVVM Folder Dialog + Service in Infra.
+(*) D&D CM to Folder; placeholder for Db update.
+(*) D&D Certificates to Folder; placeholder for Db update.
+    (*) http://stackoverflow.com/questions/10744741/how-to-do-drag-and-drop-in-wpf-in-my-metro-style-app
+	(*) http://www.wpftutorial.net/DragAndDrop.html 
+(*) Search phase 2: Project Code; Notes; ContentName.
+(*) Activate Content.
+(*) Proposal for logging & display: Log only locally (done); Button to view log (done); return message from DAL; full logger solution.
+
+
+Explorer
+--------
+(*) Main Tasks:
+    (*) Support for the new 'G' type? - for now, ignore these rows when loading the Hierarchy.
+(*) Minor Tasks:
+    (*) Open the Notes automatically if there are 'W' notes.
+    (*) 2nd Icon per node (to be displayed if there are special indicator notes). 	
+(*) Future:
+    (*) Support for sequencing nodes within parent. Context menu: Move Up \ Down within parent.
+    (*) Save\Restore user preference (WorkspacesTabItemsWidth; TreeViewWidth, InfoPaneWidth, etc.).
+    (*) Utilize Custom tree.
+(*) Remember:
+    (*) Inside VS, there is a command line with parameters for User, Environment, ConnString.
+    (*) Loading only Hierarchy & main information. Other tabs information (Certificates; Content; Notes; etc.)
+        is loaded per node once the cursor is moved to the node.
+(*) Open Issues:
+	(*) Not sure I understand how to display content inside a project; we will NOT do it like the DD Contents tab for a project.
+ 
+	

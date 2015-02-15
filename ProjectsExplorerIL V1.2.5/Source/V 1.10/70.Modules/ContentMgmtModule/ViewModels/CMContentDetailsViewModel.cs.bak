@@ -1,0 +1,812 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using Infra.MVVM;
+using ATSBusinessObjects;
+using ATSBusinessLogic.ContentMgmtBLL;
+using ATSBusinessLogic;
+using ATSBusinessObjects.ContentMgmtModels;
+using System.Collections.Specialized;
+using Infra.DragDrop;
+using System.Windows.Input;
+using ResourcesProvider;
+using System.Text;
+using System.Data;
+using ATSDomain;
+using System.Data.SqlClient;
+using System.Windows.Media.Imaging;
+using System.Linq;
+using System.Xml.Linq;
+using System.IO;
+using System.Windows;
+using System.Windows.Data;
+using System.Threading;
+using System.Reflection;
+using Microsoft.Win32;
+using TraceExceptionWrapper;
+
+
+namespace ContentMgmtModule
+{
+    public class CMContentDetailsViewModel : ViewModelBase
+    {
+        #region  Data
+
+        protected MessengerService MessageMediator = new MessengerService();
+
+        private IMessageBoxService MsgBoxService = null;
+
+        private Guid WorkspaceId;
+
+        public int tabIndex { get; set; }
+
+        public CMContentModel initCmContent = new CMContentModel();
+
+        public static CMImpersonationBLL imp = new CMImpersonationBLL();
+       
+        private CMContentModel _CMContent = null;
+        public CMContentModel CMContent
+        {
+            get
+            {
+                return _CMContent;
+            }
+            set
+            {
+                _CMContent = value;
+                RaisePropertyChanged("EditContentType");
+            }
+        }
+
+        private CMTreeViewNodeViewModelBase _CMParentContentModel;
+        public CMTreeViewNodeViewModelBase CMParentContentModel
+        {
+            get
+            {
+                return _CMParentContentModel;
+            }
+            set
+            {
+                _CMParentContentModel = value;
+            }
+        }
+
+        private List<KeyValuePair<string, string>> _ContentTypesList;
+        public List<KeyValuePair<string, string>> ContentTypesList
+        {
+            get
+            {
+                if (_ContentTypesList == null)
+                {
+                    _ContentTypesList = new List<KeyValuePair<string, string>>();
+                    List<KeyValuePair<string, string>> tempContentTypeList = new List<KeyValuePair<string, string>>();
+                    tempContentTypeList = CMContentBLL.GetContentTypeList();
+                    foreach (KeyValuePair<string, string> TypeKeyValue in tempContentTypeList)
+                    {
+                        KeyValuePair<string, string> tempTypeKeyValue = new KeyValuePair<string, string>(TypeKeyValue.Key.Trim(), TypeKeyValue.Value);
+                        _ContentTypesList.Add(tempTypeKeyValue);
+                    }
+                }
+                return _ContentTypesList;
+            }
+        }
+  
+        #endregion
+
+        #region Presentation Properties
+
+        private CMTreeViewNodeViewModelBase Node;
+
+        [Required(ErrorMessage = "'Name' field is required."), StringLength(200, ErrorMessage = "Maximum length (200 characters) exceeded.")]
+        public string ContentName
+        {
+            get
+            {
+                if (CMContent != null)
+                {
+
+                    return CMContent.Name;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (CMContent != null)
+                {
+                    CMContent.Name = value;
+                    RaisePropertyChanged("ContentName");
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", this.Node);
+                }
+            }
+        }
+     
+        [StringLength(1000, ErrorMessage = "Maximum length (1000 characters) exceeded.")]
+        public string ContentDescription
+        {
+            get
+            {
+                if (CMContent != null)
+                {
+                    return CMContent.Description;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (CMContent != null)
+                {
+                    CMContent.Description = value;
+                    RaisePropertyChanged("ContentDescription");
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", this.Node);
+                }
+            }
+        }
+
+        public bool CertificateFree
+        {
+            get
+            {
+                if (CMContent != null)
+                {
+                    return CMContent.CertificateFree;                   
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            set
+            {
+                if (CMContent != null)
+                {
+                    CMContent.CertificateFree = value;
+                    RaisePropertyChanged("CertificateFree");
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", this.Node);
+                }
+            }
+        }
+
+        public bool ECRId
+        {
+            get
+            {
+                if (CMContent != null)
+                {
+                    return CMContent.ECRId;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            set
+            {
+                if (CMContent != null)
+                {
+                    CMContent.ECRId = value;
+                    RaisePropertyChanged("ECRId");
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", this.Node);
+                }
+            }
+        }
+
+        public string EditContentType
+        {
+            get
+            {
+                if (CMContent != null)
+                {
+                    return CMContent.Id_ContentType.Trim();
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (CMContent != null)
+                {
+                    CMContent.Id_ContentType = value;
+                    RaisePropertyChanged("EditContentType");
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", this.Node);
+                }
+            }
+        }
+
+        [StringLength(1000, ErrorMessage = "Maximum length (1000 characters) exceeded.")]
+        public string TargetIconPath
+        {
+            get
+            {
+                if (CMContent != null)
+                {
+                    return CMContent.IconPath.Trim();
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (CMContent != null)
+                {
+                    CMContent.IconPath = value;               
+                    RaisePropertyChanged("TargetIconPath");
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", this.Node);
+                }
+            }
+        }
+
+        public string CreationDate
+        {
+            get
+            {
+                if (CMContent != null)
+                {
+                    if (CMContent.CreationDate == DateTime.MinValue)
+                    {
+                        return "";
+                    }
+                    else
+                    {
+                        return CMContent.CreationDate.ToString();
+                    }                
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+            }
+        }
+
+        public string LastUpdateTime
+        {
+            get
+            {
+                if (initCmContent.LastUpdateTime == DateTime.MinValue)
+                {
+                    return "";
+                }
+                else
+                {
+                    return initCmContent.LastUpdateTime.ToString();
+                }
+            }
+            set
+            {
+            }
+        }
+
+        public string LastUpdateUser
+        {
+            get
+            {
+                if (CMContent != null)
+                {
+                    return CMContent.LastUpdateUser;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+            }
+        }
+
+        private bool _ActionMode = false;
+        public bool ActionMode
+        {
+            get
+            {
+                return _ActionMode;
+            }
+            set
+            {
+                _ActionMode = value;
+                RaisePropertyChanged("ActionMode");
+            }
+        }
+
+        public bool UpdateMode
+        {
+            get
+            {
+                if (CMContent != null)
+                {
+                    return CMContent.UpdateMode;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            set
+            {
+                if (CMContent != null)
+                {
+                    CMContent.UpdateMode = value;
+                    RaisePropertyChanged("UpdateMode");
+                }
+            }
+        }
+
+        private String _ActionName = "";
+        public String ActionName
+        {
+            get
+            {
+                return _ActionName;
+            }
+            set
+            {
+                _ActionName = value;
+                RaisePropertyChanged("ActionName");
+            }
+        }
+
+        private bool _updateModeProperty;
+        public bool UpdateModeProperty
+        {
+            get
+            {
+                return _updateModeProperty;
+            }
+            set
+            {
+                _updateModeProperty = value;
+                RaisePropertyChanged("UpdateModeProperty");
+            }
+        }
+
+        #endregion
+
+        #region Constructor
+
+        public CMContentDetailsViewModel(Guid workspaceId, CMTreeViewNodeViewModelBase TV)
+        {
+            tabIndex = 0;
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+
+            //init workscpace
+            this.WorkspaceId = workspaceId;
+            //init content node
+            Node = TV;
+
+            initCmContent = CMContentBLL.GetContentRow(Node.ID);
+
+            if (initCmContent.Id == -1) //the content doesn't exists anymore
+            {
+                displayErrorMessage();
+            }
+
+            if (Node.IsView == true) //view action
+            {
+                ActionName = "";
+            }
+            else if (Node.IsUpdate) //update action
+            {
+                ActionName = "Update";
+                ActionMode = true;
+
+                //UpdateModeProperty = Node.IsUpdate && ((CMContentModel)(Node.TreeNode)).ExistPermission("UpdateProperty");
+                UpdateModeProperty = Node.IsUpdate;
+            }
+            else if (Node.ID == -1) //add action
+            {
+                ActionName = "Add";
+                Node.IsUpdate = true;
+                ActionMode = true;
+            }
+
+            //init content details
+            CMContent = new CMContentModel();
+            CMContent.Id = initCmContent.Id;
+            CMContent.Name = initCmContent.Name;
+            CMContent.Description = initCmContent.Description;
+            CMContent.IconPath = initCmContent.IconPath;
+            CMContent.UpdateMode = Node.IsUpdate;
+            CMContent.Id_ContentTree = Node.TreeNode.ParentID;
+            CMContent.Id_ContentTree = initCmContent.Id_ContentTree;
+            CMContent.Id_ContentType = initCmContent.Id_ContentType.Trim();
+            CMContent.ECRId = initCmContent.ECRId;
+
+            CMContent.LastUpdateUser = initCmContent.LastUpdateUser;
+            CMContent.CreationDate = initCmContent.CreationDate;
+            //CMContent.LastUpdateApplication = initCmFolder.LastUpdateApplication;
+            //CMContent.LastUpdateComputer = initCmFolder.LastUpdateComputer;
+            CMContent.LastUpdateTime = ((CMContentModel)(TV.TreeNode)).LastUpdateTime;
+
+            if (initCmContent.CertificateFree == true)
+            {
+                CMContent.CertificateFree = true;
+            }
+            else
+            {
+                CMContent.CertificateFree = false;
+            }
+
+            //ECRId;
+        }
+
+        public CMContentDetailsViewModel(Guid workspaceId, CMTreeViewNodeViewModelBase currTV, CMTreeViewNodeViewModelBase parentTV)
+        {
+            tabIndex = 0;
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+            //init workscpace
+            this.WorkspaceId = workspaceId;
+            //init folder details
+            Node = currTV;
+            //CMContent = new CMContentModel();
+            //CMContent.Id = Node.ID;
+            CMParentContentModel = parentTV;
+            initCmContent = CMContentBLL.GetContentRow(Node.ID);
+
+            //init content details
+            CMContent = new CMContentModel();
+            CMContent.Id = initCmContent.Id;
+            CMContent.Name = initCmContent.Name;
+            CMContent.Description = initCmContent.Description;
+            CMContent.IconPath = initCmContent.IconPath;
+            CMContent.UpdateMode = Node.IsUpdate;
+            CMContent.Id_ContentTree = parentTV.ID;
+            CMContent.Id_ContentType = initCmContent.Id_ContentType.Trim();
+            CMContent.ECRId = initCmContent.ECRId;
+
+            ActionName = "Add";
+            Node.IsUpdate = false;
+            Node.IsView = true;
+            ActionMode = true;
+            CMContent.UpdateMode = true;
+            UpdateModeProperty = true;
+
+            //Assign new content permissions
+            CMUpdatePermissionBLL upPer = new CMUpdatePermissionBLL();
+            upPer.GetContentPermission(Node.TreeNode);
+
+        }
+
+        #endregion
+
+        #region Commands
+
+            #region Browse Icon Content
+
+            private RelayCommand _BrowseIconContent;
+            public ICommand BrowseIconContent
+            {
+                get
+                {
+                    if (_BrowseIconContent == null)
+                    {
+                        _BrowseIconContent = new RelayCommand(ExecuteBrowseIconContent, CanExecuteBrowseIconContent);
+                    }
+                    return _BrowseIconContent;
+                }
+            }
+
+            private bool CanExecuteBrowseIconContent()
+            {
+                return true;
+            }
+
+            private void ExecuteBrowseIconContent()
+            {
+                var dialog = new OpenFileDialog();
+                if ((bool)dialog.ShowDialog())
+                    CMContent.IconPath = dialog.FileName;
+
+                RaisePropertyChanged("TargetIconPath");
+                MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", this.Node);
+            }
+
+            #endregion
+
+            #region  Cancel Command
+
+            private RelayCommand _CancelCommand;
+            public RelayCommand CancelCommand
+            {
+                get
+                {
+                    if (_CancelCommand == null)
+                    {
+                        _CancelCommand = new RelayCommand(ExecuteCancelCommand, CanExecuteCancelCommand);
+                    }
+                    return _CancelCommand;
+                }
+            }
+
+            private bool CanExecuteCancelCommand()
+            {
+                return true;
+            }
+
+            private void ExecuteCancelCommand()
+            {
+                //MessageMediator.NotifyColleagues(WorkspaceId + "CloseDetailsView", this); //Will be returned to the MainWindow signed for this message, to remove the node from the TreeView
+            }
+
+            #endregion
+
+            #region  Save Command
+
+            private RelayCommand _SaveCommand;
+            public RelayCommand SaveCommand
+            {
+                get
+                {
+                    if (_SaveCommand == null)
+                    {
+                        _SaveCommand = new RelayCommand(ExecuteSaveCommand, CanExecuteSaveCommand);
+                    }
+                    return _SaveCommand;
+                }
+            }
+
+            private bool CanExecuteSaveCommand()
+            {
+                if ((String.IsNullOrEmpty(ContentName) || ContentName.Length > 200 || ContentDescription.Length > 1000 || TargetIconPath.Length > 1000 || !IsValidImage(TargetIconPath)) || !((CMTreeViewContentNodeViewModel)(Node)).TreeNode.ExistPermission("Update"))
+                   return false;
+  
+                
+                return true;
+            }
+
+            private void ExecuteSaveCommand()
+            {
+                MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyNodeReceived", null);
+                //Work variables
+                Collection<string> StatusBarParameters = new Collection<string>();
+                List<String> parameters = new List<string>();
+                CMContentModel c;
+                var SB = new StringBuilder(string.Empty);
+                String errorId;
+                string displayMessage;
+
+                c = CMContent;
+
+                if (CMContent.Id == -1 && Node.IsUpdate == false) //Add new content
+                {                 
+                    if (CMContentBLL.CheckContentName(ref c).Equals("Adding existing content"))
+                    {
+                        errorId = "Adding existing content";
+                        SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + errorId + "';");
+                        MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                        displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                        parameters.Add(c.Name);
+                        displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+                        object[] ArgMessageParam = { parameters[0] };
+                        CMContentManagementViewModel.ShowErrorAndInfoMessage(errorId, ArgMessageParam);
+                    }
+                    else
+                    {
+                        CMContentBLL.AddContentIconOnFs(ref c, imp);
+                        try
+                        {
+                            CMContentBLL.AddNewContent(ref c);
+                            AddTreeNode();
+                        }
+                        catch (TraceException te)
+                        {
+                            String logMessage = te.Message + "\n" + "Source: " + te.Source + "\n" + te.StackTrace;
+                            Domain.SaveGeneralErrorLog(logMessage);
+                            SB.Clear();
+                            SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + te.ApplicationErrorID + "';");
+                            MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                            displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                            CMContentManagementViewModel.ShowErrorAndInfoMessage(te.ApplicationErrorID, null);
+                            MessageMediator.NotifyColleagues(WorkspaceId + "RefreshTree", this.CMParentContentModel); //Will be returned to the MainWindow signed for this message
+                        }
+   
+                    }    
+                }
+                else //Update content
+                {
+                    if (CMContentBLL.CheckExistingContentName(ref c).Equals("Update content name to existing"))
+                    {
+                        errorId = "Update content name to existing";
+                        SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + errorId + "';");
+                        MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                        displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                        parameters.Add(c.Name);
+                        displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+                        object[] ArgMessageParam = { parameters[0] };
+                        CMContentManagementViewModel.ShowErrorAndInfoMessage(errorId, ArgMessageParam);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            CMContentBLL.UpdateContentIconOnFs(ref c, ref initCmContent, imp);
+                            CMContentBLL.CompareUpdateTime(c.LastUpdateTime, c.Id);
+                            CMContentBLL.UpdateExistingContent(ref c);
+
+                            //CMContentBLL.PostUpdateContent(ref c, ref initCmContent);
+
+                            // Refresh the relevant TreeView node
+                            StatusBarParameters.Clear();
+                            MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                            Collection<object> MessageParameters = new Collection<object>();
+
+                            Node.Parent.ID = c.Id_ContentTree;
+                            Node.Name = c.Name;
+                            ((CMContentModel)(Node.TreeNode)).LastUpdateTime = c.LastUpdateTime;
+                            Node.Icon = new BitmapImage(new Uri((c.IconPath), UriKind.RelativeOrAbsolute)); //give node new icon path
+                            MessageParameters.Add(Node);
+                            MessageMediator.NotifyColleagues(this.WorkspaceId + "UpdateNode", MessageParameters); //Send message to the Explorer
+                            MessageMediator.NotifyColleagues(this.WorkspaceId + "ShowAndUpdateContentDetails", Node); //Will be returned to the CM Main signed for this message
+
+                            StatusBarParameters.Clear();
+                            StatusBarParameters.Add("Data Saved Successfully"); //Message
+                            StatusBarParameters.Add("White"); //Foreground
+                            StatusBarParameters.Add("Green"); //Background
+                            MessageMediator.NotifyColleagues("StatusBarParameters", StatusBarParameters); //Send message to the MainViewModel
+                        }
+                        catch (TraceException te)
+                        {
+                            String logMessage = te.Message + "\n" + "Source: " + te.Source + "\n" + te.StackTrace;
+                            Domain.SaveGeneralErrorLog(logMessage);
+                            SB.Clear();
+                            SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + te.ApplicationErrorID + "';");
+                            MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                            displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                            parameters.Clear();
+                            parameters.Add(c.Name);
+                            object[] ArgMessageParam = null;
+                            if (te.ApplicationErrorID == "Content changed")
+                            {
+                                parameters.Add(c.LastUpdateUser);
+                                object[] tempArgMessageParam = { parameters[0], parameters[1] };
+                                ArgMessageParam = tempArgMessageParam;
+                            }
+                            else if (te.ApplicationErrorID == "Content deleted")
+                            {
+                                object[] tempArgMessageParam = { parameters[0] };
+                                ArgMessageParam = tempArgMessageParam;
+                            }
+
+                            displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+
+                            CMContentManagementViewModel.ShowErrorAndInfoMessage(te.ApplicationErrorID, ArgMessageParam);
+                            MessageMediator.NotifyColleagues(WorkspaceId + "RefreshTree", this); //Will be returned to the MainWindow signed for this message
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+        #endregion
+
+        #region Methods
+
+            #region  Add Tree Node
+
+            private void AddTreeNode()
+            {
+                //Work variables
+                Collection<string> StatusBarParameters = new Collection<string>();
+                List<String> parameters = new List<string>();
+                CMTreeViewNodeViewModelBase CurrdNode = null;
+                CMContentModel CN = new CMContentModel();
+
+                CN.ID = (int)CMContent.Id;
+                CN.Name = CMContent.Name;
+                CN.Description = CMContent.Description;
+                CN.LastUpdateTime = CMContent.LastUpdateTime;
+                CN.CreationDate = CMContent.CreationDate;
+                CN.Id_ContentType = CMContent.Id_ContentType;
+                CN.IconPath = CMContent.IconPath;
+
+                if (CMContent.CertificateFree == true)
+                {
+                    CN.CertificateFree = true;
+                }
+                CN.Permission = new Dictionary<string, bool>();
+
+                CurrdNode = new CMTreeViewContentNodeViewModel(this.WorkspaceId, CN, CMParentContentModel);
+                CMParentContentModel.Children.Add(CurrdNode);
+
+                //Position the view to the newly created node and cleanup
+                CMParentContentModel.IsExpanded = true;
+                CurrdNode.IsSelected = true;
+
+                CMContentManagementViewModel.folders[(int)CMParentContentModel.ID].Nodes.Add(CN);
+                CMContentManagementViewModel.contents.Add(CN.ID, CN);
+
+                // Update permission
+                CurrdNode.TreeNode.ParentID = (int)CMParentContentModel.ID;            
+                CMContentManagementViewModel.UpdatePermissionAddNode(CMParentContentModel, CurrdNode);
+
+                MessageMediator.NotifyColleagues(this.WorkspaceId + "ShowAndUpdateContentDetails", CurrdNode); //Will be returned to the CM Main signed for this message
+
+                StatusBarParameters.Clear();
+                StatusBarParameters.Add("Data Saved Successfully"); //Message
+                StatusBarParameters.Add("White"); //Foreground
+                StatusBarParameters.Add("Green"); //Background
+                MessageMediator.NotifyColleagues("StatusBarParameters", StatusBarParameters); //Send message to the MainViewModel 
+            }
+
+            #endregion
+
+            #region display Error Message
+
+            private void displayErrorMessage()
+            {
+                //Work variables
+                Collection<string> StatusBarParameters = new Collection<string>();
+                List<String> parameters = new List<string>();
+                String errorId = "Content deleted";
+                string displayMessage;
+                var SB = new StringBuilder(string.Empty);
+
+                SB.Append("SELECT ED_Description FROM ErrorDescription where ED_ID='" + errorId + "';");
+                MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+                displayMessage = (Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null)).ToString();
+                parameters.Clear();
+                parameters.Add(Node.Name);
+                object[] ArgMessageParam = { parameters[0] };
+                displayMessage = CMContentManagementViewModel.UpdateMessageStringParameters(displayMessage, parameters);
+                CMContentManagementViewModel.ShowErrorAndInfoMessage(errorId, ArgMessageParam);
+                MessageMediator.NotifyColleagues(WorkspaceId + "RefreshTree", this); //Will be returned to the MainWindow signed for this message
+
+                throw new TraceException("Content deleted", null, "Content manager");
+            }
+
+            #endregion
+
+            #region Is Valid Image
+
+            private bool IsValidImage(String image)
+            {
+                if (image.ToString() == "")
+                    return true;
+
+                try
+                {
+                    BitmapImage bi = new BitmapImage(new Uri(image));
+                    //MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+
+                    if (!File.Exists(image))
+                    {
+                        CMContentManagementViewModel.ShowErrorAndInfoMessage("Invalid icon path", null);
+                        return false;
+                    }
+                    return true;
+                }
+                catch (Exception)
+                {
+                    CMContentManagementViewModel.ShowErrorAndInfoMessage("Incorrect icon file", null);                   
+                    return false;
+                }
+            }
+
+            #endregion
+
+        #endregion
+    }
+
+} //end of root namespace

@@ -1,0 +1,154 @@
+﻿using Infra.MVVM;
+using System.ComponentModel.DataAnnotations;
+
+namespace ExplorerModule
+{
+    public class PriorityPopupViewModel : ViewModelBase
+    {
+        #region  Data
+
+        private IMessageBoxService MsgBoxService = null;
+        private ITaskDialogService TaskDialogService = null;
+        private MessengerService MessageMediator = null;
+        private string ParentId;
+
+        #endregion
+
+        #region  Properties
+
+        private string _MessageText = "Set value:";
+        public string MessageText
+        {
+            get
+            {
+                return _MessageText;
+            }
+            set
+            {
+                _MessageText = value;
+                RaisePropertyChanged("MessageText");
+            }
+        }
+
+        private string _Seq;
+        
+        //[RegularExpression("[0-9]+", ErrorMessage = "Invalid characters entered."), StringLength(6, ErrorMessage = "Maximum length (6 characters) exceeded.")]
+        [ProjectInvalidName(ErrorMessage = "This field can contain only numbers bigger then zero")]
+        [StringLength(6, ErrorMessage = "Maximum length (6 characters) exceeded.")]
+        public string Seq
+        {
+            get
+            {
+                return _Seq;
+            }
+            set
+            {
+                _Seq = value;
+                RaisePropertyChanged("Seq");
+            }
+        }
+
+        #endregion
+
+        #region  Constructor
+
+        public PriorityPopupViewModel(string Parent)
+        {
+            ParentId = Parent;
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Task Dialog Service
+            TaskDialogService = GetService<ITaskDialogService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+        }
+
+        #endregion
+
+        #region  CloseOverlay Command
+
+        private RelayCommand _ClosePriorityPopupCommand;
+        public RelayCommand ClosePriorityPopupCommand
+        {
+            get
+            {
+                if (_ClosePriorityPopupCommand == null)
+                {
+                    _ClosePriorityPopupCommand = new RelayCommand(ExecuteClosePriorityPopupCommand, CanExecuteClosePriorityPopupCommand);
+                }
+                return _ClosePriorityPopupCommand;
+            }
+        }
+
+        private bool CanExecuteClosePriorityPopupCommand()
+        {
+            return true;
+        }
+
+        private void ExecuteClosePriorityPopupCommand()
+        {
+            MessageMediator.NotifyColleagues(this.ParentId+"OnRequestPriorityPopupCloseReceived" , string.Empty); //Will be returned to the NewTemplate
+        }
+
+        #endregion
+
+        #region Update Seqence Command
+
+        private RelayCommand _UpdateSeqCommand;
+        public RelayCommand UpdateSeqCommand
+        {
+            get
+            {
+                if (_UpdateSeqCommand == null)
+                {
+                    _UpdateSeqCommand = new RelayCommand(ExecuteUpdateSeqCommand, CanExecuteUpdateSeqCommand);
+                }
+                return _UpdateSeqCommand;
+            }
+        }
+
+        private bool CanExecuteUpdateSeqCommand()
+        {
+            if (IsValid)
+                return true;
+            else
+                return false;
+        }
+
+        private void ExecuteUpdateSeqCommand()
+        {
+            int seq;
+            int.TryParse(this.Seq ,out seq);
+            MessageMediator.NotifyColleagues(this.ParentId + "OnRequestUpdateSeqReceived", seq); //Will be returned to the NewTemplate
+        }
+
+        #endregion
+
+
+        #region Validation
+
+        public class ProjectInvalidNameAttribute : ValidationAttribute
+        {
+            public override bool IsValid(object value)
+            {
+                if (value == null || value == "")
+                {
+                    return false;
+                }
+                string val = value.ToString();
+                if (val[0] == '0') {
+                    return false;
+                }
+
+                for (int i = 0; i < val.Length; i++) {
+                    if (val[i] < '0' || val[i] > '9') { 
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        #endregion
+    }
+}

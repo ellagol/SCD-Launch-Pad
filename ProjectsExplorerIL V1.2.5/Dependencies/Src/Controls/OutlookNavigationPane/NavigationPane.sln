@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NavigationPane", "NavigationPane\NavigationPane.csproj", "{7A70C9D3-B928-4208-A1C6-7BE1245A1387}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 8
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs08
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = NavigationPane\\NavigationPane.Design\\NavigationPane.Design.csproj
+		SccProjectName1 = NavigationPane/NavigationPane.Design
+		SccLocalPath1 = NavigationPane\\NavigationPane.Design
+		SccProjectUniqueName2 = NavigationPane\\NavigationPane\u00203.5.csproj
+		SccProjectName2 = NavigationPane
+		SccLocalPath2 = NavigationPane
+		SccProjectUniqueName3 = InteroperabiltyTest\\TestWinFormsInteroperability.csproj
+		SccProjectName3 = InteroperabiltyTest
+		SccLocalPath3 = InteroperabiltyTest
+		SccProjectUniqueName4 = NavigationPane\\NavigationPane.csproj
+		SccProjectName4 = NavigationPane
+		SccLocalPath4 = NavigationPane
+		SccProjectUniqueName5 = NavigationPaneDemo\\NavigationPaneDemo.csproj
+		SccProjectName5 = NavigationPaneDemo
+		SccLocalPath5 = NavigationPaneDemo
+		SccProjectUniqueName6 = Test\\Test.csproj
+		SccProjectName6 = Test
+		SccLocalPath6 = Test
+		SccProjectUniqueName7 = MVVM\\MVVM.csproj
+		SccProjectName7 = MVVM
+		SccLocalPath7 = MVVM
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7A70C9D3-B928-4208-A1C6-7BE1245A1387}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

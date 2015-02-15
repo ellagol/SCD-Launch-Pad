@@ -1,0 +1,658 @@
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Windows;
+using ATSBusinessLogic;
+using ATSBusinessObjects;
+using ATSDomain;
+using Infra.DragDrop;
+using Infra.MVVM;
+
+
+
+namespace UserCertModule
+{
+    public class CertificatesDetailsViewModel : ViewModelBase, IDropTarget
+    {
+
+        #region  Data
+
+        
+        private StringCollection Permissions; //Collection of permissions this user is allowed to perform
+
+        protected MessengerService MessageMediator = new MessengerService();
+        private IMessageBoxService MsgBoxService = null;
+
+        private Guid WorkspaceId;
+
+        private UserCertificateModel UserCertificate;
+        private ObservableCollection<UserPartialModel> DeletedUsers = new ObservableCollection<UserPartialModel>();
+
+        #endregion
+
+        #region  Ctor
+        public CertificatesDetailsViewModel(UserCertificateModel UC, Guid WorkspaceID)
+        {
+            //Initialize this VM
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+            //Register as Subscriber to messages from other VM;
+            this.WorkspaceId = WorkspaceID;
+            MessageMediator.Register(this.WorkspaceId + "OnAddNewCertificateReceived", new Action<UserCertificateModel>(OnAddNewCertificateReceived)); //Register to recieve a message from usersDetailsViewModel
+            MessageMediator.Register(this.WorkspaceId + "OnApplySaveCertificateCommand", new Action<UserCertificateModel>(OnApplySaveCertificateCommand)); //Save If Certificate Is dirty.
+         
+            UserCertificate = UC;
+            //Initialize status collection 
+            _Status = CertificateUserBLL.GetAllStatus();
+        }
+         
+        #endregion
+
+        #region Presentation Properties
+
+         [Required(ErrorMessage = "'Id' field is required."), StringLength(10, ErrorMessage = "Maximum length (10 characters) exceeded.")]
+        public string Id
+        {
+            get
+            {
+                if (UserCertificate != null)
+                {
+                    return UserCertificate.Id;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            set
+            {
+
+                if (UserCertificate != null)
+                {
+                    UserCertificate.IsDirty = true;
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyCertificateReceived", UserCertificate);
+                    UserCertificate.Id = value;
+                    RaisePropertyChanged("Id");
+
+
+                }
+            }
+
+        }
+
+        [Required(ErrorMessage = "'Name' field is required."), StringLength(30, ErrorMessage = "Maximum length (30 characters) exceeded.")]
+        public string Name
+        {
+            get
+            {
+                if (UserCertificate != null)
+                {
+                    return UserCertificate.Name;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+
+                if (UserCertificate != null)
+                {
+                       UserCertificate.IsDirty = true;
+                        MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyCertificateReceived", UserCertificate);
+                        UserCertificate.Name = value;
+                        RaisePropertyChanged("Name");
+             
+                }
+            }
+        }
+
+        [Required(ErrorMessage = "'Description' field is required."), StringLength(500, ErrorMessage = "Maximum length (500 characters) exceeded.")]
+        public string Description
+        {
+            get
+            {
+                if (UserCertificate != null)
+                {
+                    return UserCertificate.Description;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (UserCertificate != null)
+                {
+                    UserCertificate.IsDirty = true;
+                    MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyCertificateReceived", UserCertificate);
+                    UserCertificate.Description = value;
+                    RaisePropertyChanged("Description");
+                }
+            }
+        }
+
+        private string _SelectedStatus = "";
+        public string SelectedStatus
+        {
+            get
+            {
+                if (UserCertificate != null)
+                {
+                    switch (UserCertificate.Status)
+                    {
+                        case UserCertificateStatusEnum.R:
+                            
+                            return "Retired";
+                            break;
+
+                        case UserCertificateStatusEnum.D:
+                         
+                            return "Draft";
+                            break;
+                        case UserCertificateStatusEnum.A:
+                 
+                            return "Active";
+                            break;
+                    }
+                    return  string.Empty;
+
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (UserCertificate != null)
+                {
+                    _SelectedStatus = value;
+                    switch (_SelectedStatus)
+                    {
+                        case "Retired":
+                            UserCertificate.Status = UserCertificateStatusEnum.R;
+                            MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyCertificateReceived", UserCertificate);
+                            UserCertificate.IsDirty = true;
+                            RaisePropertyChanged("SelectedStatus");
+                            break;
+                        case "Draft":
+                            UserCertificate.Status = UserCertificateStatusEnum.D;
+                            MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyCertificateReceived", UserCertificate);
+                            UserCertificate.IsDirty = true;
+                            this.Users.Clear();
+                            RaisePropertyChanged("Users");
+                            RaisePropertyChanged("SelectedStatus");
+                            break;
+                        case  "Active":
+                            UserCertificate.Status = UserCertificateStatusEnum.A;
+                            MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyCertificateReceived", UserCertificate);
+                            UserCertificate.IsDirty = true;
+                            RaisePropertyChanged("SelectedStatus");
+                            break;
+                    }
+                }
+            }
+        }
+
+        public DateTime? CreationDate
+        {
+            get
+            {
+                if (UserCertificate != null)
+                {
+                    return UserCertificate.CreationDate;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+            }
+        }
+
+        public DateTime? LastUpdateTime
+        {
+            get
+            {
+                if (UserCertificate != null)
+                {
+                    return UserCertificate.LastUpdateTime;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            set
+            {
+            }
+        }
+
+        public string LastUpdateUser
+        {
+            get
+            {
+                if (UserCertificate != null)
+                {
+                    return UserCertificate.LastUpdateUser;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+            }
+        }
+
+
+         private ObservableCollection<UserPartialModel> _Users = new ObservableCollection<UserPartialModel>();
+         public ObservableCollection<UserPartialModel> Users
+         {
+             get
+             {
+                 if (UserCertificate != null)
+                 {
+                     if (UserCertificate.Users != null)
+                         return UserCertificate.Users;
+                     else
+                         return null;
+                 }
+                 else
+                     return null;
+             }
+             set
+             {
+                 if (UserCertificate != null)
+                 {
+                     if (UserCertificate.Users != null)
+                     {
+                         _Users = UserCertificate.Users;
+                         RaisePropertyChanged("Users");
+
+                     }
+                 }
+             }
+         }
+
+         private ObservableCollection<string> _Status = new ObservableCollection<string>();
+         public ObservableCollection<string> Status
+         {
+             get
+             {
+                 if (UserCertificate != null)
+                 {
+                     if (_Status != null)
+                     {
+                        if (UserCertificate.IsNew == true)
+                         {
+                             _Status.Remove("Retired");
+                         }
+                         else
+                         {
+                             if (UserCertificate.Status == UserCertificateStatusEnum.A || UserCertificate.Status == UserCertificateStatusEnum.R)
+                                 _Status.Remove("Draft");
+                         }
+                             return _Status;
+                         
+                     }
+                     else
+                         return null;
+                 }
+                 else
+                     return null;
+             }
+             set
+             {
+                 if (UserCertificate != null)
+                 {
+                     _Status = value;
+                     RaisePropertyChanged("Status");
+                 }
+             }
+         }
+
+
+         private UserPartialModel _SelectedUser;
+         public UserPartialModel SelectedUser
+         {
+             get
+             {
+                 return _SelectedUser;
+             }
+             set
+             {
+                 
+                 _SelectedUser = value;
+                
+             }
+         }
+
+        #endregion
+
+        #region  IDropTarget Members & Other Drop Activities
+
+         public void DragOver(Infra.DragDrop.IDropInfo DropInfo)
+         {
+             try
+             {
+
+                 string SourceItemType = DropInfo.Data.GetType().ToString();
+                 if (SourceItemType.Contains("UserModel"))
+                 {
+                     UserModel SourceItem = DropInfo.Data as UserModel;
+                     if (SourceItem != null)
+                     {
+                         DropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+                         DropInfo.Effects = DragDropEffects.Move;
+                     }
+                 }
+
+
+             }
+             catch (Exception e)
+             {
+                 String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                 Domain.SaveGeneralErrorLog(logMessage);
+                 Object[] ArgsList = new Object[] { 0 };
+                 UsersCertificatesViewModel.ShowErrorAndInfoMessage(105, ArgsList);
+             }
+         }
+
+         public void Drop(Infra.DragDrop.IDropInfo DropInfo)
+         {
+             try
+             {
+                 //Identify dropped Entity Type
+                 string SourceItemType = DropInfo.Data.GetType().ToString();
+                 string DropCollectionType = DropInfo.TargetCollection.GetType().ToString();
+
+                 //If dropping Certificate, verify we drop on the right container and add to certificates list
+                 if (SourceItemType.Contains("UserModel") && DropCollectionType.Contains("UserPartialModel"))
+                 {
+
+                     UserModel SourceItem = DropInfo.Data as UserModel;
+                     //Check that the certificate status is active.
+                     if (this.UserCertificate.Status == UserCertificateStatusEnum.A)
+                     {
+                         UserPartialModel UPM = new UserPartialModel();
+                         UPM.UserName = SourceItem.UserName;
+                         
+                         bool flgUser = false;
+                         foreach (var i in Users)
+                         {
+                             if (i.UserName == UPM.UserName)
+                             {
+                                 //User already exists.
+                                 flgUser = true;
+                                 break;
+                             }
+                         }
+                         if (flgUser == false)
+                         {
+                             UserCertificate.IsDirty = true;
+                      
+                             UserCertificate.Users.Add(UPM);
+                             UPM.IsNew = true;
+                             RaisePropertyChanged("Users");
+                             //Creating new model of certifcate for adding to sourcre item user.
+                             UserCertificatePartialModel CPM = new UserCertificatePartialModel();
+                             CPM.Id = UserCertificate.Id;
+                             CPM.CertificateName = UserCertificate.Name;
+                             CPM.LastUpdateCertTime = UserCertificate.LastUpdateTime;
+                             SourceItem.UserCertificates.Add(CPM);
+                             //Refresh Save Button
+                             MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyCertificateReceived", UserCertificate);
+                             MessageMediator.NotifyColleagues(this.WorkspaceId + "OnUpdateCertificateReceived", UserCertificate);
+                         
+                         }
+                     }
+                 }
+
+             }
+             catch (Exception e)
+             {
+                 Object[] ArgsList = new Object[] { 0 };
+                 UsersCertificatesViewModel.ShowErrorAndInfoMessage(105, ArgsList);
+             }
+         }
+
+         #endregion
+
+        #region Messages
+
+        private void OnAddNewCertificateReceived(UserCertificateModel CM)
+         {
+
+             RaisePropertyChanged("UserRow");
+             RaisePropertyChanged("ViewFields");
+         }
+
+        #endregion Messages
+
+        #region New Certificate
+
+
+         private string _ViewFields = "Visible";
+         public string ViewFields
+         {
+             get
+             {
+                 if (this.UserCertificate.IsNew == true)
+                     return "Hidden";
+                 else
+                     return "Visible";
+             }
+             set
+             {
+                 _ViewFields = value;
+                 RaisePropertyChanged("ViewFields");
+
+             }
+         }
+
+         private string _UserRow = "9";
+         public string UserRow
+         {
+             get
+             {
+                 if (this.UserCertificate.IsNew == true)
+                     return "9";
+                 else
+                     return "15";
+             }
+             set
+             {
+                 _UserRow = value;
+                 RaisePropertyChanged("UserRow");
+
+             }
+         }
+         private string _LockId = "False";
+         public string LockId
+         {
+             get
+             {
+                 if (this.UserCertificate.IsNew == true)
+                     return "False";
+                 else
+                     return "True";
+             }
+             set
+             {
+                 _LockId = value;
+                 RaisePropertyChanged("LockId");
+
+             }
+         }
+
+
+        #endregion New Certificate
+
+        #region  Save Command
+
+         private RelayCommand _SaveCommand;
+         public RelayCommand SaveCommand
+         {
+             get
+             {
+                 if (_SaveCommand == null)
+                 {
+                     _SaveCommand = new RelayCommand(ExecuteSaveCommand, CanExecuteSaveCommand);
+                 }
+                 return _SaveCommand;
+             }
+         }
+
+         private bool CanExecuteSaveCommand()
+         {
+             if (Domain.IsPermitted("203", "UCM"))
+             {
+                 if (UserCertificate.IsDirty == true || UserCertificate.IsNew == true)
+                 {
+                     if (String.IsNullOrEmpty(Id) || String.IsNullOrEmpty(Name) || String.IsNullOrEmpty(Description) || (Name.Length > 30) || (Description.Length > 500 ) || (Id.Length >10))
+                         return false;
+                     else
+                         return true;
+                 }
+
+                 else
+                     return false;
+             }
+             else
+                 return false;
+         }
+
+
+         private void ExecuteSaveCommand()
+         {
+             try
+             {
+                 Domain.PersistenceLayer.BeginTransWithIsolation(IsolationLevel.Serializable);
+                 bool IsNewCert = false;
+                 if (UserCertificate.IsNew)
+                 {
+                     IsNewCert = true;
+                 }
+                 if (this.DeletedUsers.Count > 0)
+                 {
+                     foreach (var i in DeletedUsers)
+                     {
+                          string deleteResult =CertificateUserBLL.deleteAssignedUserCertificates(UserCertificate.Id, i.UserName);
+                          if (!String.IsNullOrEmpty(deleteResult))
+                          {
+                              Domain.PersistenceLayer.AbortTrans();
+                              Object[] ArgsList = new Object[] { 0 };
+                              UsersCertificatesViewModel.ShowErrorAndInfoMessage(105, ArgsList);
+                              return;
+                          }
+                     }
+                 }
+                 string result = CertificateUserBLL.PersistCertificate(ref UserCertificate);
+                 // this.UserCertificate = CertificateUserBLL.GetUserCertificateRow(UserCertificate.Id);
+                 MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyCertificateReceived", null);
+
+                 if (result != "203")
+                 {
+                     Domain.PersistenceLayer.AbortTrans();
+                 }
+                 else
+                     Domain.PersistenceLayer.CommitTrans();
+                 UserCertModule.UsersCertificatesViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(result), new Object[] { 0 });
+
+
+                 if (IsNewCert)
+                 {
+                     MessageMediator.NotifyColleagues(this.WorkspaceId + "OnSaveCertificateReceived", UserCertificate);
+                 }
+              
+             }
+
+             catch (Exception e)
+             {
+                 Domain.PersistenceLayer.AbortTrans();
+                 if (e.Message == "DB Error")
+                 {
+                     Object[] ArgsList = new Object[] { 0 };
+                     UsersCertificatesViewModel.ShowErrorAndInfoMessage(141, ArgsList);
+                 }
+                 else
+                 {
+                     Object[] ArgsList = new Object[] { 0 };
+                     UsersCertificatesViewModel.ShowErrorAndInfoMessage(105, ArgsList);
+                 }
+             }
+                 
+         }
+
+         #endregion
+
+        #region  Remove User From  Certificate Command
+
+         private RelayCommand _RemoveUserCommand;
+         public RelayCommand RemoveUserCommand
+         {
+             get
+             {
+                 if (_RemoveUserCommand == null)
+                 {
+                     _RemoveUserCommand = new RelayCommand(ExecuteRemoveUserCommand, CanExecuteRemoveUserCommand);
+                 }
+                 return _RemoveUserCommand;
+             }
+         }
+
+         private bool CanExecuteRemoveUserCommand()
+         {
+             return Domain.IsPermitted("203", "UCM");
+         }
+
+
+         private void ExecuteRemoveUserCommand()
+         {
+             try
+             {
+                 _SelectedUser.IsDirty = true;
+                 //Remove from user list this certificate.
+                 MessageMediator.NotifyColleagues(this.WorkspaceId + "OnRemoveUserReceived", UserCertificate);
+                 //Remove localy and adding to 'removed' list.
+                 DeletedUsers.Add(_SelectedUser);
+                 UserCertificate.Users.Remove(_SelectedUser);
+                 RaisePropertyChanged("Users");
+                 UserCertificate.IsDirty = true;
+                 MessageMediator.NotifyColleagues(this.WorkspaceId + "OnIsDirtyCertificateReceived", UserCertificate);
+                 //MessageMediator.NotifyColleagues(this.WorkspaceId + "OnRemoveUserReceived", UserCertificate);
+                
+             }
+             catch (Exception e)
+             {
+                 Object[] ArgsList = new Object[] { 0 };
+                 UsersCertificatesViewModel.ShowErrorAndInfoMessage(105, ArgsList);
+             }
+         }
+
+         #endregion
+
+        #region  Apply Save Certificate Command
+         private void OnApplySaveCertificateCommand(UserCertificateModel UCM)
+         {
+             if (Domain.IsPermitted("203", "UCM"))
+             {
+                 ExecuteSaveCommand();
+
+             }
+             
+         }
+         #endregion  Apply Save Certificate Command
+
+    }
+}

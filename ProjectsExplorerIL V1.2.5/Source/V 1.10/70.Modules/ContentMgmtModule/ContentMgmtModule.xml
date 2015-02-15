@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ContentMgmtModule</name>
+    </assembly>
+    <members>
+        <member name="T:ContentMgmtModule.CMContentDetailsView">
+            <summary>
+            CMContentDetailsView
+            </summary>
+        </member>
+        <member name="M:ContentMgmtModule.CMContentDetailsView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:ExplorerModule.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:ExplorerModule.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:ExplorerModule.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="T:ContentMgmtModule.CMVersionDetailsView">
+            <summary>
+            CMVersionDetailsView
+            </summary>
+        </member>
+        <member name="M:ContentMgmtModule.CMVersionDetailsView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:ContentMgmtModule.CMFolderDetailsView">
+            <summary>
+            CMFolderDetailsView
+            </summary>
+        </member>
+        <member name="M:ContentMgmtModule.CMFolderDetailsView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:ContentMgmtModule.CMContentManagementView">
+            <summary>
+            Interaction logic for ContentManagerView.xaml
+            </summary>
+            <summary>
+            CMContentManagementView
+            </summary>
+        </member>
+        <member name="M:ContentMgmtModule.CMContentManagementView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:ContentMgmtModule.CMWhereUsedView">
+            <summary>
+            Interaction logic for CMWhereUsedView.xaml
+            </summary>
+            <summary>
+            CMWhereUsedView
+            </summary>
+        </member>
+        <member name="M:ContentMgmtModule.CMWhereUsedView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:ContentMgmtModule.CMProgressBarView">
+            <summary>
+            Interaction logic for CMProgressBarView.xaml
+            </summary>
+            <summary>
+            CMProgressBarView
+            </summary>
+        </member>
+        <member name="M:ContentMgmtModule.CMProgressBarView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:ContentMgmtModule.CMSearchView">
+            <summary>
+            Interaction logic for CMSearchView.xaml
+            </summary>
+            <summary>
+            CMSearchView
+            </summary>
+        </member>
+        <member name="M:ContentMgmtModule.CMSearchView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{30900DFD-BDF5-40E3-A9C0-654514EBE27C}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ContentManager</RootNamespace>
+    <AssemblyName>ContentManager</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GalaSoft.MvvmLight.Extras.WPF4, Version=4.1.24.16313, Culture=neutral, PublicKeyToken=1673db7d5906b0ad, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Program Files\Laurent Bugnion (GalaSoft)\Mvvm Light Toolkit\Binaries\WPF4\GalaSoft.MvvmLight.Extras.WPF4.dll</HintPath>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.WPF4, Version=4.1.24.16313, Culture=neutral, PublicKeyToken=63eb5c012e0b3c1c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Program Files\Laurent Bugnion (GalaSoft)\Mvvm Light Toolkit\Binaries\WPF4\GalaSoft.MvvmLight.WPF4.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=59d6d24383174ac4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Program Files\Laurent Bugnion (GalaSoft)\Mvvm Light Toolkit\Binaries\WPF4\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic.Compatibility" />
+    <Reference Include="ProjectExplorerTester, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Projects\Modernization\DLLs\ProjectExplorerTester.dll</HintPath>
+    </Reference>
+    <Reference Include="ReferenceTableReader, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Projects\Modernization\DLLs\ReferenceTableReader.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.ServiceModel.Activities" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Program Files\Laurent Bugnion (GalaSoft)\Mvvm Light Toolkit\Binaries\WPF4\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="TraceExceptionWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Projects\Modernization\DLLs\TraceExceptionWrapper.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="ContentManagerMainWindow\ViewModel\ItemNodeCheckAllowDrop.cs" />
+    <Compile Include="ContentManagerMainWindow\ViewModel\TreeNodeDictionaryUpdater.cs" />
+    <Compile Include="ContentUpdate\ViewModel\ContentUpdater.cs" />
+    <Compile Include="ContentManagerMainWindow\ViewModel\TreeViewBehavior.cs" />
+    <Compile Include="ContentUpdate\ViewModel\ContentsDataProvider.cs" />
+    <Compile Include="ContentUpdate\ViewModel\ObservableContentType.cs" />
+    <Compile Include="Converters\BoolToFontWidthConverter.cs" />
+    <Compile Include="Converters\ItemFileStatusToColorConverter.cs" />
+    <Compile Include="Converters\UserControlTypeVisibleToEnableConverter.cs" />
+    <Compile Include="Converters\UserControlTypeVisibleToVisibleConverter.cs" />
+    <Compile Include="FolderUpdate\ViewModel\FolderUpdater.cs" />
+    <Compile Include="FolderUpdate\ViewModel\UserGroupTypeObservable.cs" />
+    <Compile Include="General\ApplicationPermission.cs" />
+    <Compile Include="General\CommandLineArgsParser.cs" />
+    <Compile Include="ProgressBar\ViewModel\ProgressBarViewModel.cs" />
+    <Compile Include="ProgressBar\View\ProgressBarView.xaml.cs">
+      <DependentUpon>ProgressBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="VersionUpdate\ViewModel\ItemNodeVersion.cs" />
+    <Compile Include="VersionUpdate\ViewModel\ItemVersionLink.cs" />
+    <Compile Include="VersionUpdate\ViewModel\ObservableContentStatus.cs" />
+    <Compile Include="ContentUpdate\View\UC_Content.xaml.cs">
+      <DependentUpon>UC_Content.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\BoolToNotBoolConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="ContentUpdate\ViewModel\ItemNodeContent.cs" />
+    <Compile Include="FolderUpdate\View\UC_Folder.xaml.cs">
+      <DependentUpon>UC_Folder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ContentManagerMainWindow\ViewModel\ItemNodeCopyMove.cs" />
+    <Compile Include="General\Locator.cs" />
+    <Compile Include="ContentManagerMainWindow\ViewModel\TreeViewItemBehavior.cs" />
+    <Compile Include="Messanger\View\UcMessanger.xaml.cs">
+      <DependentUpon>UcMessanger.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Messanger\ViewModel\MessageWrapper.cs" />
+    <Compile Include="Messanger\ViewModel\MessangerDataProvider.cs" />
+    <Compile Include="Search\View\Search.xaml.cs">
+      <DependentUpon>Search.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Search\ViewModel\SearchDataProvider.cs" />
+    <Compile Include="VersionUpdate\ViewModel\TreeViewFilesBehavior.cs" />
+    <Compile Include="VersionUpdate\ViewModel\TreeViewFilesItemBehavior.cs" />
+    <Compile Include="VersionUpdate\ViewModel\TreeViewVersionLinkBehavior.cs" />
+    <Compile Include="VersionUpdate\ViewModel\TreeViewVersionLinkItemBehavior.cs" />
+    <Compile Include="VersionUpdate\ViewModel\VercionUpdater.cs" />
+    <Compile Include="VersionUpdate\View\UcVersion.xaml.cs">
+      <DependentUpon>UcVersion.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="VersionUpdate\ViewModel\ItemFileNode.cs" />
+    <Compile Include="VersionUpdate\ViewModel\VersionDataProvider.cs" />
+    <Compile Include="ContentManagerMainWindow\ViewModel\ContentManagerDataProvider.cs" />
+    <Compile Include="FolderUpdate\ViewModel\FoldersDataProvider.cs" />
+    <Compile Include="ContentManagerMainWindow\ViewModel\ItemNode.cs" />
+    <Compile Include="FolderUpdate\ViewModel\ItemNodeFolder.cs" />
+    <Compile Include="ContentManagerMainWindow\ViewModel\ItemTreeBuilder.cs" />
+    <Compile Include="ContentManagerMainWindow\ViewModel\ItenNodeAction.cs" />
+    <Compile Include="ContentManagerMainWindow\ViewModel\UserControlType.cs" />
+    <Compile Include="WhereUsed\View Model\WhereUsedContentLinkItem.cs" />
+    <Compile Include="WhereUsed\View Model\WhereUsedProjectItem.cs" />
+    <Compile Include="WhereUsed\View Model\WhereUsedViewModel.cs" />
+    <Compile Include="WhereUsed\View\WhereUsedView.xaml.cs">
+      <DependentUpon>WhereUsedView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="ContentManagerMainWindow\View\ContentManager.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ContentManagerMainWindow\View\ContentManager.xaml.cs">
+      <DependentUpon>ContentManager.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="ContentUpdate\View\UC_Content.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FolderUpdate\View\UC_Folder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Messanger\View\UcMessanger.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProgressBar\View\ProgressBarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Search\View\Search.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VersionUpdate\View\UcVersion.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WhereUsed\View\WhereUsedView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ContentManagerProvider\ContentManagerProvider.csproj">
+      <Project>{1130D173-97D0-451A-8B3A-1365E20F1C8D}</Project>
+      <Name>ContentManagerProvider</Name>
+      <Aliases>global</Aliases>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Content.bmp" />
+    <Resource Include="Images\ContentVersion.bmp" />
+    <Resource Include="Images\Folder.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\VerStatusActive.bmp" />
+    <Resource Include="Images\VerStatusEditing.bmp" />
+    <Resource Include="Images\VerStatusRetirement.bmp" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

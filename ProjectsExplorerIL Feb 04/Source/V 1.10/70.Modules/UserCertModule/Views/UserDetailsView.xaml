@@ -1,0 +1,107 @@
+﻿<UserControl x:Class="UserCertModule.UserDetailsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dd="clr-namespace:Infra.DragDrop;assembly=Infra.DragDrop"          
+            xmlns:mvvm="clr-namespace:Infra.MVVM;assembly=Infra.MVVM"
+            xmlns:local="clr-namespace:UserCertModule"
+                 mc:Ignorable="d"
+            d:DesignHeight="445" d:DesignWidth="488">
+   
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--Metro Tab Control-->
+                <ResourceDictionary Source="pack://application:,,,/ExplorerModule;component/Resources/Themes/MetroTabStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+
+
+    <Grid x:Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--Main Content Area-->
+        <DockPanel x:Name="ContentArea" Grid.Row="0" >
+            <ScrollViewer Grid.Row="0" CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                <!--Properties TabItem-->
+
+                <Grid >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="30" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+
+                            <!-- Certifies -->
+
+
+                    <Label Grid.Row="1" Grid.Column="1" Content="Certificates:" Style="{DynamicResource WorkspaceLabelsStyle}"/>
+                    <ListView Grid.Row="1" Grid.Column="3" SelectedItem="{Binding Path=SelectedCertificate, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" ItemsSource="{Binding UserCertificates, Mode=TwoWay}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}" dd:DragDrop.UseDefaultDragAdorner="True" MinHeight="20" >
+                            <ListView.Resources>
+                                <Style TargetType="GridViewColumnHeader">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </Style>
+                            </ListView.Resources>
+                        <ListView.ContextMenu >
+                            <ContextMenu  DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="Remove"  Command="{Binding RemoveCertificateCommand}"/>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="False">
+                                <GridViewColumn Width="200" DisplayMemberBinding="{Binding CertificateName}"/>
+                            </GridView>
+                        </ListView.View>
+                            </ListView>
+
+                </Grid>
+
+            </ScrollViewer>
+        </DockPanel>
+
+        <!--Divider-->
+        <Separator Grid.Row="1" Style="{DynamicResource HorizontalSeparatorStyle}" Margin="0,0,15,0" />
+
+        <!--Command Buttons-->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+
+
+            <StackPanel Grid.Column="2" Style="{DynamicResource WorkspaceActionsStackPanelStyle}" >
+                <Button Name="btnSave" Content=" Save " Command="{Binding SaveCommand}" Margin="20,0,0,0" />
+            </StackPanel>
+
+        </Grid>
+
+    </Grid>
+
+
+
+</UserControl>

@@ -1,0 +1,5 @@
+C:\Users\au_yoren\Desktop\TraceException\TraceException\bin\Debug\TraceExceptionWrapper.dll
+C:\Users\au_yoren\Desktop\TraceException\TraceException\bin\Debug\TraceExceptionWrapper.pdb
+C:\Users\au_yoren\Desktop\TraceException\TraceException\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\au_yoren\Desktop\TraceException\TraceException\obj\Debug\TraceExceptionWrapper.dll
+C:\Users\au_yoren\Desktop\TraceException\TraceException\obj\Debug\TraceExceptionWrapper.pdb

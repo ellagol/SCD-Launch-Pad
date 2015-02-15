@@ -1,0 +1,145 @@
+﻿using System.Collections.ObjectModel;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+
+
+
+namespace ContentMgmtModule
+{
+    
+    public class CMListViewLinkedVersionsItemBehavior
+    {
+        #region IsListViewLinkedVersionsItemBehavior
+
+        public static bool GetIsListViewLinkedVersionsItemBehavior(ListViewItem listViewItem)
+        {
+            return (bool)listViewItem.GetValue(IsListViewLinkedVersionsItemBehaviorProperty);
+        }
+
+        public static void SetIsListViewLinkedVersionsItemBehavior(ListViewItem listViewItem, bool value)
+        {
+            listViewItem.SetValue(IsListViewLinkedVersionsItemBehaviorProperty, value);
+        }
+
+        public static readonly DependencyProperty IsListViewLinkedVersionsItemBehaviorProperty =
+            DependencyProperty.RegisterAttached(
+                "IsListViewLinkedVersionsItemBehavior",
+                typeof(bool),
+                typeof(CMListViewLinkedVersionsItemBehavior),
+                new UIPropertyMetadata(false, OnIsListViewLinkedVersionsItemBehaviorOccur));
+
+        private static void OnIsListViewLinkedVersionsItemBehaviorOccur(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ListViewItem item = d as ListViewItem;
+            if (item == null)
+                return;
+
+            if (e.NewValue is bool == false)
+                return;
+
+            if ((bool)e.NewValue)
+            {
+                item.Drop += OnListViewItemDrop;
+                item.KeyDown += OnListViewItemKeyDown;
+                item.DragOver += OnListViewItemDragOver;
+                //item.MouseMove += OnListViewItemMouseMove;
+                //item.Selected += OnListViewItemSelected;
+            }
+            else
+            {
+                item.Drop -= OnListViewItemDrop;
+                item.KeyDown -= OnListViewItemKeyDown;
+                item.DragOver -= OnListViewItemDragOver;
+                //item.MouseMove -= OnListViewItemMouseMove;
+                //item.Selected -= OnListViewItemSelected;
+            }
+        }
+
+
+        private static void OnListViewItemSelected(object sender, RoutedEventArgs e)
+        {
+        }
+
+        private static void OnListViewItemDragOver(object sender, DragEventArgs e)
+        {
+            object destinationNode = sender.GetType().GetProperty("ParentSelector", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(sender, null);
+
+            if (destinationNode.GetType().ToString() == "System.Windows.Controls.ListView")
+            {
+                if (((System.Windows.Controls.ListBox)(destinationNode)).SelectedItems.Count <= 0) //if trying to drop a version from the cm tree and not inside the list return
+                    return;
+
+                CMItemVersionLink linkedVersionNode = (CMItemVersionLink)((ListViewItem)sender).DataContext;
+                e.Effects = ((e.KeyStates & DragDropKeyStates.ControlKey) == DragDropKeyStates.ControlKey) ? DragDropEffects.Copy : DragDropEffects.Move;
+                e.Handled = true;
+                return;
+            }
+
+            e.Effects = DragDropEffects.None;
+            e.Handled = true;
+            
+
+            return;
+        }
+
+        private static void OnListViewItemDrop(object sender, DragEventArgs e)
+        {
+            int indexToInsert;
+            object obj = sender.GetType().GetProperty("ParentSelector", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(sender, null);
+
+            if (obj.GetType().ToString() == "System.Windows.Controls.ListView")
+            {
+                if (((System.Windows.Controls.ListBox)(obj)).SelectedItems.Count <= 0) //if trying to drop a version from the cm tree and not inside the list return
+                    return;
+
+                ObservableCollection<CMItemVersionLink> linkedVersions = (ObservableCollection<CMItemVersionLink>)((System.Windows.Controls.ListView)(obj)).ItemsSource;
+
+                CMItemVersionLink destinationNode = (CMItemVersionLink)((ListViewItem)sender).DataContext;
+                CMItemVersionLink sourceNode = (CMItemVersionLink)((System.Windows.Controls.ListBox)(obj)).SelectedItems[0];
+
+                indexToInsert = linkedVersions.IndexOf((CMItemVersionLink)destinationNode);
+                linkedVersions.Remove(sourceNode);
+                linkedVersions.Insert(indexToInsert, sourceNode);
+               
+            }     
+        }
+
+        private static void OnListViewItemKeyDown(object sender, KeyEventArgs e)
+
+        {
+            if (e.Key == Key.Delete)
+            {
+                object sourceNode = ((ListViewItem)sender).DataContext;
+
+                if (sourceNode.GetType() == typeof(CMItemVersionLink))
+                {
+                    if (((CMItemVersionLink)(sourceNode)).Status == "Ac" || ((CMItemVersionLink)(sourceNode)).Status == "Ret")
+                        return;
+
+                    object obj = sender.GetType().GetProperty("ParentSelector", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(sender, null);
+
+                    if (obj.GetType().ToString() == "System.Windows.Controls.ListView")
+
+                    {
+                        if (((System.Windows.Controls.ListBox)(obj)).SelectedItems.Count <= 0) //if trying to drop a version from the cm tree and not inside the list return
+
+                            return;
+
+                        ObservableCollection<CMItemVersionLink> linkedVersions = (ObservableCollection<CMItemVersionLink>)((System.Windows.Controls.ListView)(obj)).ItemsSource;
+                        CMItemVersionLink sourceItemVersionLinkNode = (CMItemVersionLink)sourceNode;
+                        linkedVersions.Remove(sourceItemVersionLinkNode);
+
+                    }
+                    e.Handled = true;
+
+
+
+                }
+            }
+        }
+
+        #endregion // IsBroughtIntoViewWhenDrop      
+    }
+}

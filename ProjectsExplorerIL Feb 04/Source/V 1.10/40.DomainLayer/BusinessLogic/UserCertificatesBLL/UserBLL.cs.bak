@@ -1,0 +1,366 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Data;
+using System.Linq;
+using System.Text;
+using ATSDomain;
+using ATSBusinessObjects;
+using Infra.DAL;
+using System.Data.SqlClient;
+
+namespace ATSBusinessLogic
+{
+    public class UserBLL
+    {
+
+        #region Retrieve User from database and return as ObservableCollection
+
+        public static ObservableCollection<UserModel> GetUser()
+        {
+            // Initialize work fields
+            ObservableCollection<UserModel> Users = new ObservableCollection<UserModel>();
+            try
+            {
+                UserModel EmptyUser = Domain.GetBusinessObject<UserModel>();
+                // Build The Query String
+                System.Text.StringBuilder QryStr = new System.Text.StringBuilder();
+               /* QryStr.Append("SELECT  uc.User_Id, uc.User_Name, auc.CertificateId, auc.LastUpdateTime as userLastUpdated ");
+                QryStr.Append(" FROM LinkView_Users uc left join AssignedUserCertificates auc on uc.User_Name = auc.UserName ");
+                QryStr.Append(" order by UserName ");*/
+                QryStr.Append("SELECT  uc.User_Id, uc.User_Name, c.Name as CertificateName , auc.CertificateId, auc.LastUpdateTime as userLastUpdated, c.LastUpdateTime as CertificateLastUpdate ");
+                QryStr.Append(" FROM LinkView_Users uc left join AssignedUserCertificates auc on uc.User_Name = auc.UserName left join UserCertificates c on  auc.CertificateId = c.Id ");
+                QryStr.Append(" order by uc.User_Name ASC ");
+                string Qry = QryStr.ToString();
+                // Fetch the DataTable from the database
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(QryStr.ToString(), CommandType.Text, null);
+                // Populate the collection
+                if (ResTable != null)
+                {
+                    foreach (DataRow DataRow in ResTable.Rows)
+                    {
+                      
+                        bool FlgCopy = false;
+                        UserModel User = (UserModel)Domain.DeepCopy(EmptyUser); // DeepCopy an empty instance to save on the Reflection work
+                        int UserId = (int)DataRow["User_Id"];
+                        if (CheckUsersCollection(Users, UserId) == false)
+                        {
+                            User.UserId = (int)DataRow["User_Id"];
+                            User.IsNew = false;
+                            User.IsDirty = false;
+                            User.UserName = (string)DataRow["User_Name"];
+                        }
+                        else
+                            FlgCopy = true;
+                        
+                         if (!(DataRow["CertificateId"] is System.DBNull))
+                         {
+                             UserCertificatePartialModel CM = new UserCertificatePartialModel();
+                             CM.Id = (string)DataRow["CertificateId"];
+                             CM.CertificateName = (string)DataRow["CertificateName"];
+                             if (!(DataRow["CertificateLastUpdate"] is System.DBNull))
+                             {
+                                 CM.LastUpdateCertTime = (DateTime)DataRow["CertificateLastUpdate"];
+                             }
+                             if (!(DataRow["userLastUpdated"] is System.DBNull))
+                             {
+                                 CM.LastUpdateAssignedTime = (DateTime)DataRow["userLastUpdated"];
+                             }
+                            if(FlgCopy == true)
+                                Users[Users.Count -1].UserCertificates.Add(CM);
+                             else
+                                User.UserCertificates.Add(CM);
+                         }
+                        if(FlgCopy == false)
+                            Users.Add(User);
+                    }
+                }// end of ResTable
+                
+                return Users;
+            }
+          
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+              
+                return Users;
+            }
+
+        }
+
+        #endregion
+
+        #region Retrieve User from database and return as UserModel
+
+        public static UserModel GetUserRow(string UserName)
+        {
+            // Initialize work fields   
+            UserModel User = Domain.GetBusinessObject<UserModel>();
+            try
+            {
+              
+                // Build The Query String
+                System.Text.StringBuilder QryStr = new System.Text.StringBuilder();
+
+                QryStr.Append("SELECT  uc.User_Id, uc.User_Name, c.Name as CertificateName ,auc.CertificateId, auc.LastUpdateTime as userLastUpdated, c.LastUpdateTime as CertificateLastUpdate ");
+                QryStr.Append(" FROM LinkView_Users uc left join AssignedUserCertificates auc on uc.User_Name = auc.UserName left join UserCertificates c on  auc.CertificateId = c.Id ");
+                QryStr.Append(" where uc.User_Name ='" + UserName.Trim() + "'");
+                string Qry = QryStr.ToString();
+                // Fetch the DataTable from the database
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(QryStr.ToString(), CommandType.Text, null);
+                // Populate the User.
+                if (ResTable != null)
+                {
+
+                    foreach (DataRow DataRow in ResTable.Rows)
+                    {
+                      
+                        if (User.UserId == -1)
+                        {
+                            User.UserId = (int)DataRow["User_Id"];
+                            User.IsNew = false;
+                            User.IsDirty = false;
+                            User.UserName = (string)DataRow["User_Name"];
+                        }
+                    
+
+                        if (!(DataRow["CertificateId"] is System.DBNull))
+                        {
+                            UserCertificatePartialModel CM = new UserCertificatePartialModel();
+                            CM.Id= (string)DataRow["CertificateId"];
+                            CM.CertificateName = (string)DataRow["CertificateName"];
+                            if (!(DataRow["CertificateLastUpdate"] is System.DBNull))
+                            {
+                                CM.LastUpdateCertTime = (DateTime)DataRow["CertificateLastUpdate"];
+                               
+                            }
+                            if (!(DataRow["userLastUpdated"] is System.DBNull))
+                            {
+                                CM.LastUpdateAssignedTime = (DateTime)DataRow["userLastUpdated"];
+
+                            }
+                            User.UserCertificates.Add(CM);
+                       
+                        }
+                 
+                    }
+                }// end of ResTable
+
+                return User;
+              
+            }
+
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                return User;
+            }
+
+        }
+
+        #endregion
+
+        #region check if Users contain user for retrive
+
+        public static Boolean CheckUsersCollection(ObservableCollection<UserModel> Users, int UserId)
+        {
+            try
+            {
+                if (Users.Count > 0)
+                {
+                    foreach (var i in Users)
+
+                        if (i.UserId == UserId)
+                            return true;
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                return false;
+            }
+        }
+
+        #endregion check if Users contain user
+
+        #region Presist (Add/Update) UserCertificate
+
+        public static string PersistUser(ref UserModel User)
+        {
+
+            var SB = new StringBuilder(string.Empty);
+            Boolean DatabaseSupportsBatchQueries = Domain.PersistenceLayer.GetSupportsBatchQueries();
+            List<ParamStruct> CommandParams;
+            try
+            {
+                if (LastUpadateCheck(ref User))
+                {
+                    return "104";
+                }
+
+                foreach (var i in User.UserCertificates)
+                {
+                    if (!(CertificateUserBLL.CheckExistUser(i.Id, User.UserName)))
+                    {
+                        UserCertificatePartialModel UCM = i;
+                        UpdateControlFields(ref UCM);
+                        SB.Clear();
+                        // Build the Query
+                        SB.Append("INSERT INTO AssignedUserCertificates (UserName, CertificateId, LastUpdateTime, LastUpdateUser, LastUpdateComputer , LastUpdateapplication ) ");
+                        SB.Append("VALUES (@UserName, @CertificateId, @LastUpdateTime, @LastUpdateUser, @LastUpdateComputer, @LastUpdateapplication  ) ");
+                        if (DatabaseSupportsBatchQueries)
+                        {
+                            SB.Append("; Select Scope_Identity()"); // To retrieve the Id of the inserted row
+                        }
+
+                       
+                        CommandParams = new List<ParamStruct>()
+                        {
+                        new ParamStruct { ParamName = "UserName", DataType = DbType.String, Value = User.UserName},
+                        new ParamStruct { ParamName = "CertificateId", DataType = DbType.String, Value = i.Id },
+                        new ParamStruct { ParamName = "LastUpdateTime", DataType = DbType.DateTime, Value = i.LastUpdateAssignedTime },
+                        new ParamStruct { ParamName = "LastUpdateUser", DataType = DbType.String, Value =Domain.User},
+                        new ParamStruct { ParamName = "LastUpdateComputer", DataType = DbType.String, Value = Domain.Workstn },
+                        new ParamStruct { ParamName = "LastUpdateapplication", DataType = DbType.String, Value = Domain.AppName }
+                        };
+                        // Execute the query
+                        long SV = 0;
+                        //if (DatabaseSupportsBatchQueries)
+                        //{
+                        SV = (long)Domain.PersistenceLayer.ExecuteDbCommand(SB.ToString(), System.Data.CommandType.Text, CommandParams.ToArray());
+                        /** Object RVobj = Domain.PersistenceLayer.FetchDataValue(SB.ToString(), System.Data.CommandType.Text, CommandParams.ToArray());
+                         if (!(RVobj is DBNull))
+                         {
+                             SV = Convert.ToInt64(RVobj);
+                         }**/
+                        //}
+                        // else
+                        // {
+                        //SV = (long)Domain.PersistenceLayer.ExecuteDbCommand(SB.ToString(), System.Data.CommandType.Text, CommandParams.ToArray());
+                        //}
+                        // Finalize
+                        if (SV < 1) // Something went wrong... No rows were affected
+                        {
+                            return "105";
+                        }
+                    }
+
+                }//END FOR EACH
+
+                User.IsDirty = false;
+                return "203";
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                throw new Exception("DB Error");
+               
+            }
+        }
+
+
+        #endregion  Presist (Add/Update) UserCertificate
+
+        #region LastUpdateCheck
+
+        public static bool LastUpadateCheck(ref UserModel UM)
+        {
+            try
+            {
+                System.Text.StringBuilder LastUpdateSB = new System.Text.StringBuilder();
+                LastUpdateSB.Append("SELECT c.LastUpdateTime as certLastUpdate, auc.LastUpdateTime as assignedLastUpdate, auc.CertificateId ");
+                LastUpdateSB.Append(" FROM UserCertificates c left join AssignedUserCertificates  auc on ");
+                LastUpdateSB.Append(" c.Id = auc.CertificateId WHERE auc.UserName = '" + UM.UserName + "'  ");
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(LastUpdateSB.ToString(), CommandType.Text, null);
+                // Populate the collection
+                if (ResTable != null)
+                {
+                    /** if (ResTable.Rows.Count != UM.UserCertificates.Count)
+                     {
+                         return true; //certificates has been delete or added by antoher users
+                     }**/
+                    foreach (DataRow DataRow in ResTable.Rows)
+                    {
+                        if (!(DataRow["certLastUpdate"] is System.DBNull))
+                        {
+                            bool flgUser = false;
+                            foreach (var i in UM.UserCertificates)
+                            {
+                                if (i.Id == (string)DataRow["CertificateId"])
+                                {
+
+                                    flgUser = true;
+                                    DateTime t = (DateTime)DataRow["certLastUpdate"];
+                                    long ms1 = t.Millisecond;
+                                    long ms2 = i.LastUpdateCertTime.Millisecond;
+
+                                    long certLastUpdateTimeMs = (long)(i.LastUpdateCertTime - new DateTime(1970, 1, 1)).TotalMilliseconds;
+                                    long certLastUpdateTimeDBMs = (long)(t - new DateTime(1970, 1, 1)).TotalMilliseconds;
+
+
+                                    DateTime a = (DateTime)DataRow["assignedLastUpdate"];
+                                    long msAssigned1 = a.Millisecond;
+                                    long msAssigned2 = i.LastUpdateAssignedTime.Millisecond;
+
+                                    long AssignedLastUpdateTimeMs = (long)(i.LastUpdateAssignedTime - new DateTime(1970, 1, 1)).TotalMilliseconds;
+                                    long AssignedLastUpdateTimeDBMs = (long)(a - new DateTime(1970, 1, 1)).TotalMilliseconds;
+
+
+                                    //if (i.LastUpdateCertTime != (DateTime)DataRow["certLastUpdate"])
+                                    if (certLastUpdateTimeMs - ms2 != certLastUpdateTimeDBMs - ms1)
+                                    {
+                                        return true; //certificate has been updated by antoher user.
+                                    }
+                                    if (AssignedLastUpdateTimeMs - msAssigned2 != AssignedLastUpdateTimeDBMs - msAssigned1)
+                                    {
+                                        return true; //certificate has been updated by antoher user.
+                                    }
+                                    break;
+                                }
+
+                            }
+                            if (flgUser == false)
+                            {
+                                return true; //User Not found. Updated / delete by antoher user.
+                            }
+
+                        }
+
+
+                    }
+                }//end of ResTable != null
+
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                return true;
+            }
+        }
+
+        #endregion LastUpdateCheck
+
+        #region Update Certificate  Fields
+
+        public static void UpdateControlFields(ref UserCertificatePartialModel Certificate)
+        {
+            Certificate.LastUpdateAssignedTime = DateTime.Now;
+          
+        }
+
+        #endregion
+
+       
+
+    }//end of class UserBLL
+}

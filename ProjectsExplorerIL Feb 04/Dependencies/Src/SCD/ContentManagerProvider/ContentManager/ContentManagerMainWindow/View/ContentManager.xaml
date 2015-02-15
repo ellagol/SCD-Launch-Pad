@@ -1,0 +1,163 @@
+﻿<Window x:Class="ContentManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        Title="MainWindow" Width="800" MinHeight="100" MinWidth="600" 
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:folderUpdater="clr-namespace:ContentManager.FolderUpdate.View"
+        xmlns:contentUpdate="clr-namespace:ContentManager.ContentUpdate"
+        xmlns:versionUpdate="clr-namespace:ContentManager.VersionUpdate"
+        xmlns:search="clr-namespace:ContentManager.Search" 
+        xmlns:messanger="clr-namespace:ContentManager.Messanger.View"      
+        xmlns:progressBar="clr-namespace:ContentManager.ProgressBar.View"              
+        xmlns:whereUsed="clr-namespace:ContentManager.WhereUsed.View"              
+        xmlns:viewModel="clr-namespace:ContentManager.ContentManagerMainWindow.ViewModel"
+        DataContext="{Binding ContentManagerDataProvider, Source={StaticResource Locator}}" >
+   
+    <Grid>
+
+        <Grid IsEnabled="{Binding Path=UserControlVisible, Mode=OneWay, Converter={StaticResource UcToEnable}, ConverterParameter = 'Na'}">            
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Opacity="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.15*"/>
+                    <ColumnDefinition Width="0.15*"/>
+                    <ColumnDefinition Width="0.15*"/>
+                    <ColumnDefinition Width="0.15*"/>
+                    <ColumnDefinition Width="0.15*"/>
+                    <ColumnDefinition Width="0.15*"/>
+                    <ColumnDefinition Width="0.15*"/>
+                    <ColumnDefinition Width="0.15*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Margin="5" Content="Search" Command="{Binding SearchExecute}" Visibility="{Binding Path=IsLoaded, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"/>
+                <Button Grid.Column="1" Margin="5" Content="View" Command="{Binding ViewMode}"  Visibility="{Binding Path=IsLoaded, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"/>
+                <Button Grid.Column="2" Margin="5" Content="Where used" IsEnabled="{Binding SelectedItem.IsWhereUsed}" Command="{Binding SelectedItem.WhereUsed}"  Visibility="{Binding Path=IsLoaded, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"/>                
+                <Button Grid.Column="3" Margin="5" Content="Update" IsEnabled ="{Binding SelectedItem.IsUpdate}" Command="{Binding SelectedItem.Update}" Visibility="{Binding Path=ApplicationWritePermission, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"/>
+                <Button Grid.Column="4" Margin="5" Content="Delete" IsEnabled ="{Binding SelectedItem.IsDelete}" Command="{Binding SelectedItem.Delete}" Visibility="{Binding Path=ApplicationWritePermission, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"/>
+                <Button Grid.Column="5" Margin="5" Content="Add folder" IsEnabled ="{Binding SelectedItem.IsAddFolder}" Command="{Binding SelectedItem.Add}" CommandParameter="Folder" Visibility="{Binding Path=ApplicationWritePermission, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"/>
+                <Button Grid.Column="6" Margin="5" Content="Add content" IsEnabled ="{Binding SelectedItem.IsAddContent}" Command="{Binding SelectedItem.Add}" CommandParameter="Content" Visibility="{Binding Path=ApplicationWritePermission, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"/>
+                <Button Grid.Column="7" Margin="5" Content="Add version" IsEnabled ="{Binding SelectedItem.IsAddVersion}" Command="{Binding SelectedItem.Add}" CommandParameter="Version" Visibility="{Binding Path=ApplicationWritePermission, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"/>
+            </Grid>
+            
+            <Grid Grid.Row ="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TreeView Name="TreeViewItems" ItemsSource="{Binding SubItemNode}" Grid.Row="0" AllowDrop="True">
+                    <TreeView.Resources>
+                        <Style TargetType="{x:Type TreeView}">
+                            <Setter Property="viewModel:TreeViewBehavior.IsTreeViewBehavior" Value="True"/>
+                        </Style>
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <Setter Property="viewModel:TreeViewItemBehavior.IsTreeViewItemBehavior" Value="True" />
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                            <Setter Property="FontWeight" Value="Normal" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TreeView.Resources>
+                    <TreeView.ContextMenu>
+                        <ContextMenu Visibility="{Binding Path=ApplicationAddRootFolderPermission, Mode=OneWay,Converter={StaticResource BoolToVisibility}}">
+                            <MenuItem Header="Add Folder" Command="{Binding AddFolder}"/>
+                        </ContextMenu>    
+                    </TreeView.ContextMenu>
+                          <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectedItemChanged">
+                                <i:InvokeCommandAction Command="{Binding ChangeSelectedItem}" CommandParameter="{Binding ElementName=TreeViewItems, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                          </i:Interaction.Triggers>   
+                          <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding SubItemNode}">
+                                <Grid>
+                                    <Grid.ContextMenu> 
+                                        <ContextMenu>
+                                            <MenuItem Header="Add" Visibility="{Binding Path=IsAdd, Mode=OneWay,Converter={StaticResource BoolToVisibility}}">
+                                                <MenuItem Header="Add Folder" Visibility="{Binding Path=IsAddFolder, Mode=OneWay,Converter={StaticResource BoolToVisibility}}" Command="{Binding Add}" CommandParameter="Folder"/>
+                                                <MenuItem Header="Add Content" Visibility="{Binding Path=IsAddContent, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"  Command="{Binding Add}" CommandParameter="Content"/>
+                                                <MenuItem Header="Add Version" Visibility="{Binding Path=IsAddVersion, Mode=OneWay,Converter={StaticResource BoolToVisibility}}"  Command="{Binding Add}" CommandParameter="Version"/>
+                                            </MenuItem>
+                                            <MenuItem Header="Update" Visibility="{Binding Path=IsUpdate, Mode=OneWay,Converter={StaticResource BoolToVisibility}}" Command="{Binding Update}"/>
+                                            <MenuItem Header="Delete" Visibility="{Binding Path=IsDelete, Mode=OneWay,Converter={StaticResource BoolToVisibility}}" Command="{Binding Delete}"/>
+                                            <MenuItem Header="Where used" Visibility="{Binding Path=IsWhereUsed, Mode=OneWay,Converter={StaticResource BoolToVisibility}}" Command="{Binding WhereUsed}"/>
+                                    </ContextMenu>
+                                    </Grid.ContextMenu>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Image Grid.Column="0" Grid.ColumnSpan="1" Margin="2" Width="32" Height="18" Source="{Binding Path=Icon}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Path=Name}" Grid.Column="1" Grid.ColumnSpan="1" Margin="2"  VerticalAlignment="Center" FontWeight="Bold" />
+                                </Grid>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                </TreeView>
+
+                <Grid Grid.Row="1" Visibility="{Binding Path=IsSerchVisible, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+                    <search:Search Margin="5,10" Height="60"/>
+                </Grid> 
+               
+            </Grid>   
+            <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding Path=IsFolderUiVisible, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+                <folderUpdater:UcFolder/>
+            </Grid>
+            <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding Path=IsContentUiVisible, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+                <contentUpdate:UcContent />
+            </Grid>
+            <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding Path=IsVersionUiVisible, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+                <versionUpdate:UcVersion />
+            </Grid>
+        
+        </Grid>
+        <Grid Visibility="{Binding Path=UserControlVisible, Mode=OneWay, Converter={StaticResource UcToVisibility}, ConverterParameter = 'Message'}" >            
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.6*"/>
+                <ColumnDefinition Width="0.2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.2*"/>
+                <RowDefinition Height="0.6*"/>
+                <RowDefinition Height="0.2*"/>
+            </Grid.RowDefinitions>
+            <messanger:UcMessanger Grid.Row="1" Grid.Column="1"/>
+        </Grid>
+        <Grid Visibility="{Binding Path=UserControlVisible, Mode=OneWay, Converter={StaticResource UcToVisibility}, ConverterParameter = 'ProgressBar'}" >
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.6*"/>
+                <ColumnDefinition Width="0.2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.2*"/>
+                <RowDefinition Height="0.6*"/>
+                <RowDefinition Height="0.2*"/>
+            </Grid.RowDefinitions>
+            <progressBar:ProgressBarView Grid.Row="1" Grid.Column="1"/>
+        </Grid>
+        <Grid Visibility="{Binding Path=UserControlVisible, Mode=OneWay, Converter={StaticResource UcToVisibility}, ConverterParameter = 'WhereUsed'}" >
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.6*"/>
+                <ColumnDefinition Width="0.2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.2*"/>
+                <RowDefinition Height="0.6*"/>
+                <RowDefinition Height="0.2*"/>
+            </Grid.RowDefinitions>
+            <whereUsed:WhereUsedView Grid.Row="1" Grid.Column="1"/>
+        </Grid>        
+    </Grid>
+</Window>

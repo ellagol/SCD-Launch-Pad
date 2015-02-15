@@ -1,0 +1,572 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading;
+using System.Windows.Input;
+using ATSBusinessLogic;
+using ATSBusinessObjects;
+using ATSBusinessObjects.ContentMgmtModels;
+using ATSDomain;
+using Infra.MVVM;
+
+namespace ExplorerModule
+{
+    public class CMTreeViewVersionNodeViewModel : CMTreeViewNodeViewModelBase
+    {
+
+        #region  Data
+
+        private IMessageBoxService MsgBoxService = null;
+        private HierarchyModel Hierarchy = new HierarchyModel();
+        private IEnumerable<ContentModel> _activeContents;
+
+        #endregion
+
+        #region Constructor
+
+        public CMTreeViewVersionNodeViewModel(Guid workspaceId, CMTreeNode TN)
+            : this(workspaceId, TN, null)
+        {
+            
+        }
+
+        public CMTreeViewVersionNodeViewModel(Guid workspaceId, CMTreeNode TN, CMTreeViewNodeViewModelBase ParentNode)
+            : base(workspaceId, TN, ParentNode)
+        {
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //The messageMediator is registered in the ViewModelBase - Generally you have 1 mediator; Hence, the restricted access to the constructor
+            MessageMediator = GetService<MessengerService>();
+           
+           
+        }
+        public CMTreeViewVersionNodeViewModel(Guid workspaceId, CMTreeNode TN, CMTreeViewNodeViewModelBase ParentNode, HierarchyModel HM, IEnumerable<ContentModel> ActiveContents)
+            : base(workspaceId, TN, ParentNode)
+        {
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //The messageMediator is registered in the ViewModelBase - Generally you have 1 mediator; Hence, the restricted access to the constructor
+            MessageMediator = GetService<MessengerService>();
+            this.Hierarchy = HM;
+            this._activeContents = ActiveContents;
+            contentToAction = new ContentModel(null, TN.Name, TN.ID, DateTime.Now.ToString(), null, null);
+
+        }
+
+        #endregion
+
+        #region Node Data
+
+        //For CR3600
+        public static bool isCMFlyoutOpen = false;
+        public override string NodeData
+        {
+            get
+            {
+                if (this.TreeNode.TreeNodeType != TreeNodeObjectType.ContentVersion || isCMFlyoutOpen == true)
+                {
+                return this.Name; //Here you can place any content you want to see in the Tree for this node...
+            }
+                else
+                {
+                    string x = "";
+                    try
+                    {
+                        x = ContentBLL.contents[ContentBLL.versions[this.TreeNode.ID].ParentID].Name + " " + this.Name;
+                    }
+                    catch { 
+                        //TODO error
+                    }
+                    return x;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Other Methods
+
+        public override void Refresh()
+        {
+            this.Children.Clear();
+            this.LoadChildren();
+            RaisePropertyChanged("NodeData");
+        }
+
+        public override void LoadChildren()
+        {
+        }
+
+        #endregion
+
+        #region Content Execution
+
+        #region Relay Command
+        Dictionary<String, String> certificates = new Dictionary<string, string>();
+        private RelayCommand _ContentCopyCommand;
+        private bool allowExecute = true;
+
+        public ICommand ContentCopyCommand
+        {
+            get
+            {
+                if (_ContentCopyCommand == null)
+                {
+                    _ContentCopyCommand = new RelayCommand(ExecuteContentCopyCommand, CanExecuteContentCopyCommand);
+                }
+                return _ContentCopyCommand;
+            }
+        }
+        public ContentModel contentToAction  { set; get; }
+
+        private bool CanExecuteContentCopyCommand()
+        {
+            //Check if version is saved before enabling execute
+            if (allowExecute && !Hierarchy.IsCloned && !Hierarchy.IsClonedRelated && !Hierarchy.IsClonedRelatedSplit && !Hierarchy.IsClonedRelatedUpdate && contentToAction is ContentModel)
+                return true;
+            else
+                return false;
+        }
+
+        private void ExecuteContentCopyCommand()
+        {
+            MessageMediator.NotifyColleagues("StatusBarParameters", null); //Send message to the MainViewModel to clear Statusbar from any previous operation
+            ContentExecutionBLL.ErrorHandling luStatus = new ContentExecutionBLL.ErrorHandling();
+            //Last Update and permission check
+            luStatus = ContentExecutionBLL.PriorValidations(Hierarchy, "112");
+            if (!(String.IsNullOrEmpty(luStatus.errorId)))
+            {
+                ExplorerModule.ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(luStatus.errorId), luStatus.errorParams);
+                return;
+            }
+            Thread ContentExecutionThread = new Thread(new ThreadStart(ContentExecution));
+            ContentExecutionThread.Start();
+            certificates = new Dictionary<string, string>();
+        }
+
+        #endregion
+
+        #region Main content excecute command
+
+        private void ContentExecution()
+        {
+            MessageMediator.NotifyColleagues(this.WorkSpaceId + "OnExecuteLinkedVersionReceived", this);   
+            MessageMediator.NotifyColleagues(WorkSpaceId + "OnLinkedVersionExecutionStartReceived", this);
+            int errorId = -1;
+            ContentExecutionBLL.ErrorHandling Status = new ContentExecutionBLL.ErrorHandling();
+
+            try
+            {
+
+                #region Get contents, folder and version tree from API
+                Dictionary<int, CMFolderModel> outFolders = new Dictionary<int, CMFolderModel>();
+                Dictionary<int, CMContentModel> outContents = new Dictionary<int, CMContentModel>();
+                Dictionary<int, CMVersionModel> outVersions = new Dictionary<int, CMVersionModel>();
+
+                //Performance
+                //Get CM sub tree
+                Status = ContentExecutionBLL.GetCMSubTree((ObservableCollection<ContentModel>)_activeContents, out outFolders, out outContents, out outVersions);
+                #region Handle Get CM sub tree errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), Status.errorParams);
+                    return;
+                }
+                #endregion
+
+                #endregion get contents
+
+                #region Perform all required validations prior to execution
+                Status = ContentExecutionBLL.validations(outContents, outVersions, contentToAction, Hierarchy);
+                #region Handle validations errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    if (Status.errorId == "107")
+                    {
+                        if (MsgBoxService.ShowOkCancel(Status.errorParams[0].ToString(), DialogIcons.Question) != DialogResults.OK)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            bool temp = ATSDomain.Domain.IsPermitted("126");
+                            if (Status.errorId == "107" && !Domain.IsPermitted("126"))
+                            {
+                                ProjectsExplorerViewModel.ShowErrorAndInfoMessage(106, new object[] { 0 });
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), new object[] { 0 });
+                        return;
+                    }
+                }
+                #endregion
+
+                Status = ContentExecutionBLL.userCertificatesValidations(Hierarchy);
+                #region Handle validations errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    if (Status.errorId == "170")
+                    {
+                        if (MsgBoxService.ShowOkCancel(Status.errorParams[0].ToString(), DialogIcons.Question) != DialogResults.OK)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            bool temp = ATSDomain.Domain.IsPermitted("126");
+                            if (Status.errorId == "170" && !Domain.IsPermitted("133"))
+                            {
+                                ProjectsExplorerViewModel.ShowErrorAndInfoMessage(106, new object[] { 0 });
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), new object[] { 0 });
+                        return;
+                    }
+                }
+                #endregion
+
+                #endregion
+
+                #region Copy content files
+                //Start new thread for copying files and copy files to local directory
+                ThreadStart threadStart = new ThreadStart(IncrementProgressCounter);
+                Thread t = new Thread(threadStart);
+                t.Start();
+                Status = ContentExecutionBLL.prepareLocalDirectoryToExecution(outVersions, outContents, threadStart,
+                                                                                (ObservableCollection<ContentModel>)_activeContents,
+                                                                                 contentToAction,
+                                                                                 Hierarchy);
+                #region Handle files copy errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), Status.errorParams);
+                    return;
+                }
+
+                #endregion
+
+                #endregion copy content files
+
+                #region Run command line
+
+                IncrementProgressCounter(10);
+                HierarchyModel updatedHierarchy = Hierarchy;
+                updatedHierarchy.VM.Contents = (ObservableCollection<ContentModel>)_activeContents;
+                Status = ContentExecutionBLL.ExecuteContentVersionAndSaveInfo(updatedHierarchy, outVersions, outContents, contentToAction.id);
+                #region Handle execution errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), Status.errorParams);
+                        ProgressText = "0 %";
+                        MessageMediator.NotifyColleagues(WorkSpaceId + "OnContentsTabProgressTextReceived", this);
+                        return;
+                    }
+                #endregion
+
+                #endregion
+
+                #region Save history
+                //Record Execute History
+                Status = ContentExecutionBLL.recordExecutionHistory(Hierarchy.VM.VersionId);
+                #region Handle save history errors if any
+
+                if (Status.errorId != string.Empty)
+                {
+                    String logMessage = "Failed to save record in ExecutionHistory table";
+                    Domain.SaveGeneralErrorLog(logMessage);
+                }
+                #endregion
+
+                #endregion save history
+            }
+            catch (Exception ex)
+            {
+                String logMessage = ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                ProjectsExplorerViewModel.ShowErrorAndInfoMessage(105, new object[] {0});
+            }
+        }
+
+        #endregion Main content excecute command
+
+        #region Progress Bar
+        #region Fields
+
+        // Property variables
+        private float p_Progress = 0;
+        private int p_ProgressMax = 10;
+        private String p_ProgressText = "";
+        private float totalProgress = 0f;
+        #endregion
+
+        #region Data Properties
+
+        // The progress of an image processing job.
+        // The setter for this property also sets the ProgressMessage property.
+        public float Progress
+        {
+            get { return p_Progress; }
+
+            set
+            {
+                RaisePropertyChanged("Progress");
+                p_Progress = value;
+                RaisePropertyChanged("Progress");
+            }
+        }
+
+        public String ProgressText
+        {
+            get { return p_ProgressText; }
+
+            set
+            {
+                RaisePropertyChanged("ProgressText");
+                p_ProgressText = value;
+                RaisePropertyChanged("ProgressText");
+            }
+        }
+
+        //The maximum progress value.
+        public int ProgressMax
+        {
+            get { return p_ProgressMax; }
+
+            set
+            {
+                RaisePropertyChanged("ProgressMax");
+                p_ProgressMax = value;
+                RaisePropertyChanged("ProgressMax");
+            }
+        }
+
+
+        #endregion
+
+        #region Progress Bar Internal Methods
+
+
+        //Clears the view model.
+        internal void ClearViewModel()
+        {
+            p_Progress = 0;
+            p_ProgressMax = 100;
+            IncrementProgressCounter(10);
+            FileSystemBLL.filesCompleted = 0;
+        }
+
+        // Advances the progress counter for the Progress dialog.
+        public void IncrementProgressCounter(float incrementClicks)
+        {
+            incrementClicks = (int)(incrementClicks * 10);
+
+            totalProgress = incrementClicks;
+            if (totalProgress > 99)
+            {
+                totalProgress = 100;
+                Progress = p_ProgressMax;
+                ProgressText = "100 %";
+                FileSystemBLL.filesCompleted = 0;
+            }
+            else if (totalProgress < 0)
+            {
+                totalProgress = 0;
+
+                ProgressText = 0 + "%";
+            }
+            else
+            {
+                // Increment counter
+                this.Progress = incrementClicks / 10;
+                ProgressText = totalProgress + "%";
+            }
+
+            MessageMediator.NotifyColleagues(WorkSpaceId + "OnContentsTabProgressTextReceived", this);
+
+            // Update progress message
+            float progress = (p_Progress);
+            float progressMax = (p_ProgressMax);
+            float f = (progress / progressMax);
+            float percentComplete = Single.IsNaN(f) ? 0 : (f);
+        }
+
+        public void IncrementProgressCounter()
+        {
+            MessageMediator.NotifyColleagues(WorkSpaceId + "OnLinkedVersionExecutionReceived", this);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region ExecutionErrorHandler
+        int ExecutionErrorHandler(string BLLName, int enumInt)
+        {
+            int errorId = 105;
+            if (BLLName == "ContentBLL")
+            {
+                ContentBLL.CMApiReturnCode StatusEnum = (ContentBLL.CMApiReturnCode)enumInt;
+                switch (StatusEnum)
+                {
+                    case ContentBLL.CMApiReturnCode.GetTreeObjectsException:
+                        errorId = 144;
+                        break;
+                    case ContentBLL.CMApiReturnCode.EmptyCMTree:
+                        errorId = 144;
+                        break;
+                    case ContentBLL.CMApiReturnCode.ContentNotFree:
+                        errorId = 0;
+                        break;
+                    case ContentBLL.CMApiReturnCode.ContentVersionNotFound:
+                        errorId = 144;
+                        break;
+                    default:
+                        errorId = 144;
+                        break;
+                }
+
+            }
+            else if (BLLName == "CertificateBLL")
+            {
+                CertificateBLL.CertificateBLLReturnResult StatusEnum = (CertificateBLL.CertificateBLLReturnResult)enumInt;
+                switch (StatusEnum)
+                {
+                    case CertificateBLL.CertificateBLLReturnResult.RMCommonException:
+                        errorId = 137;
+                        break;
+
+                    case CertificateBLL.CertificateBLLReturnResult.DBConnectionError:
+                        errorId = 137;
+                        break;
+                    case CertificateBLL.CertificateBLLReturnResult.AllCertListEmpty:
+                        errorId = 137;
+                        break;
+                    case CertificateBLL.CertificateBLLReturnResult.RMException:
+                        errorId = 137;
+                        break;
+                    default:
+                        errorId = 137;
+                        break;
+                }
+
+            }
+            else if (BLLName == "FileSystemBLL")
+            {
+                ClearViewModel();
+                FileSystemBLL.FileSystemBLLReturnCode StatusEnum = (FileSystemBLL.FileSystemBLLReturnCode)enumInt;
+                switch (StatusEnum)
+                {
+                    case FileSystemBLL.FileSystemBLLReturnCode.UnauthorizedAccessException:
+                        {
+                            return 147;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.FailedToCopyContentfiles:
+                        {
+                            return 145;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.FailedToDeleteObsoleteFiles:
+                        {
+                            return 146;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.CommonException:
+                        {
+                            return 105;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.DriveNotFound:
+                        {
+                            return 140;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.exeNotSpecified:
+                        {
+                            return 132;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.ExecutableNotFound:
+                        {
+                            return 132;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.FileNotFound:
+                        {
+                            return 142;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.InvalidCommandLine:
+                        {
+                            return 132;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.NotEnoughSpace:
+                        {
+                            return 121;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.TargetDirectoryNotFound:
+                        {
+                            return 147;
+                            break;
+                        }
+                    case FileSystemBLL.FileSystemBLLReturnCode.UnableToExecute:
+                        {
+                            return 132;
+                            break;
+                        }
+                    default:
+                        return 105;
+                        break;
+                }
+            }
+            else
+            {
+                errorId = 105;
+            }
+
+            return errorId;
+        }
+
+        #endregion
+  
+        #endregion Content Execution
+
+        #region Open Content Version In Cm
+
+        private RelayCommand _OpenContentVersionInCm;
+        public ICommand OpenContentVersionInCm
+        {
+            get
+            {
+                if (_OpenContentVersionInCm == null)
+                {
+                    _OpenContentVersionInCm = new RelayCommand(ExecuteOpenContentVersionInCm, CanExecuteOpenContentVersionInCm);
+                }
+                return _OpenContentVersionInCm;
+            }
+        }
+
+        private bool CanExecuteOpenContentVersionInCm()
+        {
+            return true;
+        }
+
+        private void ExecuteOpenContentVersionInCm()
+        {
+            MessageMediator.NotifyColleagues("RequestGotoCm", this.contentToAction); //Send message to the MainViewModel to clear Statusbar from any previous operation
+        }
+
+        #endregion
+
+    }
+} 

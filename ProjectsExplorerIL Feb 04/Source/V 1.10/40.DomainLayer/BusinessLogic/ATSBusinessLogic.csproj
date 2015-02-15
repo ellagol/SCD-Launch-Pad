@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C359B3F4-760E-45F0-AF1F-C5742DD4437D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ATSBusinessLogic</RootNamespace>
+    <AssemblyName>ATSBusinessLogic</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\Binaries\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ATSBusinessObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\PE_API_Tester\Tester console\ConsoleApplication1\_Dependencies\ATSBusinessObjects.dll</HintPath>
+    </Reference>
+    <Reference Include="ATSDomain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\PE_API_Tester\Tester console\ConsoleApplication1\_Dependencies\ATSDomain.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.DAL.DataAccessServiceBase, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\DataAccessLayer\Infra.DAL.DataAccessServiceBase.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.DAL.DataAccessServiceInterface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\DataAccessLayer\Infra.DAL.DataAccessServiceInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\MVVM\Infra.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.MVVM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Expender List\ExpandersList\Dependencies\Infra.MVVM.dll</HintPath>
+    </Reference>
+    <Reference Include="ResourcesProvider, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ResourcesProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="TraceExceptionWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Dependencies\Bin\SCD\TraceExceptionWrapper.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApiBLL.cs" />
+    <Compile Include="CertificateBLL.cs" />
+    <Compile Include="ContentBLL.cs" />
+    <Compile Include="ContentExecution.cs" />
+    <Compile Include="ContentMgmtBLL\CMContentBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMContentsReaderBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMContentStatusReaderBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMContentTypesReaderBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMFileSystemUpdaterBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMFolderBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMImpersonationBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMSecurityBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMTreeNodeBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMUpdatePermissionBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMUserGroupTypesReaderBLL.cs" />
+    <Compile Include="ContentMgmtBLL\CMVersionBLL.cs" />
+    <Compile Include="BulkUpdateBLL.cs" />
+    <Compile Include="ExportProjectBLL.cs" />
+    <Compile Include="ExportProjectToEnvBLL.cs" />
+    <Compile Include="FileSystemBLL.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HierarchyBLL.cs" />
+    <Compile Include="ImportProjectBLL.cs" />
+    <Compile Include="TemplateBLL.cs" />
+    <Compile Include="NoteBLL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserCertificateBLL.cs" />
+    <Compile Include="UserCertificatesBLL\UserCertificateApiBLL.cs" />
+    <Compile Include="UserCertificatesBLL\CertificateUserBLL.cs" />
+    <Compile Include="UserCertificatesBLL\UserBLL.cs" />
+    <Compile Include="VersionBLL.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

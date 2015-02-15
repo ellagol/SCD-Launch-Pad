@@ -1,0 +1,579 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Text;
+using ATSBusinessObjects;
+using ATSBusinessObjects.ContentMgmtModels;
+using ATSDomain;
+
+namespace ATSBusinessLogic
+{
+    public  class VersionBLL
+    {
+
+        #region GetVersion
+        public static ObservableCollection<VersionModel> GetVersion(long HierarchyId)
+        {
+
+
+
+
+            // Initialize work fields
+            ObservableCollection<VersionModel> VersionList = new ObservableCollection<VersionModel>();
+            VersionModel EmptyVersion = Domain.GetBusinessObject<VersionModel>();
+            // Build The Query String
+            System.Text.StringBuilder QryStr = new System.Text.StringBuilder();
+            QryStr.Append("Select * FROM PE_Version t1 Where HierarchyId = '"+ HierarchyId.ToString()+ "'");
+            QryStr.Append("and not (");
+            QryStr.Append("VersionId = (select MIN(versionId) from PE_Version Where HierarchyId = '" + HierarchyId.ToString() + "')");
+            QryStr.Append("and not exists ");
+            QryStr.Append("(select 1 from PE_VersionContent t2 where t1.VersionId=t2.VersionId))");
+           
+            string Qry = QryStr.ToString();
+            // Fetch the DataTable from the database
+            DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(QryStr.ToString(), CommandType.Text, null);
+            // Populate the collection
+            if (ResTable != null)
+            {
+                foreach (DataRow DataRow in ResTable.Rows)
+                {
+                    VersionModel Version = (VersionModel)Domain.DeepCopy(EmptyVersion); // DeepCopy an empty instance to save on the Reflection work
+                    //
+                    //VersionModel Version = new VersionModel();
+                    Version.VersionId = (int)DataRow["VersionId"];
+                    Version.IsNew = false;
+                    Version.IsDirty = false;
+
+                    Version.HierarchyId = (int)DataRow["HierarchyId"];
+
+                    Version.Sequence = Convert.ToInt32(DataRow["VersionSeqNo"]);
+                    Version.VersionName = (string)DataRow["VersionName"];
+                    Version.VersionStatus = (string)DataRow["VersionStatus"].ToString().Trim();
+                    Version.TargetPath = (string)DataRow["TargetPath"];
+                    Version.Description = (string)DataRow["Description"];
+                    Version.CreationDate = (DateTime)DataRow["CreationDate"];
+                    Version.LastUpdateTime = (DateTime)DataRow["LastUpdateTime"];
+                    Version.LastUpdateUser = (string)DataRow["LastUpdateUser"];
+                    Version.EcrId = (DataRow["ECRId"] is System.DBNull) ? "" : (string)DataRow["ECRId"];
+                    
+                    if (!(DataRow["DefaultTargetPathInd"] is System.DBNull))
+                    {
+                        Version.DefaultTargetPathInd = (Boolean)DataRow["DefaultTargetPathInd"];
+                    }
+
+
+
+                    VersionList.Add(Version);
+                    
+
+                    }
+
+                    // TODO: Continue populating all properties  
+                
+                    
+                }
+            return VersionList;
+        }
+
+        #endregion GetVersion
+
+        #region GetVersionRow By hierarchy id
+
+        public static VersionModel GetVersionRow(long Id)
+        {
+            // Initialize work fields
+            VersionModel Version = Domain.GetBusinessObject<VersionModel>();
+            // Build The Query String
+            System.Text.StringBuilder QryStr = new System.Text.StringBuilder();
+            QryStr.Append("Select * FROM PE_Version WHERE HierarchyId = '" + Id + "' AND VersionStatus='A'");
+            string Qry = QryStr.ToString();
+            // Fetch the DataTable from the database
+            DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(QryStr.ToString(), CommandType.Text, null);
+            // Populate the collection
+            if (ResTable != null && ResTable.Rows.Count == 1)
+            {
+                DataRow DataRow = ResTable.Rows[0];
+                //
+
+                Version.VersionId = (int)DataRow["VersionId"];
+                Version.IsNew = false;
+                Version.IsDirty = false;
+
+                Version.HierarchyId = (int)DataRow["HierarchyId"];
+
+                Version.Sequence = Convert.ToInt32(DataRow["VersionSeqNo"]);
+                Version.VersionName = (string)DataRow["VersionName"];
+                Version.VersionStatus = (string)DataRow["VersionStatus"].ToString().Trim();
+                Version.TargetPath = (string)DataRow["TargetPath"];
+                Version.Description = (string)DataRow["Description"];
+                Version.CreationDate = (DateTime)DataRow["CreationDate"];
+                Version.LastUpdateTime = (DateTime)DataRow["LastUpdateTime"];
+                Version.LastUpdateUser = (string)DataRow["LastUpdateUser"];
+                Version.EcrId = (DataRow["ECRId"] is System.DBNull) ? "" : (string)DataRow["ECRId"];
+                if (!(DataRow["DefaultTargetPathInd"] is System.DBNull))
+                {
+                    Version.DefaultTargetPathInd = (Boolean)DataRow["DefaultTargetPathInd"];
+                }
+
+
+            }
+            return Version;
+        }
+
+        #endregion GetVersionRow
+
+        #region GetVersionRow By hierarchy id and version id
+
+        public static VersionModel GetVersionByIdAndHierarchyId(long versionId, long HierarchyId)
+        {
+            VersionModel Version = Domain.GetBusinessObject<VersionModel>();
+            try
+            {
+                // Initialize work fields
+                //VersionModel Version = Domain.GetBusinessObject<VersionModel>();
+                // Build The Query String
+                System.Text.StringBuilder QryStr = new System.Text.StringBuilder();
+                QryStr.Append("Select * FROM PE_Version WHERE HierarchyId = '" + HierarchyId + "' AND VersionId = '" + versionId + "'");
+                string Qry = QryStr.ToString();
+                // Fetch the DataTable from the database
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(QryStr.ToString(), CommandType.Text, null);
+                // Populate the collection
+                if (ResTable != null && ResTable.Rows.Count == 1)
+                {
+                    DataRow DataRow = ResTable.Rows[0];
+                    //
+
+                    Version.VersionId = (int)DataRow["VersionId"];
+                    Version.IsNew = false;
+                    Version.IsDirty = false;
+
+                    Version.HierarchyId = (int)DataRow["HierarchyId"];
+
+                    Version.Sequence = Convert.ToInt32(DataRow["VersionSeqNo"]);
+                    Version.VersionName = (string)DataRow["VersionName"];
+                    Version.VersionStatus = (string)DataRow["VersionStatus"].ToString().Trim();
+                    Version.TargetPath = (string)DataRow["TargetPath"];
+                    Version.Description = (string)DataRow["Description"];
+                    Version.CreationDate = (DateTime)DataRow["CreationDate"];
+                    Version.LastUpdateTime = (DateTime)DataRow["LastUpdateTime"];
+                    Version.LastUpdateUser = (string)DataRow["LastUpdateUser"];
+                    Version.EcrId = (DataRow["ECRId"] is System.DBNull) ? "" : (string)DataRow["ECRId"];
+                    if (!(DataRow["DefaultTargetPathInd"] is System.DBNull))
+                    {
+                        Version.DefaultTargetPathInd = (Boolean)DataRow["DefaultTargetPathInd"];
+                    }
+
+
+                }
+                return Version;
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                return Version;
+            }
+        }
+
+        #endregion GetVersionRow
+
+        #region ReOpen Version
+
+        public static Boolean reOpenVersion(long AversionID, long CversionID)
+        {
+            try
+            {
+                var SB = new StringBuilder(string.Empty);
+                SB.Append("Update PE_Version set VersionStatus='C', LastUpdateTime=GETDATE(), LastUpdateUser='" + Domain.User + "', LastUpdateComputer='" + Domain.Workstn + "', LastUpdateapplication='" + Domain.AppName + "' where VersionId = '" + AversionID + "'");
+                SB.Append(" Update PE_Version set VersionStatus='A', LastUpdateTime=GETDATE(), LastUpdateUser='" + Domain.User + "', LastUpdateComputer='" + Domain.Workstn + "', LastUpdateapplication='" + Domain.AppName + "' where VersionId = '" + CversionID + "';");
+                long result = Convert.ToInt64(Domain.PersistenceLayer.FetchDataValue(SB.ToString(), System.Data.CommandType.Text, null));
+                if (result < -1)
+                    return false;
+                else
+                    return true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("DB Error");
+            }
+        }
+
+        #endregion
+
+        public static int ParentId = 0;
+        public static int ID = 0;
+        public static string getParentName(string parentId2)
+        {
+           
+            var Target = new StringBuilder(string.Empty);
+          
+                var TargetQry = new StringBuilder(string.Empty);
+                TargetQry.Append("select Name, ParentId, Id from PE_Hierarchy where Id='" + parentId2.ToString().Trim() + "'");
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(TargetQry.ToString(), CommandType.Text, null);
+                if (ResTable != null && ResTable.Rows.Count == 1)
+                {
+                    DataRow DataRow = ResTable.Rows[0];
+
+                    string TargetParent = (string)DataRow["Name"];
+                    //Target.Append("/" + TargetParent.ToString().Trim());
+                    //int parentId = 0;
+
+                    if (!(DataRow["ParentId"] is System.DBNull))
+                    {
+                        ParentId = (int)DataRow["ParentId"];
+                        string Tr = getParentName(ParentId.ToString());
+                        Target.Append(Tr.ToString().Trim());
+                        ID = (int)DataRow["Id"];
+                        ParentId = ID;
+                    }
+                    else if (ParentId == 0)
+                    {
+                        ParentId = Convert.ToInt32(parentId2);
+                      
+                    }
+
+
+                   
+                    Target.Append("/" + TargetParent.ToString().Trim());
+                 //getParentId(parentId);
+                } 
+
+        
+            return Target.ToString().Trim();
+        }
+    
+        #region VersionBLL return codes enumeration
+        public enum VersionBLLReturnCode : int
+        {
+            DBException,
+            EmptyDataTable,
+            Success, //Common for all BLLs
+            CommonException, //Common for all BLLs
+            VersionToActivateNotFound,
+            MoreThanOneVerForCntName
+        }
+        #endregion
+
+        #region Bootstrap API
+
+        #region Get VersionContents by version name and Project Id
+
+        public static VersionBLLReturnCode GetVersionInfoByProjctIdAndVersionName(long projId, string VerName, out Dictionary<long, int> activeVerContens, out string targetPath, out long verId)
+        {
+            activeVerContens = new Dictionary<long, int>();
+            targetPath = string.Empty;
+            verId = -1;
+            Dictionary<string, string> activeVerContensStr = new Dictionary<string, string>();
+            VersionBLLReturnCode status = VersionBLLReturnCode.DBException;
+            try
+            {
+                StringBuilder getContentsQry = new System.Text.StringBuilder();
+                getContentsQry.Append("Select distinct ContentVersionId, ContentSeqNo, TargetPath, av.VersionId ");
+                getContentsQry.Append("from dbo.PE_VersionContent avc Join dbo.PE_Version av ");
+                getContentsQry.Append("on av.versionId=avc.VersionId ");
+                getContentsQry.Append("where av.VersionName='" + VerName + "' and av.HierarchyId=" + projId + ";");
+
+                DataTable contentsList = Domain.PersistenceLayer.FetchDataTable(getContentsQry.ToString(), CommandType.Text, null);
+                if (contentsList.Rows.Count > 0)
+                {
+
+                    foreach (DataRow DataRow in contentsList.Rows)
+                    {
+                        activeVerContens.Add(Convert.ToInt32(DataRow["ContentVersionId"]), Convert.ToInt32(DataRow["ContentSeqNo"]));
+                        targetPath = Convert.ToString(DataRow["TargetPath"]);
+                        verId = Convert.ToInt32(DataRow["VersionId"]);
+                        status = VersionBLLReturnCode.Success; //Success
+                    }
+                }
+                else
+                {
+                    status = VersionBLLReturnCode.EmptyDataTable; // no rows selected
+                }
+                return status;
+            }
+            catch (Exception)
+            {
+                return status; // DB error - future handling
+            }
+        }
+        #endregion
+
+        #region Get Content Version Id by Content name and Project Version name
+
+        //Receives Content name and Project Id. 
+        //Returns status 1 - success, 0 - no rows selected, -1 - exception
+        //Populates activated content version id and Content CertificateFree flag
+        public static VersionBLLReturnCode GetActivatedCntVersionIdByCntNameAndPrVersionName(string cntName, string PrVersionName, long projId, Dictionary<int, CMContentModel> cmContents, Dictionary<int, CMVersionModel> cmVersions, out long conVersionToActivate)
+        {
+            conVersionToActivate = -1;
+            VersionBLLReturnCode callStatus = VersionBLL.VersionBLLReturnCode.CommonException;//Exception
+
+            try
+            {
+                Dictionary<long, int> activeVersionContens;
+                string versionTargetPath = string.Empty;
+                long prVersionId = -1;
+
+                //retrieve Version contents and Target path by Project Id and Version Name
+                VersionBLL.VersionBLLReturnCode dbCallStatus = VersionBLL.GetVersionInfoByProjctIdAndVersionName(projId, PrVersionName, out activeVersionContens, out versionTargetPath, out prVersionId);
+
+                if (dbCallStatus == VersionBLL.VersionBLLReturnCode.Success) //Success - at least 1 row returned in activeVersionContens
+                {
+                    //Look for ContentVersionId by Content Name and make sure only one match found
+                    int countMatchingVersions = 0; //
+                    foreach (long v in activeVersionContens.Keys)
+                    {
+                        //foreach (KeyValuePair<int, ContentVersion> ver in cmVersions)
+                        //{
+                        //    if (ver.Key == v)
+                        //    {
+                        //        foreach (KeyValuePair<int, Content> cmCnt in cmContents)
+                        //        {
+                        //            if (cmCnt.Value.Name == cntName && cmCnt.Key == ver.Value.ParentID)
+                        //            {
+                        //                conVersionToActivate = v; // versionId of the activated version
+                        //                countMatchingVersions++; //counter to validate that only one version Id was found
+                        //            }
+                        //        }
+                        //    }
+                        //}
+
+                        int versionParentId = cmVersions[Convert.ToInt32(v)].ParentID;
+                        string versionContentName = cmContents[versionParentId].Name;
+                        if (versionContentName.Equals(cntName))
+                        {
+                            conVersionToActivate = v; // versionId of the activated version
+                            countMatchingVersions++; //counter to validate that only one version Id was found
+                        }
+                    }
+                    if (countMatchingVersions == 1)
+                    {
+                        callStatus = VersionBLL.VersionBLLReturnCode.Success;
+                    }
+                    else if (countMatchingVersions > 1)
+                    {
+                        callStatus = VersionBLL.VersionBLLReturnCode.MoreThanOneVerForCntName;
+                    }
+                    else callStatus = VersionBLL.VersionBLLReturnCode.VersionToActivateNotFound;
+                }
+                else
+                {
+                    callStatus = dbCallStatus;//Empty Data Table or connection error 
+                }
+                return callStatus;
+            }
+            catch (Exception ex)
+            {
+                ApiBLL.TraceExceptionParameterValue.Add(ex.Message);
+                return callStatus;
+            }
+        }
+
+        public static VersionBLLReturnCode GetRequiredDiskspace(out int reqSpace)
+        {
+            VersionBLLReturnCode callStatus = VersionBLL.VersionBLLReturnCode.CommonException;//Exception
+            reqSpace = -1;
+            try
+            {
+
+                string reqDiskSpaceQry = "select value from PE_SystemParameters where variable='RequiredDiskSpace';";
+
+
+                reqSpace = Convert.ToInt32(Domain.PersistenceLayer.FetchDataValue(reqDiskSpaceQry, CommandType.Text, null));
+                if (reqSpace >= 0)
+                {
+                    callStatus = VersionBLLReturnCode.Success;
+                }
+                return callStatus;
+            }
+            catch (Exception e)
+            {
+                ApiBLL.TraceExceptionParameterValue.Add(e.Message);
+                return callStatus;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        public static string GetProjectFullPathByProjectId(long HierarchyId, String VersionName)
+        {
+            String fullPath=null;
+            // Build The Query String
+            System.Text.StringBuilder QryStr = new System.Text.StringBuilder();
+            QryStr.Append("  select [TargetPath] from [PE_Version] where [HierarchyId]='" + HierarchyId.ToString() + "' and [VersionName]='" + VersionName.ToString() + "';");
+
+            string Qry = QryStr.ToString();
+
+            DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(QryStr.ToString(), CommandType.Text, null);
+            // Populate the collection
+            if (ResTable != null)
+            {
+                foreach (DataRow DataRow in ResTable.Rows)
+                {
+                    fullPath = DataRow[0].ToString();
+                }
+                return fullPath;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        #region LastUpadateVersionCheck
+
+        public static string LastUpadateVersionCheck(ref HierarchyModel HM)
+        {
+            try
+            {
+                if (!HM.IsNew)
+                {
+                    System.Text.StringBuilder LastUpdateSB = new System.Text.StringBuilder();
+                    LastUpdateSB.Append("SELECT LastUpdateTime FROM PE_Version WHERE VersionId = '" + HM.VM.VersionId + "'");
+                    object LastDateObj = Domain.PersistenceLayer.FetchDataValue(LastUpdateSB.ToString(), System.Data.CommandType.Text, null);
+                    if (LastDateObj != null)
+                    {
+                        string LastDate = Convert.ToDateTime(LastDateObj).ToString();
+                        string ObjDate = HM.VM.LastUpdateTime.ToString();
+                        if (LastDate != ObjDate) //If TimeStamp on the file is AFTER what we had when row was loaded into memory
+                        {
+                            return "104";
+                        }
+                    }
+                    else
+                        return "104";
+                }
+                return string.Empty;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0} Exception caught.", e); // TODO: Log error
+                throw new Exception("DB Error");
+            }
+        }
+        #endregion LastUpadateVersionCheck
+
+        #region LastUpadateVersionCheck
+
+        public static string LastUpadateReOpenVersionCheck(ref VersionModel VM)
+        {
+            try
+            {
+                System.Text.StringBuilder LastUpdateSB = new System.Text.StringBuilder();
+                LastUpdateSB.Append("SELECT LastUpdateTime FROM PE_Version WHERE VersionId = '" + VM.VersionId + "'");
+                object LastDateObj = Domain.PersistenceLayer.FetchDataValue(LastUpdateSB.ToString(), System.Data.CommandType.Text, null);
+                if (LastDateObj != null)
+                {
+                    string LastDate = Convert.ToDateTime(LastDateObj).ToString();
+                    string ObjDate = VM.LastUpdateTime.ToString();
+                    if (LastDate != ObjDate) //If TimeStamp on the file is AFTER what we had when row was loaded into memory
+                    {
+                        return "104";
+                    }
+
+                }
+                return string.Empty;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0} Exception caught.", e); // TODO: Log error
+                throw new Exception("DB Error");
+            }
+        }
+        #endregion LastUpadateVersionCheck
+
+        #region get list of used content versions
+
+        public static void GetListOfUsedContentVersionsPE(ref List<int> listOfUsedContentVersions)
+        {
+            listOfUsedContentVersions = new List<int>();
+            try
+            {
+                string qry = "select distinct ContentVersionId from PE_VersionContent";
+                DataTable contentVersions = Domain.PersistenceLayer.FetchDataTable(qry.ToString(), CommandType.Text, null);
+                if (contentVersions != null)
+                {
+                    foreach (DataRow DataRow in contentVersions.Rows)
+                    {
+                        int cvID = Convert.ToInt32(DataRow.ItemArray[0]);
+                        listOfUsedContentVersions.Add(cvID);
+   
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                ATSDomain.Domain.SaveGeneralErrorLog(logMessage);
+                throw new Exception("Failed to get list of content versions");
+            }
+        }
+
+        #endregion get list of used content versions
+
+        #region Export-Import
+
+        public static DataTable GetActiveVersionDataTable(long Id)
+        {
+            try
+            {
+                // Build The Query String
+                System.Text.StringBuilder QryStr = new System.Text.StringBuilder();
+                QryStr.Append("Select * FROM PE_Version WHERE HierarchyId = '" + Id + "' AND VersionStatus='A'");
+                string Qry = QryStr.ToString();
+                // Fetch the DataTable from the database
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(QryStr.ToString(), CommandType.Text, null);
+                if (ResTable != null && ResTable.Rows.Count <= 1)
+                {
+                    return ResTable;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                return null;
+            }
+        }
+
+        public static VersionModel GetActiveVersionModel(DataRow versionRow)
+        {
+            // Initialize work fields
+            VersionModel Version = Domain.GetBusinessObject<VersionModel>();
+
+            if (versionRow != null)
+            {
+                DataRow DataRow = versionRow;
+                //
+
+                Version.VersionId = (int)DataRow["VersionId"];
+                Version.IsNew = false;
+                Version.IsDirty = false;
+
+                Version.HierarchyId = (int)DataRow["HierarchyId"];
+
+                Version.Sequence = Convert.ToInt32(DataRow["VersionSeqNo"]);
+                Version.VersionName = (string)DataRow["VersionName"];
+                Version.VersionStatus = (string)DataRow["VersionStatus"].ToString().Trim();
+                Version.TargetPath = (string)DataRow["TargetPath"];
+                Version.Description = (string)DataRow["Description"];
+                Version.CreationDate = (DateTime)DataRow["CreationDate"];
+                Version.LastUpdateTime = (DateTime)DataRow["LastUpdateTime"];
+                Version.LastUpdateUser = (string)DataRow["LastUpdateUser"];
+                Version.EcrId = (DataRow["ECRId"] is System.DBNull) ? "" : (string)DataRow["ECRId"];
+                if (!(DataRow["DefaultTargetPathInd"] is System.DBNull))
+                {
+                    Version.DefaultTargetPathInd = (Boolean)DataRow["DefaultTargetPathInd"];
+                }
+            }
+            return Version;
+        }
+
+        #endregion Export-Import
+
+    }
+}

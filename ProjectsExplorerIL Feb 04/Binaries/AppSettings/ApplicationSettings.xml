@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Application>
+  <Section Name="Login">
+    <Key Name="User" Value="" />
+    <Key Name="Password" Value="" />
+  </Section>
+  <Section Name="SqlServer">
+    <Key Name="ConnectionStringClientServer" Value="Data Source=(local)\SQLExpress;Initial Catalog=ATS;Integrated Security=true;" />
+    <Key Name="ConnectionStringTiered" Value="Data Source=Domain\SQLExpress;Initial Catalog=ATS;User Id=sa;Password=pwd;" />
+    <!--<Key Name="ConnectionStringTiered" Value="Data Source=(local)\SQLExpress;Initial Catalog=ATS;Integrated Security=true;" />-->
+  </Section>
+  <Section Name="SqlServerCE">
+    <Key Name="FileName" Value="" />
+  </Section>
+  <Section Name="DAL">
+    <Key Name="DbEngine" Value="SqlServer" />
+    <!--<Key Name="DbEngine" Value="SqlServerCE" />-->
+    <Key Name="Architecture" Value="ClientServer" />
+    <!--<Key Name="Architecture" Value="Tiered" />-->
+    <Key Name="EndPointAddress" Value="net.tcp://localhost:5000/DAL" />
+  </Section>
+</Application>

@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="ContentManager.Messanger.View.UcMessanger"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="334" d:DesignWidth="530"
+             DataContext="{Binding MessangerDataProvider, Source={StaticResource Locator}}">
+    <Grid Background="{Binding Path=MessageBgColor}" Opacity="0.7">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="0.6*"/>
+            <RowDefinition Height="0.2*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.2*"/>
+            <ColumnDefinition Width="0.8*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Text="{Binding Path=MessageTitle}" Background="DodgerBlue" FontSize="18"/>
+        <Image Grid.Column="0" Grid.Row="1" Source="{Binding Path=MessageIcon}" />
+        <TextBlock Grid.Row="1" Grid.Column="1" TextWrapping ="WrapWithOverflow" Text="{Binding Path=MessageText}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="22"/>
+        
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Margin="10" Grid.Column="0" Content="OK" Opacity="1" Command="{Binding Path=ActionExecute}" Visibility="{Binding Path=IsAcknowledge, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"/>
+            <Button Margin="10" Grid.Column="1" Content="Cancel" Opacity="1" Command="{Binding Path=ActionCancel}" Visibility="{Binding Path=IsAcknowledge, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"/>
+            <Button Margin="10" Grid.ColumnSpan="2" Content="Close" Opacity="1" Command="{Binding Path=ActionCancel}" Visibility="{Binding Path=IsAcknowledge, Mode=OneWay, Converter={StaticResource BoolToVisibility}, ConverterParameter = '[Not]'}"/>                  
+        </Grid>
+    </Grid>
+</UserControl>

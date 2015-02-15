@@ -1,0 +1,5 @@
+C:\Users\au_yoren\Desktop\ContentManagerProvider\ContentManagerProviderTester\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\au_yoren\Desktop\ContentManagerProvider\ContentManagerProviderTester\obj\x86\Debug\ContentManagerProviderTester.Form1.resources
+C:\Users\au_yoren\Desktop\ContentManagerProvider\ContentManagerProviderTester\obj\x86\Debug\ContentManagerProviderTester.Properties.Resources.resources
+C:\Users\au_yoren\Desktop\ContentManagerProvider\ContentManagerProviderTester\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\au_yoren\Desktop\ContentManagerProvider\ContentManagerProviderTester\obj\x86\Debug\GenerateResource.write.1.tlog

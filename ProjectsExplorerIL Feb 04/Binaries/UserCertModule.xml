@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>UserCertModule</name>
+    </assembly>
+    <members>
+        <member name="M:UserCertModule.ScrollIntoViewForListView.OnAttached">
+            <summary>
+             When Beahvior is attached
+            </summary>
+        </member>
+        <member name="M:UserCertModule.ScrollIntoViewForListView.AssociatedObject_SelectionChanged(System.Object,System.Windows.Controls.SelectionChangedEventArgs)">
+            <summary>
+            On Selection Changed
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:UserCertModule.ScrollIntoViewForListView.OnDetaching">
+            <summary>
+            When behavior is detached
+            </summary>
+        </member>
+        <member name="T:ExplorerModule.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:ExplorerModule.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:ExplorerModule.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="T:UserCertModule.UsersCertificatesView">
+            <summary>
+            Interaction logic for UsersCertificatesView.xaml
+            </summary>
+            <summary>
+            UsersCertificatesView
+            </summary>
+        </member>
+        <member name="M:UserCertModule.UsersCertificatesView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:UserCertModule.UsersCertificatesViewModel.OnUpdateCertificateReceived(ATSBusinessObjects.UserCertificateModel)">
+            private string _Name;
+                    public string Name
+                    {
+                        get
+                        {
+                            if (_SelectedCertificate != null)
+                            {
+                                return _SelectedCertificate.Name;
+                            }
+                            else
+                                return _Name;
+                        }
+                        set
+                        {
+                            _Name = value;
+                            RaisePropertyChanged("Name");
+            
+            
+                        }
+            
+                    }*
+        </member>
+        <member name="T:UserCertModule.UserDetailsView">
+            <summary>
+            Interaction logic for UserDetailsView.xaml.xaml
+            </summary>
+            <summary>
+            UserDetailsView
+            </summary>
+        </member>
+        <member name="M:UserCertModule.UserDetailsView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:UserCertModule.CertificatesDetailsView">
+            <summary>
+            Interaction logic for CertificatesDetailsView.xaml
+            </summary>
+            <summary>
+            CertificatesDetailsView
+            </summary>
+        </member>
+        <member name="M:UserCertModule.CertificatesDetailsView.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+    </members>
+</doc>

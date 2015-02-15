@@ -1,0 +1,5 @@
+C:\Projects\Modernization\DLLs\ProfileManagerProvider.dll
+C:\Projects\Modernization\DLLs\ProfileManagerProvider.pdb
+C:\Users\au_yoren\Desktop\ProfileManagerProvider\ProfileManagerProvider\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\au_yoren\Desktop\ProfileManagerProvider\ProfileManagerProvider\obj\Debug\ProfileManagerProvider.dll
+C:\Users\au_yoren\Desktop\ProfileManagerProvider\ProfileManagerProvider\obj\Debug\ProfileManagerProvider.pdb

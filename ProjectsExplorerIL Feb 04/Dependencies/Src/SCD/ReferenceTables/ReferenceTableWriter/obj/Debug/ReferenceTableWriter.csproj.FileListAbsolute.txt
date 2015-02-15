@@ -1,0 +1,5 @@
+C:\Users\au_yoren\Desktop\ReferenceTables\ReferenceTableWriter\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\au_yoren\Desktop\ReferenceTables\ReferenceTableWriter\obj\Debug\ReferenceTableWriter.ManageReferenceTables.resources
+C:\Users\au_yoren\Desktop\ReferenceTables\ReferenceTableWriter\obj\Debug\ReferenceTableWriter.PropertiesEditing.resources
+C:\Users\au_yoren\Desktop\ReferenceTables\ReferenceTableWriter\obj\Debug\GenerateResource.read.1.tlog
+C:\Users\au_yoren\Desktop\ReferenceTables\ReferenceTableWriter\obj\Debug\GenerateResource.write.1.tlog

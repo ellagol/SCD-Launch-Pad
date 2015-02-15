@@ -1,0 +1,195 @@
+﻿using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+using ATSBusinessObjects.ContentMgmtModels;
+
+namespace ContentMgmtModule
+{
+    class CMTreeViewVersionLinkBehavior
+    {
+        #region IsTreeViewVersionLinkBehaviorProperty
+
+        public static bool GetIsTreeViewVersionLinkBehavior(TreeView treeView)
+        {
+            return (bool)treeView.GetValue(IsTreeViewVersionLinkBehaviorProperty);
+        }
+
+        public static void SetIsTreeViewVersionLinkBehavior(TreeView treeView, bool value)
+        {
+            treeView.SetValue(IsTreeViewVersionLinkBehaviorProperty, value);
+        }
+
+        public static readonly DependencyProperty IsTreeViewVersionLinkBehaviorProperty =
+            DependencyProperty.RegisterAttached(
+                "IsTreeViewVersionLinkBehavior",
+                typeof(bool),
+                typeof(CMTreeViewVersionLinkBehavior),
+                new UIPropertyMetadata(false, OnIsTreeViewVersionLinkBehaviorOccur));
+
+        private static void OnIsTreeViewVersionLinkBehaviorOccur(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            TreeView item = d as TreeView;
+            if (item == null)
+                return;
+
+            if (e.NewValue is bool == false)
+                return;
+
+            //if ((bool)e.NewValue)
+            //{
+            //    item.Drop += OnTreeViewDrop;
+            //    item.DragOver += OnTreeViewDropDragOver;
+            //}
+            //else
+            //{
+            //    item.Drop -= OnTreeViewDrop;
+            //    item.DragOver -= OnTreeViewDropDragOver;
+            //}
+        }
+
+        //private static void OnTreeViewDrop(object sender, DragEventArgs e)
+        //{
+        //    if (!Locator.VersionDataProvider.UpdateModeData)
+        //    {
+        //        e.Effects = DragDropEffects.None;
+        //        e.Handled = true;
+        //        return;
+        //    }
+
+        //    if (e.Data.GetDataPresent(typeof(TreeViewItem).ToString()))
+        //    {
+        //        object sourceNode = ((TreeViewItem)e.Data.GetData(typeof(TreeViewItem).ToString())).DataContext;
+
+        //        if (sourceNode.GetType() == typeof(ItemVersionLink))
+        //        {
+        //            ItemVersionLink sourceItemVersionLinkNode = (ItemVersionLink)sourceNode;
+        //            Locator.VersionDataProvider.VersionProperty.SubItemVersionLinkNodeRemove(sourceItemVersionLinkNode);
+        //            Locator.VersionDataProvider.VersionProperty.SubItemVersionLinkNodeAdd(sourceItemVersionLinkNode);
+
+        //            e.Handled = true;
+        //        }
+
+        //        if (sourceNode.GetType() == typeof(ItemNode))
+        //        {
+        //            ItemNode sourceItemVersionNode = (ItemNode)sourceNode;
+        //            if (sourceItemVersionNode.Type == TreeNodeObjectType.ContentVersion)
+        //            {
+        //                ItemVersionLink versionLink = new ItemVersionLink
+        //                {
+        //                    ContentVersionID = sourceItemVersionNode.ID,
+        //                    ContentID = sourceItemVersionNode.Parent.ID,
+        //                    Icon = sourceItemVersionNode.Icon,
+        //                    ContentName = sourceItemVersionNode.Parent.Name,
+        //                    Name = sourceItemVersionNode.Name
+        //                };
+
+        //                Locator.VersionDataProvider.VersionProperty.SubItemVersionLinkNodeAdd(versionLink);
+        //                e.Handled = true;
+        //            }
+        //        }
+        //    }
+        //}
+
+        //private static void OnTreeViewDropDragOver(object sender, DragEventArgs e)
+        //{
+        //    if (!Locator.VersionDataProvider.UpdateModeData)
+        //    {
+        //        e.Effects = DragDropEffects.None;
+        //        e.Handled = true;
+        //        return;
+        //    }
+
+        //    if (e.Data.GetDataPresent(typeof(TreeViewItem).ToString()))
+        //    {
+        //        object sourceNode = ((TreeViewItem)e.Data.GetData(typeof(TreeViewItem).ToString())).DataContext;
+
+        //        if (sourceNode.GetType() == typeof(ItemVersionLink))
+        //        {
+        //            e.Effects = DragDropEffects.Move;
+        //            e.Handled = true;
+        //            return;
+        //        }
+
+        //        if (sourceNode.GetType() == typeof(ItemNode))
+        //        {
+        //            ItemNode sourceItemVersionNode = (ItemNode)sourceNode;
+
+        //            int parentContentID;
+
+        //            if (Locator.VersionDataProvider.VersionAction == ItenNodeAction.Update)
+        //                parentContentID = Locator.VersionDataProvider.VersionItem.Parent.ID;
+        //            else
+        //                parentContentID = Locator.VersionDataProvider.ParentFolderOfContentVersionItem.ID;
+
+        //            if (!AllowDropItemVersionLink(sourceItemVersionNode, parentContentID,
+        //                                          Locator.VersionDataProvider.VersionProperty.SubItemVersionLinkNode))
+        //            {
+        //                e.Effects = DragDropEffects.None;
+        //                e.Handled = true;
+        //                return;
+        //            }
+        //            else
+        //            {
+        //                e.Effects = DragDropEffects.Move;
+        //                e.Handled = true;
+        //                return;
+        //            }
+        //        }
+        //    }
+
+        //    e.Effects = DragDropEffects.None;
+        //    e.Handled = true;
+        //}
+
+        //private static bool AllowDropItemVersionLink(ItemNode sourceItemVersionNode, int parentContentID, IEnumerable<ItemVersionLink> existingSubItems)
+        //{
+
+        //    // Link not a ContentVersion
+        //    if (sourceItemVersionNode.Type != TreeNodeObjectType.ContentVersion)
+        //        return false;
+
+        //    List<int> linkedContents = new List<int> { parentContentID };
+
+        //    // Add existing links to List 
+        //    foreach (ItemVersionLink itemVersionLink in existingSubItems)
+        //    {
+        //        if (!linkedContents.Contains(itemVersionLink.ContentID))
+        //            linkedContents.Add(itemVersionLink.ContentID);
+        //        else
+        //            return false;
+
+        //        if (!AddSubLinkedContents(linkedContents, Locator.ContentVersions[itemVersionLink.ContentVersionID]))
+        //            return false;
+        //    }
+
+        //    //Add new links to List
+        //    if (!linkedContents.Contains(sourceItemVersionNode.Parent.ID))
+        //        linkedContents.Add(sourceItemVersionNode.Parent.ID);
+        //    else
+        //        return false;
+
+        //    if (!AddSubLinkedContents(linkedContents, Locator.ContentVersions[sourceItemVersionNode.ID]))
+        //        return false;
+
+        //    return true;
+        //}
+
+        private static bool AddSubLinkedContents(List<int> linkedContents, CMVersionModel contentVersion)
+        {
+            foreach (KeyValuePair<int, CMContentVersionSubVersionModel> subVersion in contentVersion.ContentVersions)
+            {
+                if (!linkedContents.Contains(subVersion.Value.Content.ID))
+                    linkedContents.Add(subVersion.Value.Content.ID);
+                else
+                    return false;
+
+                if (!AddSubLinkedContents(linkedContents, subVersion.Value.ContentSubVersion))
+                    return false;
+            }
+
+            return true;
+        }
+
+        #endregion
+    }
+}

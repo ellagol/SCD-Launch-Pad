@@ -1,0 +1,155 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Collections.ObjectModel;
+using ATSBusinessObjects.ContentMgmtModels;
+using ATSBusinessLogic.ContentMgmtBLL;
+
+namespace ContentMgmtModule
+{
+    public class CMItemNodeVersionVersionLinkConfirmer
+    {
+        #region Properties
+
+        private Dictionary<int, List<int>> VersionLinksToConfirm { get; set; }
+        private Dictionary<int, List<CMVersionKey>> ContentVersionLinks { get; set; }
+        public static Dictionary<int, CMVersionModel> versions { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        public bool ConfirmerContentVersion(ObservableCollection<CMItemVersionLink> subItemVersionLinkNode, int versionID, int versionParentContentID, Dictionary<int, CMVersionModel> _versions)
+        {
+            versions = _versions;
+            ContentVersionLinks = GetContentVersionLinks();
+
+            foreach (KeyValuePair<int, List<CMVersionKey>> contentVersionLink in ContentVersionLinks)
+            {
+                foreach (CMVersionKey versionKey in contentVersionLink.Value)
+                {
+                    if (versionKey.VersionID == versionID)
+                        versionKey.ContentID = versionParentContentID;
+                }
+            }
+
+            if (versionID != 0)
+                ContentVersionLinks.Remove(versionID);
+
+            List<CMVersionKey> newVersionLinks = new List<CMVersionKey>();
+
+            foreach (CMItemVersionLink versionLink in subItemVersionLinkNode)
+            {
+                if (newVersionLinks.Any(versionKey => versionKey.ContentID == versionLink.ContentID))
+                    return false;
+            //        return "Version linked to content " + Locator.Contents[versionLink.ContentID].Name + " twice.";
+
+                newVersionLinks.Add(new CMVersionKey() { ContentID = versionLink.ContentID, VersionID = versionLink.ContentVersionID });
+            }
+
+            ContentVersionLinks.Add(versionID, newVersionLinks);
+            return ConfirmerContentVersionsList(versionID, versionParentContentID);
+        }
+
+        private bool ConfirmerContentVersionsList(int versionID, int versionParentContentID)
+        {
+            string errorStr;
+
+            VersionLinksToConfirm = new Dictionary<int, List<int>>();
+            AddVersionToConfirm(versionParentContentID, versionID, versionParentContentID);
+
+            foreach (KeyValuePair<int, List<int>> versionToConfirm in VersionLinksToConfirm)
+            {
+                errorStr = ConfirmVersionLinks(versionToConfirm.Key, ContentVersionLinks[versionToConfirm.Key]);
+
+                if (errorStr != "")
+                    return false;
+            }
+
+            return true;
+        }
+
+
+        private string ConfirmVersionLinks(int versionToConfirm, List<CMVersionKey> versionsToAdd)
+        {
+            string errorStr;
+
+            foreach (CMVersionKey versionKey in versionsToAdd)
+            {
+                if (VersionLinksToConfirm[versionToConfirm].Contains(versionKey.ContentID))
+                    return "error";
+         //           return "Version " + Locator.ContentVersions[versionToConfirm].Name + " linked to content " + Locator.Contents[versionKey.ContentID].Name + " twice. Data will now be refreshed.";
+
+                VersionLinksToConfirm[versionToConfirm].Add(versionKey.ContentID);
+
+                if (ContentVersionLinks.ContainsKey(versionKey.VersionID))
+                {
+                    errorStr = ConfirmVersionLinks(versionToConfirm, ContentVersionLinks[versionKey.VersionID]);
+
+                    if (errorStr != "")
+                        return errorStr;
+                }
+            }
+
+            return "";
+        }
+
+        private void AddVersionToConfirm(int contentID, int newVersionID, int updatedVersionParentID)
+        {
+
+            if (VersionLinksToConfirm.ContainsKey(newVersionID))
+                return;
+
+            VersionLinksToConfirm.Add(newVersionID, new List<int>() { contentID });
+
+            foreach (KeyValuePair<int, List<CMVersionKey>> versionUseBy in ContentVersionLinks)
+            {
+                foreach (CMVersionKey versionKey in versionUseBy.Value)
+                {
+                    if (versionKey.VersionID == newVersionID)
+                    {
+                        if (versionUseBy.Key == newVersionID)
+                            AddVersionToConfirm(updatedVersionParentID, versionUseBy.Key, updatedVersionParentID);
+                        else
+                        {
+                            CMVersionModel vm = CMVersionBLL.GetVersiontRow(versionUseBy.Key);
+                            AddVersionToConfirm(vm.ParentID, versionUseBy.Key, updatedVersionParentID);
+                        }
+                         
+                          //  AddVersionToConfirm(Locator.ContentVersions[versionUseBy.Key].ParentID, versionUseBy.Key, updatedVersionParentID);
+                    }
+                }
+            }
+        }
+
+        private Dictionary<int, List<CMVersionKey>> GetContentVersionLinks()
+        {
+            int version;
+            int versionLink;
+            int versionLinkParentContent = 0;
+
+            Dictionary<int, List<CMVersionKey>> versionLinks = new Dictionary<int, List<CMVersionKey>>();
+
+            foreach (KeyValuePair<int, CMVersionModel> contentVersion in versions)
+            {
+
+                foreach (KeyValuePair<int, CMContentVersionSubVersionModel> contentVersionSubVersion in contentVersion.Value.ContentVersions)
+                {
+                    version = contentVersion.Value.ID;
+                    versionLink = contentVersionSubVersion.Value.ContentSubVersion.ID;
+                    versionLinkParentContent = contentVersionSubVersion.Value.Content.ID;
+
+                    if (versionLinks.ContainsKey(version))
+                        versionLinks[version].Add(new CMVersionKey() { ContentID = versionLinkParentContent, VersionID = versionLink });
+                    else
+                        versionLinks.Add(version, new List<CMVersionKey>() { new CMVersionKey() { ContentID = versionLinkParentContent, VersionID = versionLink } });
+                }
+            }
+
+            return versionLinks;
+        }
+
+        #endregion
+    }
+}

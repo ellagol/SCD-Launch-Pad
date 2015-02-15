@@ -1,0 +1,697 @@
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Linq;
+using System.Text;
+using ATSBusinessObjects;
+using ATSDomain;
+using System;
+using Infra.DAL;
+
+
+namespace ATSBusinessLogic
+{
+    public  class BulkUpdateBLL
+    {
+
+        #region Intersect all projects and from content
+
+        public static ObservableCollection<HierarchyModel> LinkedContentToProjects(ObservableCollection<HierarchyModel> ProjectsFamily, ObservableCollection<ContentModel> FindList)
+        {
+            if (FindList.Count == 1 && ProjectsFamily.Count > 0)
+            {
+                var QryStr = new StringBuilder(string.Empty);
+                QryStr.Append("SELECT DISTINCT h.Id FROM PE_Hierarchy AS h inner join PE_Version v ON h.Id = v.HierarchyId ");
+                QryStr.Append("inner join PE_VersionContent vc ON v.VersionId = vc.VersionId ");
+                QryStr.Append("WHERE vc.ContentVersionId ='" + FindList[0].id + "'  AND v.VersionStatus='A' ");
+               for(int i =0; i < ProjectsFamily.Count ; i++)
+               {
+                   if( i== 0)
+                       QryStr.Append(" AND (h.Id ='" + ProjectsFamily[0].Id+ "' ");
+                   else
+                       QryStr.Append(" OR h.Id ='" + ProjectsFamily[i].Id+ "' ");
+              
+               }
+               QryStr.Append(")");
+                string Qry = QryStr.ToString();
+                // Fetch the DataTable from the database
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(QryStr.ToString(), CommandType.Text, null);
+                // Populate the collection
+                if (ResTable != null)
+                {
+                     foreach (var project in ProjectsFamily.ToList())
+                     {
+                         bool IsContain = false;
+                          foreach (DataRow DataRow in ResTable.Rows)
+                          { 
+                              int HirearchyID = (int)DataRow["Id"];
+                              if(project.Id == HirearchyID)
+                                  IsContain = true;
+                          }
+                         if(!IsContain)
+                             ProjectsFamily.Remove(project);
+                     }
+                }
+                    
+            }
+            return ProjectsFamily;
+        }
+
+        #endregion Intersect all projects and from content
+
+        #region Replace Validations
+
+        public static bool CheckProjectContents(ObservableCollection<HierarchyModel> projects, ObservableCollection<ContentModel> FindList, ObservableCollection<ContentModel>ReplaceList)
+        {
+            foreach (var Hierarchy in projects)
+            {
+                var SB = new StringBuilder(string.Empty);
+                SB.Append("SELECT ContentVersionId FROM dbo.PE_VersionContent avc Join dbo.PE_Version av " +
+                " on av.versionId = avc.VersionId  WHERE av.HierarchyId = ");
+                if (Hierarchy.GroupId == -1)
+                {
+                    SB.Append(" '" + Hierarchy.Id + "' ");
+                }
+                else
+                    SB.Append(" '" + Hierarchy.GroupId + "' ");
+                SB.Append(" AND av.VersionStatus='A' and av.versionId ='" + Hierarchy.VM.VersionId + "'");
+                SB.Append(" AND ContentVersionId != '" + FindList[0].id + "'");
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(SB.ToString(), CommandType.Text, null);
+
+                if (ResTable != null)
+                {
+                    foreach (DataRow DataRow in ResTable.Rows)
+                    {
+                        int ContentVersionId = (int)DataRow["ContentVersionId"];
+                        Dictionary<int, int> ExsitingContents = new Dictionary<int, int>();
+                        //int DBverParentId = explrerContentManagementViewModel.versions[ContentVersionId].ParentID; 
+                    }
+                }
+            }
+           return true;
+            
+        }
+
+
+        #endregion CheckToVersion
+
+        #region Save Bulk Update
+
+        public static string PresistBulkUpdate(HierarchyModel Hierarchy, ObservableCollection<ContentModel> FindList, ObservableCollection<ContentModel> ReplaceList)
+        {
+            List<ParamStruct> CommandParamsVersion;
+            try
+            {
+                //creating hirearchy by ref(in foreach hirearchy is read only);
+                HierarchyModel HierarchyRef = new HierarchyModel();
+                HierarchyRef = Hierarchy;
+
+                //check Hierarchy last update.
+                string updateCheck = HierarchyBLL.LastUpadateCheck(ref HierarchyRef);
+                if (!(String.IsNullOrEmpty(updateCheck)))
+                {
+                    return updateCheck;
+                }
+
+                //check version last update.
+                string updateVersionCheck = VersionBLL.LastUpadateVersionCheck(ref HierarchyRef);
+                if (!(String.IsNullOrEmpty(updateVersionCheck)))
+                {
+                    return updateVersionCheck;
+                }
+
+                ObservableCollection<ContentModel> FinalContents = new ObservableCollection<ContentModel>();
+
+                //Flag --> is replace list include find list.
+                bool IsAddContent = false;
+                //Find and add(don't replace)
+                if (ReplaceList.Count > 0)
+                {
+                    foreach (var i in ReplaceList)
+                    {
+                        if (i.id == FindList[0].id)
+                        {
+                            IsAddContent = true;
+                            break;
+                        }
+                    }
+                }
+
+                //In case of replace and find list with the same content.
+                //In find content exists more contents.
+                if (IsAddContent)
+                    FinalContents = GetContentSequenceInsertContents(FindList, ReplaceList, Hierarchy);
+                else
+                    FinalContents = GetContentSequence(FindList, ReplaceList, Hierarchy);
+
+                string ClosedResult = BulkUpdateBLL.PersistClosedVersion(Hierarchy);
+                if (!string.IsNullOrEmpty(ClosedResult))
+                    return ClosedResult;
+
+                DateTime VersionLastUpdateTime = DateTime.Now;
+
+                //get next version Name.
+                string VersionName = BulkUpdateBLL.GetVersionName(Hierarchy.VM.VersionName, Hierarchy.Id);
+                
+
+                string TargetPath = GetTargetPath(Hierarchy, VersionName);
+                var SB = new StringBuilder(string.Empty);
+                SB.Append("INSERT INTO PE_Version (HierarchyId, VersionName, VersionSeqNo, VersionStatus, Description, TargetPath, CreationDate, LastUpdateTime, LastUpdateUser, LastUpdateComputer, LastUpdateapplication, DefaultTargetPathInd) ");
+                SB.Append("VALUES (@HierarchyId, @VersionName, @VersionSeqNo, @VersionStatus, @Description, @TargetPath, @CreationDate, @LastUpdateTime, @LastUpdateUser, @LastUpdateComputer, @LastUpdateapplication, @DefaultTargetPathInd) ");
+                SB.Append("; Select Scope_Identity()");
+
+                CommandParamsVersion = new List<ParamStruct>()
+                {
+                    new ParamStruct { ParamName = "HierarchyId", DataType = DbType.Int32, Value = (Hierarchy.GroupId == -1) ? Hierarchy.Id : Hierarchy.GroupId },
+                    new ParamStruct { ParamName = "VersionName", DataType = DbType.String, Value = VersionName.Trim() },
+                    new ParamStruct { ParamName = "VersionSeqNo", DataType = DbType.Int32, Value = Hierarchy.VM.Sequence +1},
+                    new ParamStruct { ParamName = "VersionStatus", DataType = DbType.String, Value = 'A' },
+                    new ParamStruct { ParamName = "Description", DataType = DbType.String, Value = Hierarchy.VM.Description.Trim() },
+                    new ParamStruct { ParamName = "TargetPath", DataType = DbType.String, Value = TargetPath.Trim()},
+                    new ParamStruct { ParamName = "CreationDate", DataType = DbType.DateTime, Value = VersionLastUpdateTime },
+                    new ParamStruct { ParamName = "LastUpdateTime", DataType = DbType.DateTime, Value = VersionLastUpdateTime },
+                    new ParamStruct { ParamName = "LastUpdateUser", DataType = DbType.String, Value = Hierarchy.LastUpdateUser },
+                    new ParamStruct { ParamName = "LastUpdateComputer", DataType = DbType.String, Value = Hierarchy.LastUpdateComputer },
+                    new ParamStruct { ParamName = "LastUpdateApplication", DataType = DbType.String, Value = Hierarchy.LastUpdateApplication },
+                    new ParamStruct { ParamName = "DefaultTargetPathInd", DataType = DbType.Boolean, Value = Hierarchy.VM.DefaultTargetPathInd }
+                };
+
+                long NewVersionId = 0;
+                object VersionIdObject = Domain.PersistenceLayer.FetchDataValue(SB.ToString(), System.Data.CommandType.Text, CommandParamsVersion.ToArray());
+
+
+                if (VersionIdObject != null)
+                {
+                    NewVersionId = Convert.ToInt64(VersionIdObject);
+                    //Hierarchy.VM.VersionId = NewVersionId;
+                    //Hierarchy.VM.VersionName = VersionName;
+                    //Hierarchy.VM.Sequence += 1;
+                    //Hierarchy.VM.TargetPath = TargetPath;
+                }
+                else
+                    return "180";
+
+                //Add version Content to new version.
+
+                foreach (var i in FinalContents)
+                {
+
+                    var VersionContentInsert = new StringBuilder(string.Empty);
+                    VersionContentInsert.Append("INSERT INTO PE_VersionContent (VersionId, ContentVersionId, ContentSeqNo, CreationDate, LastUpdateTime, LastUpdateUser, LastUpdateComputer, LastUpdateApplication) ");
+                    VersionContentInsert.Append("VALUES (@VersionId, @ContentVersionId, @ContentSeqNo, @CreationDate, @LastUpdateTime, @LastUpdateUser, @LastUpdateComputer, @LastUpdateApplication) ");
+                    VersionContentInsert.Append("; Select Scope_Identity()");
+                    CommandParamsVersion.Clear();
+                    CommandParamsVersion = new List<ParamStruct>()
+                        {
+                        new ParamStruct { ParamName = "VersionId", DataType = DbType.Int32, Value =  NewVersionId},
+                        new ParamStruct { ParamName = "ContentVersionId", DataType = DbType.Int32, Value = i.id},
+                        new ParamStruct { ParamName = "ContentSeqNo", DataType = DbType.Int32, Value = i.seq },
+                        new ParamStruct { ParamName = "CreationDate", DataType = DbType.DateTime, Value =  DateTime.Now },
+                        new ParamStruct { ParamName = "LastUpdateTime", DataType = DbType.DateTime, Value = DateTime.Now },
+                        new ParamStruct { ParamName = "LastUpdateUser", DataType = DbType.String, Value = Domain.User },
+                        new ParamStruct { ParamName = "LastUpdateComputer", DataType = DbType.String, Value = Domain.Workstn },
+                        new ParamStruct { ParamName = "LastUpdateApplication", DataType = DbType.String, Value = Domain.AppName },
+                        
+                        };
+                    long ContID = 0;
+
+                    object ContIDObj = Domain.PersistenceLayer.FetchDataValue(VersionContentInsert.ToString(), System.Data.CommandType.Text, CommandParamsVersion.ToArray());
+                    if (ContIDObj != null)
+                    {
+                        ContID = Convert.ToInt64(ContIDObj);
+                    }
+
+                    if (ContID < 1)
+                    {
+                        return "180";
+                    }
+
+                }
+                
+                //Update version model.(all OK).
+                Hierarchy.VM.LastUpdateTime = VersionLastUpdateTime;
+                Hierarchy.VM.CreationDate = VersionLastUpdateTime;
+                Hierarchy.VM.VersionId = NewVersionId;
+                Hierarchy.VM.VersionName = VersionName;
+                Hierarchy.VM.Sequence += 1;
+                Hierarchy.VM.TargetPath = TargetPath;
+                Hierarchy.IsBulkUpdatedChecked = false;
+
+                return string.Empty;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0} Exception caught.", e); // TODO: Log error
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                ATSDomain.Domain.SaveGeneralErrorLog(logMessage);
+                throw new Exception("DB Error");
+            }
+
+
+        }
+
+        #endregion Save Bulk Update
+
+        #region PersistClosedVersion
+
+        public static string PersistClosedVersion(HierarchyModel Hierarchy)
+        {
+            try
+            {
+                if (Hierarchy.VM.VersionId != -1)
+                {
+
+                    long updateVersion = 0;
+                    string Qry = "Update PE_Version set PE_Version.VersionStatus='C' where PE_Version.VersionId='" + Hierarchy.VM.VersionId.ToString().Trim() + "';";
+
+                    updateVersion = (long)Domain.PersistenceLayer.ExecuteDbCommand(Qry, CommandType.Text, null);
+                    if (updateVersion != 0)
+                    {
+                        return string.Empty;
+                    }
+                    else
+                        return "105";
+                }
+                return string.Empty;
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                ATSDomain.Domain.SaveGeneralErrorLog(logMessage);
+                throw new Exception("DB Error");
+
+            }
+        }
+        #endregion PersistClosedVersion
+
+        #region GetVersionName
+
+        public static string GetVersionName(string VersionName, long HierarchyId)
+        {
+            char[] VersionArray = VersionName.ToCharArray();
+            char[] ArrayResult;
+            char[] ArrayNameResult;
+            string VersionConvertName;
+            double DoubleNum = 0;
+            int IntNum = 0;
+            string FinalName = null;
+            bool IsNumberfound = false;
+            for (int i = 0; i < VersionArray.Length; i++)
+            {
+                if (!Char.IsNumber(VersionArray[VersionArray.Length - 1]))
+                {
+                    FinalName = new string(VersionArray);
+                    FinalName += "1";
+                    break;
+                }
+                if (Char.IsNumber(VersionArray[i]))
+                {
+                    IsNumberfound = true;
+                    ArrayResult = new char[VersionArray.Length - i];
+                    Array.Copy(VersionArray, i, ArrayResult, 0, VersionArray.Length - i);
+                   VersionConvertName = new string(ArrayResult);
+                    //check if it is float nuber.
+                   
+                    if (VersionConvertName.Contains("."))
+                    {
+                        DoubleNum = Convert.ToDouble(VersionConvertName);
+                        DoubleNum += 0.01;
+                    }
+                    else// not float.
+                    {
+                        IntNum = Convert.ToInt32(VersionConvertName);
+                        IntNum += 1;
+                    }
+
+                    ArrayNameResult = new char[i];
+                    Array.Copy(VersionArray, 0, ArrayNameResult, 0, i);
+
+                    FinalName = new string(ArrayNameResult);
+                    if (DoubleNum != 0)
+                        FinalName += DoubleNum.ToString();
+                    else
+                        FinalName += IntNum.ToString();
+
+                    break;
+                }
+
+            }
+
+            //there is no digit in the name.
+            if (!IsNumberfound)
+            {
+                FinalName = new string(VersionArray);
+                FinalName += "1";
+            }
+
+            //check that this versionName does not exists in DB.
+            var SB = new StringBuilder(string.Empty);
+            SB.Append("SELECT VersionId FROM PE_Version WHERE VersionName ='" + FinalName + "' AND HierarchyId ='" + HierarchyId + "'");
+            object VersionIdCheck = Domain.PersistenceLayer.FetchDataValue(SB.ToString(), System.Data.CommandType.Text, null);
+
+            if (VersionIdCheck != null)
+            {
+                //there is a version with this name. call for the function for new version.
+                FinalName = BulkUpdateBLL.GetVersionName(FinalName, HierarchyId);
+            }
+
+
+            return FinalName;
+        }
+
+
+
+        //public static string GetVersionName(string VersionName, long HierarchyId)
+        //{
+        //    char[] VersionArray = VersionName.ToCharArray();
+        //    char[] ArrayResult;
+        //    char[] ArrayNameResult;
+        //    string VersionConvertName;
+        //    double DoubleNum = 0;
+        //    int IntNum = 0;
+        //    StringBuilder ConcatNumber = new StringBuilder();
+        //    string FinalName = null;
+            
+        //    //search in the array from the end of it.
+        //    for (int i = VersionArray.Length -1 ;  i >= 0 ; i--)
+        //    {
+        //        //the last char is not a digit.
+        //        if (Char.IsNumber(VersionArray[VersionArray.Length - 1 - 1]))
+        //        {
+        //            FinalName = new string(VersionArray);
+        //            FinalName += "1";
+        //            break;
+        //        }
+
+
+        //        if (Char.IsNumber(VersionArray[i]))
+        //        {
+        //            for (int j = 0; j < VersionArray.Length; j++)
+        //            {
+        //                if (Char.IsNumber(VersionArray[j]))
+        //                {
+        //                    ArrayResult = new char[VersionArray.Length - j];
+        //                    Array.Copy(VersionArray, j, ArrayResult, 0, VersionArray.Length - j);
+        //                    VersionConvertName = new string(ArrayResult);
+        //                    //check if it is float nuber.
+        //                    if (VersionConvertName.Contains("."))
+        //                    {
+        //                        DoubleNum = Convert.ToDouble(VersionConvertName);
+        //                        DoubleNum += 0.01;
+        //                    }
+        //                    else// not float.
+        //                    {
+        //                        IntNum = Convert.ToInt32(VersionConvertName);
+        //                        IntNum += 1;
+        //                    }
+
+        //                    ArrayNameResult = new char[j];
+        //                    Array.Copy(VersionArray, 0, ArrayNameResult, 0, j);
+
+        //                    FinalName = new string(ArrayNameResult);
+        //                    if (DoubleNum != 0)
+        //                        FinalName += DoubleNum.ToString();
+        //                    else
+        //                        FinalName += IntNum.ToString();
+
+        //                    break;
+        //                }
+
+        //            }
+                  
+        //        }
+
+        //    }
+
+        //    //check that this versionName does not exists in DB.
+        //    var SB = new StringBuilder(string.Empty);
+        //    SB.Append("SELECT VersionId FROM PE_Version WHERE VersionName ='" + FinalName + "' AND HierarchyId ='" + HierarchyId + "'");
+        //    object VersionIdCheck = Domain.PersistenceLayer.FetchDataValue(SB.ToString(), System.Data.CommandType.Text, null);
+
+        //    if (VersionIdCheck != null)
+        //    {
+        //        //there is a version with this name. call for the function for new version.
+        //        FinalName = BulkUpdateBLL.GetVersionName(FinalName, HierarchyId);
+        //    }
+
+
+        //    return FinalName;
+        //}
+
+        #endregion GetVersionName
+
+        #region GetContentSequence
+
+        public static ObservableCollection<ContentModel> GetContentSequence(ObservableCollection<ContentModel> FindList, ObservableCollection<ContentModel> ReplaceList, HierarchyModel Hierarchy)
+        {
+            ObservableCollection<ContentModel> FinalList = new ObservableCollection<ContentModel>();
+            try
+            {
+                var SB = new StringBuilder(string.Empty);
+                SB.Append("SELECT ContentVersionId, ContentSeqNo FROM dbo.PE_VersionContent avc Join dbo.PE_Version av " +
+                " on av.versionId = avc.VersionId  WHERE av.HierarchyId = ");
+                  if (Hierarchy.GroupId == -1)
+                {
+                    SB.Append(" '" + Hierarchy.Id + "' ");
+                }
+                else
+                     SB.Append(" '" + Hierarchy.GroupId + "' ");
+                SB.Append(" AND av.VersionStatus='A' and av.versionId ='" + Hierarchy.VM.VersionId + "'");
+                
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(SB.ToString(), CommandType.Text, null);
+
+                if (ResTable != null)
+                {
+                    //Count the num of iteration.
+                    int Counter = 0;
+                    foreach (DataRow DataRow in ResTable.Rows)
+                    {
+
+                        int ContentVersionId = (int)DataRow["ContentVersionId"];
+                        int ContentSeq = (int)DataRow["ContentSeqNo"];
+                        if (ContentVersionId == FindList[0].id)
+                        {
+                            //(1) - replace in the same place.
+                            if (ReplaceList.Count == 1)
+                            {
+                                ContentModel PartialContent = new ContentModel("", "", ReplaceList[0].id, ContentSeq, "", "");
+                                FinalList.Add(PartialContent);
+                            }
+                            //(2) replace list is more then one.
+                            if (ReplaceList.Count > 1)
+                            {
+                                foreach (var ReplaceContent in ReplaceList)
+                                {
+                                    ContentModel PartialContent = new ContentModel("", "", ReplaceContent.id, ContentSeq, "", "");
+                                    FinalList.Add(PartialContent);
+                                    ContentSeq++;
+                                }
+                                
+                                //there is not contents to add
+                                if (ResTable.Rows.Count - 1 == Counter)
+                                {
+                                    return FinalList;
+                                }
+                                else
+                                {
+                                    //there is more contents to add
+                                    for (int i = Counter + 1; i < ResTable.Rows.Count; i++)
+                                    {
+                                        int Id = (int)ResTable.Rows[i]["ContentVersionId"];
+                                        //int ContentSeq = (int)ResTable.Rows[i]["ContentSeqNo"];
+                                        ContentModel PartialContent = new ContentModel("", "", Id, ContentSeq, "", "");
+                                        FinalList.Add(PartialContent);
+                                        ContentSeq++;
+                                    }
+                                    return FinalList;
+
+                                }
+                                
+                            }
+                            //(3) replace list is empty
+                            if (ReplaceList.Count == 0)
+                            {
+                                //Adding the contents that are after the content that removed 'from content'
+                                for (int i = Counter + 1; i < ResTable.Rows.Count ; i++)
+                                {
+                                    int Id = (int)ResTable.Rows[i]["ContentVersionId"];
+                                    int ContentSeqNum = (int)ResTable.Rows[i]["ContentSeqNo"] - 1;
+                                    ContentModel PartialContent = new ContentModel("", "", Id, ContentSeqNum, "", "");
+                                    FinalList.Add(PartialContent);
+                                    
+                                }
+                                return FinalList;
+                            }
+
+                        }
+                        else
+                        {
+                            ContentModel PartialContent = new ContentModel("", "", ContentVersionId, ContentSeq, "", "");
+                            FinalList.Add(PartialContent);
+                        }
+
+                        Counter++;
+                    }
+                }
+
+                return FinalList;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0} Exception caught.", e); 
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                ATSDomain.Domain.SaveGeneralErrorLog(logMessage);
+                throw new Exception("DB Error");
+            }
+            
+        }
+
+        #endregion GetContentSequence
+
+        #region GetContentSequenceInsertContents
+        //adding contents to existing contents. 
+        public static ObservableCollection<ContentModel> GetContentSequenceInsertContents(ObservableCollection<ContentModel> FindList, ObservableCollection<ContentModel> ReplaceList, HierarchyModel Hierarchy)
+        {
+            ObservableCollection<ContentModel> FinalList = new ObservableCollection<ContentModel>();
+            try
+            {
+                var SB = new StringBuilder(string.Empty);
+                SB.Append("SELECT ContentVersionId, ContentSeqNo FROM dbo.PE_VersionContent avc Join dbo.PE_Version av " +
+                " on av.versionId = avc.VersionId  WHERE av.HierarchyId = ");
+                if (Hierarchy.GroupId == -1)
+                {
+                    SB.Append(" '" + Hierarchy.Id + "' ");
+                }
+                else
+                    SB.Append(" '" + Hierarchy.GroupId + "' ");
+                SB.Append(" AND av.VersionStatus='A' and av.versionId ='" + Hierarchy.VM.VersionId + "'");
+
+                DataTable ResTable = Domain.PersistenceLayer.FetchDataTable(SB.ToString(), CommandType.Text, null);
+
+                if (ResTable != null)
+                {
+                    //Count the num of iteration.
+                    int Counter = 0;
+                    foreach (DataRow DataRow in ResTable.Rows)
+                    {
+
+                        int ContentVersionId = (int)DataRow["ContentVersionId"];
+                        int ContentSeq = (int)DataRow["ContentSeqNo"];
+                        if (ContentVersionId == FindList[0].id)
+                        {
+                            if (ReplaceList.Count > 1)
+                            {
+                                //Adding the content that was not ment to replace.
+                                ContentModel OriginalContent = new ContentModel("", "", ContentVersionId, ContentSeq, "", "");
+                                FinalList.Add(OriginalContent);
+                                ContentSeq++;
+
+                                foreach (var ReplaceContent in ReplaceList)
+                                {
+                                    //checking that the content is not the same content that was already added.
+                                    //this content is in replcae list.
+                                    if (ReplaceContent.id != ContentVersionId)
+                                    {
+                                        ContentModel PartialContent = new ContentModel("", "", ReplaceContent.id, ContentSeq, "", "");
+                                        FinalList.Add(PartialContent);
+                                        ContentSeq++;
+                                    }
+                                }
+
+                                //there is not contents to add
+                                if (ResTable.Rows.Count - 1 == Counter)
+                                {
+                                    return FinalList;
+                                }
+                                else
+                                {
+                                    //there is more contents to add
+                                    for (int i = Counter + 1; i < ResTable.Rows.Count; i++)
+                                    {
+                                        int Id = (int)ResTable.Rows[i]["ContentVersionId"];
+                                        //int ContentSeq = (int)ResTable.Rows[i]["ContentSeqNo"];
+                                        ContentModel PartialContent = new ContentModel("", "", Id, ContentSeq, "", "");
+                                        FinalList.Add(PartialContent);
+                                        ContentSeq++;
+                                    }
+                                    return FinalList;
+
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ContentModel PartialContent = new ContentModel("", "", ContentVersionId, ContentSeq, "", "");
+                            FinalList.Add(PartialContent);
+                        }
+
+                        Counter++;
+                    }
+                }
+
+                return FinalList;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0} Exception caught.", e);
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                ATSDomain.Domain.SaveGeneralErrorLog(logMessage);
+                throw new Exception("DB Error");
+            }
+
+        }
+
+        #endregion GetContentSequence
+
+        #region GetTargetPath
+        public static string GetTargetPath(HierarchyModel Hierarchy, string VersionName)
+        {
+            var Target = new StringBuilder(string.Empty);
+            try
+            {
+
+                var SysPathQry = new StringBuilder(string.Empty);
+                if (Hierarchy.IsClonedRelated == false)
+                {
+                    SysPathQry.Append("select Value from PE_SystemParameters where Variable='ProjectLocalPath'");
+                }
+                if (Hierarchy.IsClonedRelated == true)
+                {
+                    SysPathQry.Append("select Value from PE_SystemParameters where Variable='RelatedProjectLocalPath'");
+                }
+                string SysParm = (string)Domain.PersistenceLayer.FetchDataValue(SysPathQry.ToString(), System.Data.CommandType.Text, null);
+
+                Target = new StringBuilder(string.Empty);
+                Target.Append(SysParm.ToString().Trim());
+                if (Hierarchy.ParentId != -1)
+                {
+
+
+                    Target.Append(VersionBLL.getParentName(Hierarchy.ParentId.ToString().Trim()));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                String logMessage = ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                System.Diagnostics.Debug.WriteLine("{0} Exception caught.", ex); // TODO: Log error
+                return ex.Message;
+            }
+
+            if ((Hierarchy.GroupId == -1 && Hierarchy.IsClonedRelated == false) || Hierarchy.IsClonedRelatedSplit == true)
+            {
+                Target.Append("/" + Hierarchy.Name.ToString().Trim() + "/" + VersionName.ToString().Trim());
+            }
+            else
+            {
+                Target.Append("/" + Hierarchy.GroupName.ToString().Trim() + "/" + VersionName.ToString().Trim());
+            }
+            return Target.ToString();
+
+        }
+        #endregion getTargetPath
+    }
+}
+
+

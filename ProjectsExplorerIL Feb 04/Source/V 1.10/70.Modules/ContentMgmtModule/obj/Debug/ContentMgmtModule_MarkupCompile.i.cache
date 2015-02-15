@@ -1,0 +1,20 @@
+﻿ContentMgmtModule
+
+
+library
+C#
+.cs
+C:\Users\au_egoldberg\Desktop\SCD\Launch Pad\Dev\ProjectsExplorerIL Feb 04\Source\V 1.10\70.Modules\ContentMgmtModule\obj\Debug\
+ContentMgmtModule
+none
+false
+DEBUG;TRACE
+
+11605391115
+
+361567499846
+271984695233
+Resources\Resources\Themes\CustomControlsStyles.xaml;Resources\Resources\Themes\MetroTabStyle.xaml;Resources\Themes\CustomControlsStyles.xaml;Resources\Themes\MetroTabStyle.xaml;Views\CMContentDetailsView.xaml;Views\CMContentManagementView.xaml;Views\CMFolderDetailsView.xaml;Views\CMProgressBarView.xaml;Views\CMSearchView.xaml;Views\CMVersionDetailsView.xaml;Views\CMWhereUsedView.xaml;
+
+False
+

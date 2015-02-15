@@ -1,0 +1,1101 @@
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:25:47
+Error........: Could not find a part of the path 'C:\Temp\V113'.
+Source: mscorlib
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   at System.IO.Directory.GetDirectories(String path, String searchPattern, SearchOption searchOption)
+   at ATSBusinessLogic.FileSystemBLL.CopyFolderWithFilesAndSubfolders(String sourcePath, String targetPath, ThreadStart t) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL Jan 17\Source\V 1.10\40.DomainLayer\BusinessLogic\FileSystemBLL.cs:line 666
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:29:10
+Error........: Could not find a part of the path 'C:\Temp\V113'.
+Source: mscorlib
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   at System.IO.Directory.GetDirectories(String path, String searchPattern, SearchOption searchOption)
+   at ATSBusinessLogic.FileSystemBLL.CopyFolderWithFilesAndSubfolders(String sourcePath, String targetPath, ThreadStart t) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL Jan 17\Source\V 1.10\40.DomainLayer\BusinessLogic\FileSystemBLL.cs:line 666
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:29:35
+Warning ........: 
+Failed to generate default version name.
+Please check parent folder default version naming properties.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:31:00
+Warning ........: 
+Failed to generate default version name.
+Please check parent folder default version naming properties.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:31:49
+Warning ........: Missing information for versionId 7336.
+                  Refreshing Contents tree data.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:33:38
+Command Type.: Text
+Command......: INSERT INTO PE_Note (HierarchyId, NoteTitle, NoteType, NoteStatus, NoteText, SpecialInd, CreationDate, CreatedByUser, LastUpdateTime, LastUpdateUser, LastUpdateComputer, LastUpdateApplication) VALUES (@HierarchyId, @NoteTitle, @NoteType, @NoteStatus, @NoteText, @SpecialInd, @CreationDate, @CreatedByUser, @LastUpdateTime, @LastUpdateUser, @LastUpdateComputer, @LastUpdateApplication) ; Select Scope_Identity()
+Parameters...: => Name: Id   Value: -1     => Name: HierarchyId   Value: -1     => Name: NoteTitle   Value: Memo     => Name: NoteType   Value: I     => Name: NoteStatus   Value: A     => Name: NoteText   Value: Project version New Version has been imported from Production by user SysAdmin on 20 Jan, 2015 8:32:32.     => Name: SpecialInd   Value: True     => Name: CreatedByUser   Value: SysAdmin     => Name: CreationDate   Value: 20 Jan, 2015 8:33:35     => Name: LastUpdateTime   Value: 20 Jan, 2015 8:33:35     => Name: LastUpdateUser   Value: SysAdmin     => Name: LastUpdateComputer   Value: WST40010478     => Name: LastUpdateApplication   Value: Explorer     
+Error........: The INSERT statement conflicted with the FOREIGN KEY constraint "FK_Note_Hierarchy". The conflict occurred in database "FilesMigration", table "dbo.PE_Hierarchy", column 'Id'.
+Error........: The statement has been terminated.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:33:38
+Warning ........: Failed to create memo note. Note Type I
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:34:01
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL Jan 17\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 591
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:34:01
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL Jan 17\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 591
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 20 Jan, 2015 8:34:01
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL Jan 17\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 558
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:21:41
+Command Type.: Text
+Command......: INSERT INTO PE_Note (HierarchyId, NoteTitle, NoteType, NoteStatus, NoteText, SpecialInd, CreationDate, CreatedByUser, LastUpdateTime, LastUpdateUser, LastUpdateComputer, LastUpdateApplication) VALUES (@HierarchyId, @NoteTitle, @NoteType, @NoteStatus, @NoteText, @SpecialInd, @CreationDate, @CreatedByUser, @LastUpdateTime, @LastUpdateUser, @LastUpdateComputer, @LastUpdateApplication) ; Select Scope_Identity()
+Parameters...: => Name: Id   Value: -1     => Name: HierarchyId   Value: -1     => Name: NoteTitle   Value: Memo     => Name: NoteType   Value: I     => Name: NoteStatus   Value: A     => Name: NoteText   Value: Project version New Version has been imported from Production by user SysAdmin on 21 Jan, 2015 9:21:38.     => Name: SpecialInd   Value: True     => Name: CreatedByUser   Value: SysAdmin     => Name: CreationDate   Value: 21 Jan, 2015 9:21:38     => Name: LastUpdateTime   Value: 21 Jan, 2015 9:21:38     => Name: LastUpdateUser   Value: SysAdmin     => Name: LastUpdateComputer   Value: WST40010478     => Name: LastUpdateApplication   Value: Explorer     
+Error........: The INSERT statement conflicted with the FOREIGN KEY constraint "FK_Note_Hierarchy". The conflict occurred in database "FilesMigration", table "dbo.PE_Hierarchy", column 'Id'.
+Error........: The statement has been terminated.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:21:41
+Warning ........: Failed to create memo note. Note Type I
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:22:01
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 591
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:22:01
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 591
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:22:01
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 558
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:39:40
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 591
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:39:40
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 591
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:39:40
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 558
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:41:50
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 591
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:41:50
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 591
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 9:41:50
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 558
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:02:33
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:02:33
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:02:33
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:03:04
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:03:04
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:03:04
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:11:28
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:11:28
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:11:28
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:19:39
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:19:39
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:19:39
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:29:48
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:29:48
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:29:48
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:33:52
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:33:52
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:33:52
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:34:21
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:34:21
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:34:21
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:39:07
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:39:09
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:39:09
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:42:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:42:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:42:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:47:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:47:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:47:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:50:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:50:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:50:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:57:29
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:57:29
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 596
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 10:57:29
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 563
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 11:13:08
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 11:13:08
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 21 Jan, 2015 11:13:09
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 564
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 11:10:00
+Warning ........: Missing information for versionId 1008453.
+                  Refreshing Contents tree data.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 14:47:12
+Command Type.: Text
+Command......: DELETE FROM UserCertificates WHERE Id=@Id
+Parameters...: => Name: Id   Value: newnew     
+Error........: The DELETE statement conflicted with the REFERENCE constraint "FK_AssignedUserCertificates_UserCertificates". The conflict occurred in database "GenPR_Test", table "dbo.AssignedUserCertificates", column 'CertificateId'.
+Error........: The statement has been terminated.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 14:47:12
+Error........: The DELETE statement conflicted with the REFERENCE constraint "FK_AssignedUserCertificates_UserCertificates". The conflict occurred in database "GenPR_Test", table "dbo.AssignedUserCertificates", column 'CertificateId'.
+The statement has been terminated.
+Source: .Net SqlClient Data Provider
+   at Infra.DAL.DataAccess.ExecuteDbCommand(String strSQL, CommandType cmdType, ParamStruct[] parameterArray)
+   at ATSBusinessLogic.CertificateUserBLL.DeleteCertificate(String Id) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\UserCertificatesBLL\CertificateUserBLL.cs:line 271
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 14:47:22
+Command Type.: Text
+Command......: DELETE FROM UserCertificates WHERE Id=@Id
+Parameters...: => Name: Id   Value: newnew     
+Error........: The DELETE statement conflicted with the REFERENCE constraint "FK_AssignedUserCertificates_UserCertificates". The conflict occurred in database "GenPR_Test", table "dbo.AssignedUserCertificates", column 'CertificateId'.
+Error........: The statement has been terminated.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 14:47:23
+Error........: The DELETE statement conflicted with the REFERENCE constraint "FK_AssignedUserCertificates_UserCertificates". The conflict occurred in database "GenPR_Test", table "dbo.AssignedUserCertificates", column 'CertificateId'.
+The statement has been terminated.
+Source: .Net SqlClient Data Provider
+   at Infra.DAL.DataAccess.ExecuteDbCommand(String strSQL, CommandType cmdType, ParamStruct[] parameterArray)
+   at ATSBusinessLogic.CertificateUserBLL.DeleteCertificate(String Id) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\UserCertificatesBLL\CertificateUserBLL.cs:line 271
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 18:58:38
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 18:58:38
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 18:58:38
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 564
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:40:15
+Error........: Could not find a part of the path 'C:\Temp\V113'.
+Source: mscorlib
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   at System.IO.Directory.GetDirectories(String path, String searchPattern, SearchOption searchOption)
+   at ATSBusinessLogic.FileSystemBLL.CopyFolderWithFilesAndSubfolders(String sourcePath, String targetPath, ThreadStart t) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\FileSystemBLL.cs:line 666
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:42:07
+Command Type.: Text
+Command......: INSERT INTO ContentTree (CT_Name, CT_ParentID, CT_ChildNumber, CT_Description, CT_LastUpdateUser, CT_LastUpdateTime, CT_LastUpdateComputer, CT_LastUpdateApplication, CT_CreationDate, CT_DefaultVNPrefix, CT_DefaultVNStartValue, CT_DefaultVNIncrement) VALUES (@CT_Name, @CT_ParentID, @CT_ChildNumber, @CT_Description, @CT_LastUpdateUser,  @CT_LastUpdateTime, @CT_LastUpdateComputer, @CT_LastUpdateApplication, @CT_CreationDate, @CT_DefaultVNPrefix, @CT_DefaultVNStartValue, @CT_DefaultVNIncrement) ; Select Scope_Identity()
+Parameters...: => Name: CT_ID   Value: -1     => Name: CT_Name   Value: Try     => Name: CT_ParentID   Value: 0     => Name: CT_ChildNumber   Value: 0     => Name: CT_Description   Value:      => Name: CT_LastUpdateUser   Value: SysAdmin     => Name: CT_LastUpdateTime   Value: 25 Jan, 2015 20:42:05     => Name: CT_LastUpdateComputer   Value: WST40010478     => Name: CT_LastUpdateApplication   Value: Content manager     => Name: CT_CreationDate   Value: 25 Jan, 2015 20:42:05     => Name: CT_DefaultVNPrefix   Value:      => Name: CT_DefaultVNStartValue   Value:      => Name: CT_DefaultVNIncrement   Value:      
+Error........: The INSERT statement conflicted with the FOREIGN KEY SAME TABLE constraint "FK_ContentTree_ContentTree". The conflict occurred in database "FilesMigration1", table "dbo.ContentTree", column 'CT_ID'.
+Error........: The statement has been terminated.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:42:07
+Error........: The INSERT statement conflicted with the FOREIGN KEY SAME TABLE constraint "FK_ContentTree_ContentTree". The conflict occurred in database "FilesMigration1", table "dbo.ContentTree", column 'CT_ID'.
+The statement has been terminated.
+Source: .Net SqlClient Data Provider
+   at Infra.DAL.DataAccess.FetchDataValue(String strSQL, CommandType cmdtype, ParamStruct[] parameterArray)
+   at ATSBusinessLogic.ContentMgmtBLL.CMFolderBLL.AddNewFolder(CMFolderModel& f) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ContentMgmtBLL\CMFolderBLL.cs:line 534
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:42:07
+Error........: Exception of type 'TraceExceptionWrapper.TraceException' was thrown.
+Source: ATSBusinessLogic
+   at ATSBusinessLogic.ContentMgmtBLL.CMFolderBLL.AddNewFolder(CMFolderModel& f) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ContentMgmtBLL\CMFolderBLL.cs:line 551
+   at ATSBusinessLogic.ImportProjectBLL.CreateContentFoldersSubTree(ImportCMFolderModel& startFolder, Dictionary`2& folders) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ImportProjectBLL.cs:line 2192
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:50:05
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:50:05
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:50:05
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 564
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:54:04
+Error........: Could not find a part of the path 'C:\Temp\V323'.
+Source: mscorlib
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   at System.IO.Directory.GetDirectories(String path, String searchPattern, SearchOption searchOption)
+   at ATSBusinessLogic.FileSystemBLL.CopyFolderWithFilesAndSubfolders(String sourcePath, String targetPath, ThreadStart t) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\FileSystemBLL.cs:line 666
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:54:28
+Warning ........: 
+Failed to generate default version name.
+Please check parent folder default version naming properties.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:55:33
+Warning ........: Missing information for versionId 7338.
+                  Refreshing Contents tree data.
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:56:08
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:56:08
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:56:08
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 564
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:56:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:56:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:56:27
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 564
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:57:10
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:57:10
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 20:57:10
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 564
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 21:14:01
+Error........: Could not find a part of the path 'C:\Temp\V113'.
+Source: mscorlib
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   at System.IO.Directory.GetDirectories(String path, String searchPattern, SearchOption searchOption)
+   at ATSBusinessLogic.FileSystemBLL.CopyFolderWithFilesAndSubfolders(String sourcePath, String targetPath, ThreadStart t) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\FileSystemBLL.cs:line 666
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 21:14:44
+Error........: Illegal characters in path.
+Source: mscorlib
+   at System.IO.Path.CheckInvalidPathChars(String path, Boolean checkAdditional)
+   at System.Security.Permissions.FileIOPermission.CheckIllegalCharacters(String[] str)
+   at System.Security.Permissions.FileIOPermission.AddPathList(FileIOPermissionAccess access, AccessControlActions control, String[] pathListOrig, Boolean checkForDuplicates, Boolean needFullPath, Boolean copyPathList)
+   at System.Security.Permissions.FileIOPermission..ctor(FileIOPermissionAccess access, String[] pathList, Boolean checkForDuplicates, Boolean needFullPath)
+   at System.IO.Directory.InternalCreateDirectoryHelper(String path, Boolean checkHost)
+   at System.IO.Directory.CreateDirectory(String path)
+   at ATSBusinessLogic.FileSystemBLL.CreateFolder(String folderFullPath) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\FileSystemBLL.cs:line 569
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 21:15:21
+Error........: Could not find a part of the path 'C:\Temp\V113'.
+Source: mscorlib
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   at System.IO.Directory.GetDirectories(String path, String searchPattern, SearchOption searchOption)
+   at ATSBusinessLogic.FileSystemBLL.CopyFolderWithFilesAndSubfolders(String sourcePath, String targetPath, ThreadStart t) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\FileSystemBLL.cs:line 666
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 21:17:40
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 21:17:40
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserFNameAndLNameFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 597
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 21:17:40
+Warning ........: Failed to send CC email to user SysAdmin.
+The server is not operational.
+
+Source: System.DirectoryServices
+   at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+   at System.DirectoryServices.DirectoryEntry.Bind()
+   at System.DirectoryServices.DirectoryEntry.get_AdsObject()
+   at System.DirectoryServices.DirectorySearcher.FindAll(Boolean findMoreThanOne)
+   at System.DirectoryServices.DirectorySearcher.FindAll()
+   at ATSBusinessLogic.ExportProjectToEnvBLL.GetUserEmailAddressFromLDAP(String userName) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\ExportProjectToEnvBLL.cs:line 564
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 21:17:51
+Error........: Could not find a part of the path 'C:\Temp\V221'.
+Source: mscorlib
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   at System.IO.Directory.GetDirectories(String path, String searchPattern, SearchOption searchOption)
+   at ATSBusinessLogic.FileSystemBLL.CopyFolderWithFilesAndSubfolders(String sourcePath, String targetPath, ThreadStart t) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\FileSystemBLL.cs:line 666
+
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.
+Date / Time..: 25 Jan, 2015 21:18:21
+Error........: Could not find a part of the path 'C:\Temp\V221'.
+Source: mscorlib
+   at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   at System.IO.FileSystemEnumerableIterator`1.CommonInit()
+   at System.IO.FileSystemEnumerableIterator`1..ctor(String path, String originalUserPath, String searchPattern, SearchOption searchOption, SearchResultHandler`1 resultHandler, Boolean checkHost)
+   at System.IO.Directory.GetDirectories(String path, String searchPattern, SearchOption searchOption)
+   at ATSBusinessLogic.FileSystemBLL.CopyFolderWithFilesAndSubfolders(String sourcePath, String targetPath, ThreadStart t) in C:\Users\au_egoldberg\Desktop\SCD\Dev\ProjectsExplorerIL V1.2.5\Source\V 1.10\40.DomainLayer\BusinessLogic\FileSystemBLL.cs:line 666
+

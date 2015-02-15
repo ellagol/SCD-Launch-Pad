@@ -1,0 +1,123 @@
+﻿using ATSBusinessObjects.ContentMgmtModels;
+using Infra.MVVM;
+
+
+namespace ContentMgmtModule
+{
+    public class CMProgressBarViewModel : ViewModelBase, CMICopyFilesProgressModel
+    {
+        public bool Canceled { get; private set; }
+        public RelayCommand Cancel { get; set; }
+        protected MessengerService MessageMediator = new MessengerService();
+
+        public void IncreaseProgress(string copySource, string copyDestination, int progress)
+        {
+            Progress = progress;
+            ProgressMessage = Progress + "/" + ProgressMax;
+            ProgressMessageSource = copySource;
+            ProgressMessageDestination = copyDestination;
+        }
+
+        public CMProgressBarViewModel()
+        {
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+
+            Canceled = false;
+            Cancel = new RelayCommand(CancelRelayCommandFun);
+        }
+
+        private void CancelRelayCommandFun()
+        {
+            Canceled = true;
+            Close();
+        }
+
+        private string _progressMessageSource = "From file";
+        public string ProgressMessageSource
+        {
+            get
+            {
+                return _progressMessageSource;
+            }
+            set
+            {
+                _progressMessageSource = value;
+                RaisePropertyChanged("ProgressMessageSource");
+            }
+        }
+
+        private string _progressMessageDestination = "To file";
+        public string ProgressMessageDestination
+        {
+            get
+            {
+                return _progressMessageDestination;
+            }
+            set
+            {
+                _progressMessageDestination = value;
+                RaisePropertyChanged("ProgressMessageDestination");
+            }
+        }
+
+        private string _progressMessage = "1/100";
+        public string ProgressMessage
+        {
+            get
+            {
+                return _progressMessage;
+            }
+            set
+            {
+                _progressMessage = value;
+                RaisePropertyChanged("ProgressMessage");
+            }
+        }
+
+        private int _progress = 0;
+        public int Progress
+        {
+            get
+            {
+                return _progress;
+            }
+            set
+            {
+                _progress = value;
+                RaisePropertyChanged("Progress");
+            }
+        }
+
+        private int _progressMax = 100;
+        public int ProgressMax
+        {
+            get
+            {
+                return _progressMax;
+            }
+            set
+            {
+                _progressMax = value;
+                RaisePropertyChanged("ProgressMax");
+            }
+        }
+        public void Init(int progressMax)
+        {
+            Progress = 0;
+            Canceled = false;
+            ProgressMax = progressMax;
+        }
+
+        public void Show()
+        {
+          //  MessageMediator.NotifyColleagues("ShowCmProgressBar"); //Register to recieve a message asking to show progress bar
+        }
+        public void Close()
+        {
+            MessageMediator.NotifyColleagues("CloseCmProgressBar"); //Register to recieve a message asking to closing progress bar
+        }
+    }
+}
+
+

@@ -1,0 +1,423 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ExplorerModule</RootNamespace>
+    <AssemblyName>ExplorerModule</AssemblyName>
+    <OutputType>Library</OutputType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <MyType>Custom</MyType>
+    <ProjectGuid>{323DB358-7689-48B3-88BE-4F8BF352A2A8}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <IncrementalBuild>true</IncrementalBuild>
+    <OutputPath>..\..\..\..\Binaries\</OutputPath>
+    <DocumentationFile>ExplorerModule.xml</DocumentationFile>
+    <WarningLevel>1</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <DefineConstants>TRACE</DefineConstants>
+    <IncrementalBuild>false</IncrementalBuild>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>ExplorerModule.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Infra.DAL.DataAccessServiceInterface">
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\DataAccessLayer\Infra.DAL.DataAccessServiceInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.Domain">
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\MVVM\Infra.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.DragDrop">
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\DragDrop\Infra.DragDrop.dll</HintPath>
+    </Reference>
+    <Reference Include="Infra.MVVM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Dependencies\Bin\Infrastructure\MVVM\Infra.MVVM.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="NavigationPane">
+      <HintPath>..\..\..\..\Dependencies\Bin\Controls\OutlookNavigationPane\NavigationPane.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework.Aero" />
+    <Reference Include="ResourcesProvider, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ResourcesProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="TaskDialog">
+      <HintPath>..\..\..\..\Dependencies\Bin\Controls\TaskDialogWrapper\TaskDialog.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows" />
+    <Import Include="System.Windows.Controls" />
+    <Import Include="System.Windows.Data" />
+    <Import Include="System.Windows.Documents" />
+    <Import Include="System.Windows.Input" />
+    <Import Include="System.Windows.Shapes" />
+    <Import Include="System.Windows.Media" />
+    <Import Include="System.Windows.Media.Imaging" />
+    <Import Include="System.Windows.Navigation" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Resources\AnimatedContentControl.cs" />
+    <Compile Include="Resources\EnhancedWindowBase.cs" />
+    <Compile Include="Resources\Flyout\Flyout.cs" />
+    <Compile Include="Resources\Flyout\SetFlyoutOpenAction.cs" />
+    <Compile Include="Resources\PasswordBox\BindablePasswordBox.cs" />
+    <Compile Include="Resources\PasswordBox\WatermarkPasswordBox.cs" />
+    <Compile Include="Resources\ScrollViewerExtensions.cs" />
+    <Compile Include="Resources\TabControlEx.cs" />
+    <Compile Include="Resources\WatermarkTextBox.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ViewModels\CertificatesViewModel.cs" />
+    <Compile Include="ViewModels\ActiveVersionsItemBehavior.cs" />
+    <Compile Include="ViewModels\CMTreeViewContentNodeViewModel.cs" />
+    <Compile Include="ViewModels\CMTreeViewFolderNodeViewModel.cs" />
+    <Compile Include="ViewModels\CMTreeViewNodeViewModelBase.cs" />
+    <Compile Include="ViewModels\CMTreeViewRootNodeViewModel.cs" />
+    <Compile Include="ViewModels\CMTreeViewVersionNodeViewModel.cs" />
+    <Compile Include="ViewModels\ContentManagementViewModel.cs" />
+    <Compile Include="ViewModels\BulkUpdateViewModel.cs" />
+    <Compile Include="ViewModels\CloneTemplateViewModel.cs" />
+    <Compile Include="ViewModels\ContentManagementFindViewModel.cs" />
+    <Compile Include="ViewModels\ContentManagementReplaceViewModel.cs" />
+    <Compile Include="ViewModels\ProgresBarViewModel.cs" />
+    <Compile Include="ViewModels\SelectEnvironmentViewModel.cs" />
+    <Compile Include="ViewModels\PriorityPopupViewModel.cs" />
+    <Compile Include="ViewModels\TreeViewTemplateNodeViewModel.cs" />
+    <Compile Include="ViewModels\EnvironmentDetailsViewModel.cs" />
+    <Compile Include="ViewModels\FolderDetailsViewModel.cs" />
+    <Compile Include="ViewModels\NewTemplateViewModel.cs" />
+    <Compile Include="ViewModels\ProjectDetailsViewModel.cs" />
+    <Compile Include="ViewModels\ProjectsExplorerViewModel.cs" />
+    <Compile Include="ViewModels\SearchViewModel.cs" />
+    <Compile Include="ViewModels\StationCertificateListViewModel.cs" />
+    <Compile Include="ViewModels\TreeViewFolderNodeViewModel.cs" />
+    <Compile Include="ViewModels\TreeViewNodeViewModelBase.cs" />
+    <Compile Include="ViewModels\TreeViewProjectNodeViewModel.cs" />
+    <Compile Include="ViewModels\TreeViewRootNodeViewModel.cs" />
+    <Compile Include="ViewModels\TreeViewTemplateVersionNodeViewModel.cs" />
+    <Compile Include="ViewModels\TreeViewVersionNodeViewModel.cs" />
+    <Compile Include="ViewModels\UserCertificatesViewModel.cs" />
+    <Compile Include="ViewModels\TemplateVersionDetailsViewModel.cs" />
+    <Compile Include="ViewModels\VersionDetailsViewModel.cs" />
+    <Compile Include="Views\CertificatesView.xaml.cs">
+      <DependentUpon>CertificatesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ContentManagementView.xaml.cs">
+      <DependentUpon>ContentManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\BulkUpdateView.xaml.cs">
+      <DependentUpon>BulkUpdateView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CloneTemplateView.xaml.cs">
+      <DependentUpon>CloneTemplateView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ContentManagementFindView.xaml.cs">
+      <DependentUpon>ContentManagementFindView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ContentManagementReplaceView.xaml.cs">
+      <DependentUpon>ContentManagementReplaceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProgressBarView.xaml.cs">
+      <DependentUpon>ProgressBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SelectEnvironmentView.xaml.cs">
+      <DependentUpon>SelectEnvironmentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NewTemplateView.xaml.cs">
+      <DependentUpon>NewTemplateView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PriorityPopupView.xaml.cs">
+      <DependentUpon>PriorityPopupView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StationCertificateListView.xaml.cs">
+      <DependentUpon>StationCertificateListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\EnvironmentDetailsView.xaml.cs">
+      <DependentUpon>EnvironmentDetailsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\FolderDetailsView.xaml.cs">
+      <DependentUpon>FolderDetailsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProjectDetailsView.xaml.cs">
+      <DependentUpon>ProjectDetailsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProjectsExplorerView.xaml.cs">
+      <DependentUpon>ProjectsExplorerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SearchView.xaml.cs">
+      <DependentUpon>SearchView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserCertificatesView.xaml.cs">
+      <DependentUpon>UserCertificatesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TemplateVersionDetailsView.xaml.cs">
+      <DependentUpon>TemplateVersionDetailsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\VersionDetailsView.xaml.cs">
+      <DependentUpon>VersionDetailsView.xaml</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicVbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Project.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Root.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Version.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Resources\Themes\MetroTabStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\CertificatesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ContentManagementView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\BulkUpdateView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\CloneTemplateView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ContentManagementFindView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ContentManagementReplaceView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProgressBarView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SelectEnvironmentView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\NewTemplateView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\PriorityPopupView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\StationCertificateListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\EnvironmentDetailsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SearchView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserCertificatesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TemplateVersionDetailsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\VersionDetailsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Views\FolderDetailsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProjectDetailsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProjectsExplorerView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\40.DomainLayer\BusinessLogic\ATSBusinessLogic.csproj">
+      <Project>{C359B3F4-760E-45F0-AF1F-C5742DD4437D}</Project>
+      <Name>ATSBusinessLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\40.DomainLayer\BusinessObjects\ATSBusinessObjects.csproj">
+      <Project>{68F3D538-CDE9-40A6-8591-4B1B9D57978E}</Project>
+      <Name>ATSBusinessObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\40.DomainLayer\Domain\ATSDomain.csproj">
+      <Project>{4977DD22-0A82-45A2-B95C-8A59D763F743}</Project>
+      <Name>ATSDomain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NotesModule\NotesModule.csproj">
+      <Project>{3023786F-09D4-4994-A330-00EC3D490BEE}</Project>
+      <Name>NotesModule %2870.Modules\NotesModule\NotesModule%29</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\Folder.png" />
+    <Resource Include="Resources\Icons\256x256\Version.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\Project.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Content.png" />
+    <Resource Include="Resources\Icons\32x32\ContentVersion.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\ProjectDis.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\VersionDis.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\groupClosed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\groupActive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\FolderSpecial.png" />
+    <Resource Include="Resources\Icons\32x32\groupActiveSpecial.png" />
+    <Resource Include="Resources\Icons\32x32\groupClosedSpecial.png" />
+    <Resource Include="Resources\Icons\32x32\ProjectDisSpecial.png" />
+    <Resource Include="Resources\Icons\32x32\ProjectSpecial.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\FolderSpecial.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\groupActive.png" />
+    <Resource Include="Resources\Icons\256x256\groupActiveSpeciel.png" />
+    <Resource Include="Resources\Icons\256x256\groupClosed.png" />
+    <Resource Include="Resources\Icons\256x256\groupClosedSpeciel.png" />
+    <Resource Include="Resources\Icons\256x256\ProjectDisable.png" />
+    <Resource Include="Resources\Icons\256x256\ProjectDisableSpeciel.png" />
+    <Resource Include="Resources\Icons\256x256\ProjectSpeciel.png" />
+    <Resource Include="Resources\Icons\256x256\VersionDis.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\Template.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\TemplateDisable.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\Template.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\TemplateDisable.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\TemplateDisableSpesialsmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\TemplateDisableSpesialBig.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\TemplateSpesialSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\256x256\TemplateSpesialBig.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\IconFilterT.png" />
+    <Resource Include="Resources\Icons\32x32\IconFilterTCancel.png" />
+    <Resource Include="Resources\Icons\32x32\IconFilterUsedCancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\32x32\IconFilterUsed.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

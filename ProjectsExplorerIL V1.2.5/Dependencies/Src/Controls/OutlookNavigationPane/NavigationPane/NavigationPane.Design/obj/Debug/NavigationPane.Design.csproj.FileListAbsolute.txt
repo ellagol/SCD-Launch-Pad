@@ -1,0 +1,5 @@
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\bin\Debug\NavigationPane.Design.dll
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\bin\Debug\NavigationPane.Design.pdb
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\NavigationPane.Design\obj\Debug\NavigationPane.Design.csprojResolveAssemblyReference.cache
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\NavigationPane.Design\obj\Debug\NavigationPane.Design.dll
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\NavigationPane.Design\obj\Debug\NavigationPane.Design.pdb

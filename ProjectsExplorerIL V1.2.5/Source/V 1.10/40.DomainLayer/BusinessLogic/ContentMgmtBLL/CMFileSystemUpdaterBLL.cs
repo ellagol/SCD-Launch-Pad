@@ -1,0 +1,428 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using ATSBusinessObjects.ContentMgmtModels;
+using ATSDomain;
+using TraceExceptionWrapper;
+using System.Threading;
+
+namespace ATSBusinessLogic.ContentMgmtBLL
+{
+    public class CMFileSystemUpdaterBLL
+    {
+
+        #region Data
+
+        static string DestinationRoot { get { return "%Root%"; } }
+
+        #endregion
+
+        #region get Cm Folder
+
+        public static String getCmFolder()
+        {
+            // Initialize work fields
+            String CmFolder = "";
+
+            try
+            {
+                var SBCmFolder = new StringBuilder(string.Empty);
+
+                SBCmFolder.Append("SELECT SP_Value FROM SystemParameters WHERE SP_Name = 'CmFolder'");
+
+
+                // Fetch the DataTable from the database
+                object CmFolderObj = Domain.PersistenceLayer.FetchDataValue(SBCmFolder.ToString(), System.Data.CommandType.Text, null);
+                // Populate the collection
+                if (CmFolderObj != null)
+                {
+                    CmFolder = (string)CmFolderObj;
+                    return CmFolder;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                return null;
+            }
+        }
+
+        #endregion
+
+        #region Create Folder
+
+        public static String CreateFolder(CMTreeNode content)
+        {
+            String relativePath;
+            return CreateFolder(content, out relativePath);
+        }
+
+        public static String CreateFolder(CMTreeNode content, out String relativePath)
+        {
+            int index = 0;
+            string folderName = "";
+            string contentName = UpdateFsString(content.Name);
+            string rootFolder = CMTreeNodeBLL.getRootPath();
+
+            try
+            {
+                do
+                {
+                    index++;
+                    relativePath = contentName + index;
+
+                    folderName = rootFolder + "\\" + relativePath;
+
+                } while (Directory.Exists(folderName));
+
+                Directory.CreateDirectory(folderName);
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                throw new TraceException("Create directory", new List<string>() { folderName, e.Message }, new StackFrame(1, true), e, "Content manager");
+            }
+
+            return folderName;
+
+        }
+
+        #endregion
+
+        #region Update Fs tring
+
+        public static String UpdateFsString(string fsName)
+        {
+
+            fsName = fsName.Replace("<", "_");
+            fsName = fsName.Replace(">", "_");
+            fsName = fsName.Replace("*", "_");
+            fsName = fsName.Replace("|", "_");
+            fsName = fsName.Replace("?", "_");
+            fsName = fsName.Replace(":", "_");
+            fsName = fsName.Replace("\"", "_");
+            fsName = fsName.Replace("/", "_");
+            fsName = fsName.Replace("\\", "_");
+            return fsName;
+        }
+
+        #endregion
+
+        #region Delete File
+
+        public static void DeleteFile(string sourceFullPath)
+        {
+            try
+            {
+                File.Delete(sourceFullPath);
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                throw new TraceException("Delete file", new List<string>() { sourceFullPath, e.Message }, new StackFrame(1, true), e, "Content manager");
+            }
+        }
+
+        #endregion
+
+        #region Delete Folder
+
+        public static void DeleteFolder(string folderFullPath)
+        {
+            try
+            {
+                if (Directory.Exists(folderFullPath))
+                {
+                    DirectoryClearReadOnlyAttributes(folderFullPath);
+                    Directory.Delete(folderFullPath, true);
+                }
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                throw new TraceException("Delete folder recursive", new List<string>() { folderFullPath, e.Message }, new StackFrame(1, true), e, "Content manager");
+            }
+        }
+
+        #endregion
+
+        #region Directory Clear Read Only Attributes
+
+        public static void DirectoryClearReadOnlyAttributes(string currentDirectory)
+        {
+            string[] subFiles = Directory.GetFiles(currentDirectory);
+            string[] subDirectorys = Directory.GetDirectories(currentDirectory);
+
+            foreach (string file in subFiles)
+            {
+                FileAttributes attrib = File.GetAttributes(file);
+
+                if ((attrib & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                    File.SetAttributes(file, attrib & ~FileAttributes.ReadOnly);
+            }
+
+            foreach (string directory in subDirectorys)
+                DirectoryClearReadOnlyAttributes(directory);
+        }
+
+        #endregion
+
+        #region Create Directory
+
+        public static void CreateDirectory(string directory)
+        {
+            try
+            {
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                throw new TraceException("Create directory", new List<string>() { directory, e.Message }, new StackFrame(1, true), e, "Content manager");
+            }
+        }
+
+        #endregion
+
+        #region Get File Folder
+
+        public static string GetFileFolder(string filePath)
+        {
+            return Path.GetDirectoryName(filePath);
+        }
+
+        #endregion
+
+        #region Add File
+
+        public static String AddFile(string destinationFullPath, string fileFullPath)
+        {
+            try
+            {
+                String destFileName = destinationFullPath + "\\" + Path.GetFileName(fileFullPath);
+
+                try
+                {
+                    File.Copy(fileFullPath, destFileName);
+                }
+                catch (Exception e)
+                {
+                    String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                    Domain.SaveGeneralErrorLog(logMessage);
+                    throw new TraceException("Copy file", new List<string>() { fileFullPath, destFileName, e.Message }, new StackFrame(1, true), e, "Content manager");
+                }
+
+                return destFileName;
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                TraceException te = new TraceException(new StackFrame(1, true), e, "Content manager");
+                throw te;
+            }
+        }
+
+        public static void AddFile(string sourceFile, string destinationFullPath, string destinationDirectoryPath)
+        {
+
+            CreateDirectory(destinationDirectoryPath);
+
+            try
+            {
+                File.Copy(sourceFile, destinationFullPath);
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                throw new TraceException("Copy file", new List<string>() { sourceFile, destinationFullPath, e.Message }, new StackFrame(1, true), e, "Content manager");
+            }
+        }
+
+        #endregion
+
+        #region Add Content Version Files On Fs
+
+        public static void AddContentVersionFilesOnFs(CMVersionModel contentVersion, CMICopyFilesProgressModel progressBar, CMImpersonationBLL cmImp)
+        {
+            string destinationFullPath;
+            string destinationDirectoryPath;
+
+            CMFileSystemUpdaterBLL.DeleteFolder(getCmFolder());
+            CMFileSystemUpdaterBLL.CreateDirectory(getCmFolder());
+
+            CMDoubleCopyFileModel dcFile;
+            List<CMDoubleCopyFileModel> copyFiles = new List<CMDoubleCopyFileModel>();
+
+            foreach (KeyValuePair<int, CMContentFileModel> file in contentVersion.Files)
+            {
+                file.Value.GetDestinationPath(DestinationRoot, out destinationFullPath, out destinationDirectoryPath);
+                dcFile = new CMDoubleCopyFileModel
+                {
+                    SourceFileFullPath = file.Value.FileFullPath,
+                    LocalCopyDirectoryPath =
+                        file.Value.FileRelativePath == String.Empty
+                            ? getCmFolder()
+                            : getCmFolder() + "\\" + file.Value.FileRelativePath,
+                    DestinationFileFullPath = destinationFullPath,
+                    DestinationDirectoryPath = destinationDirectoryPath
+                };
+
+                dcFile.LocalCopyFullPath = dcFile.LocalCopyDirectoryPath + "\\" + file.Value.FileName;
+                copyFiles.Add(dcFile);
+            }
+
+            string relativePath;
+            AddFilesOnFs(contentVersion, out relativePath, copyFiles, progressBar, cmImp);
+            contentVersion.Path = new ATSBusinessObjects.ContentMgmtModels.CMVersionModel.PathFS() { Type = ATSBusinessObjects.ContentMgmtModels.CMVersionModel.PathType.Relative, Name = relativePath };
+
+            foreach (KeyValuePair<int, CMContentFileModel> file in contentVersion.Files)
+                file.Value.UpdateFileFullPath(contentVersion.Path);
+        }
+
+        public static void AddContentVersionFilesOnFsBg(CMVersionModel contentVersion, CMICopyFilesProgressModel progressBar, 
+                                                        CMImpersonationBLL cmImp, ThreadStart t)
+        {
+            string destinationFullPath;
+            string destinationDirectoryPath;
+
+            CMFileSystemUpdaterBLL.DeleteFolder(getCmFolder());
+            CMFileSystemUpdaterBLL.CreateDirectory(getCmFolder());
+
+            CMDoubleCopyFileModel dcFile;
+            List<CMDoubleCopyFileModel> copyFiles = new List<CMDoubleCopyFileModel>();
+
+            foreach (KeyValuePair<int, CMContentFileModel> file in contentVersion.Files)
+            {
+                file.Value.GetDestinationPath(DestinationRoot, out destinationFullPath, out destinationDirectoryPath);
+                dcFile = new CMDoubleCopyFileModel
+                {
+                    SourceFileFullPath = file.Value.FileFullPath,
+                    LocalCopyDirectoryPath =
+                        file.Value.FileRelativePath == String.Empty
+                            ? getCmFolder()
+                            : getCmFolder() + "\\" + file.Value.FileRelativePath,
+                    DestinationFileFullPath = destinationFullPath,
+                    DestinationDirectoryPath = destinationDirectoryPath
+                };
+
+                dcFile.LocalCopyFullPath = dcFile.LocalCopyDirectoryPath + "\\" + file.Value.FileName;
+                copyFiles.Add(dcFile);
+            }
+
+            string relativePath;
+            AddFilesOnFsBg(contentVersion, out relativePath, copyFiles, t, cmImp);
+            contentVersion.Path = new ATSBusinessObjects.ContentMgmtModels.CMVersionModel.PathFS() { Type = ATSBusinessObjects.ContentMgmtModels.CMVersionModel.PathType.Relative, Name = relativePath };
+
+            foreach (KeyValuePair<int, CMContentFileModel> file in contentVersion.Files)
+                file.Value.UpdateFileFullPath(contentVersion.Path);
+        }
+
+
+        #endregion
+
+        #region Add Files On Fs
+
+        public static void AddFilesOnFs(CMTreeNode treeNode, out string relativePath, List<CMDoubleCopyFileModel> copyFiles, CMICopyFilesProgressModel progressBar, CMImpersonationBLL cmImp)
+        {
+            if (progressBar != null)
+            {
+                progressBar.Init(copyFiles.Count * 2);
+                progressBar.Show();
+            }
+
+            for (int i = 0; i < copyFiles.Count; i++)
+            {
+                if (progressBar != null)
+                {
+                    progressBar.IncreaseProgress(copyFiles[i].SourceFileFullPath, copyFiles[i].LocalCopyFullPath, i);
+
+                    if (progressBar.Canceled)
+                        throw new TraceException("Aborted by user", false, null, "Content manager");
+                }
+
+                AddFile(copyFiles[i].SourceFileFullPath, copyFiles[i].LocalCopyFullPath, copyFiles[i].LocalCopyDirectoryPath);
+            }
+
+            cmImp.Logon();
+
+            String folderName = CreateFolder(treeNode, out relativePath);
+
+            for (int i = 0; i < copyFiles.Count; i++)
+            {
+                copyFiles[i].DestinationFileFullPath = copyFiles[i].DestinationFileFullPath.Replace(DestinationRoot, folderName);
+                copyFiles[i].DestinationDirectoryPath = copyFiles[i].DestinationDirectoryPath.Replace(DestinationRoot, folderName);
+
+                if (progressBar != null)
+                {
+                    progressBar.IncreaseProgress(copyFiles[i].LocalCopyFullPath, copyFiles[i].DestinationFileFullPath, copyFiles.Count + i);
+
+                    if (progressBar.Canceled)
+                        throw new TraceException("Aborted by user", false, null, "Content manager");
+                }
+
+                AddFile(copyFiles[i].LocalCopyFullPath, copyFiles[i].DestinationFileFullPath, copyFiles[i].DestinationDirectoryPath);
+            }
+
+            cmImp.Dispose();
+
+            //progressBar.Close();
+        }
+
+        public static void AddFilesOnFsBg(CMTreeNode treeNode, out string relativePath, List<CMDoubleCopyFileModel> copyFiles, 
+                                            ThreadStart t, CMImpersonationBLL cmImp)
+        {
+            for (int i = 0; i < copyFiles.Count; i++)
+            {
+                AddFile(copyFiles[i].SourceFileFullPath, copyFiles[i].LocalCopyFullPath, copyFiles[i].LocalCopyDirectoryPath);
+                if (t != null)
+                {
+                    FileSystemBLL.importFilesCompleted++;
+                    Thread thread = new Thread(t);
+                    thread.Start();
+                    thread.Join();
+                }
+            }
+
+            cmImp.Logon();
+
+            String folderName = CreateFolder(treeNode, out relativePath);
+
+            for (int i = 0; i < copyFiles.Count; i++)
+            {
+                copyFiles[i].DestinationFileFullPath = copyFiles[i].DestinationFileFullPath.Replace(DestinationRoot, folderName);
+                copyFiles[i].DestinationDirectoryPath = copyFiles[i].DestinationDirectoryPath.Replace(DestinationRoot, folderName);
+
+                AddFile(copyFiles[i].LocalCopyFullPath, copyFiles[i].DestinationFileFullPath, copyFiles[i].DestinationDirectoryPath);
+
+                if (t != null)
+                {
+                    FileSystemBLL.importFilesCompleted++;
+                    Thread thread = new Thread(t);
+                    thread.Start();
+                    thread.Join();
+                }
+            }
+
+            cmImp.Dispose();
+
+            //progressBar.Close();
+        }
+
+        #endregion
+       
+    }
+}

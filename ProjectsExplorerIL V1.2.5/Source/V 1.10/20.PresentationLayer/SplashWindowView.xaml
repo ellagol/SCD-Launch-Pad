@@ -1,0 +1,14 @@
+﻿<Window x:Class="ATSUI.SplashWindowView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:ATSUI"
+    Title="SplashWindowView"  WindowStartupLocation="CenterScreen" WindowStyle="None" Height="340" Width="560"
+    AllowsTransparency="True" Opacity="1" Background="{x:Null}" ShowInTaskbar="False" ResizeMode="NoResize">
+
+    <Grid Background="#FF406793" Width="542" Height="282">
+
+        <!--Progress Label-->
+        <Label Margin="27,0,120,44" Name="StatusLabel" VerticalAlignment="Bottom" Content="{Binding Source={x:Static local:MessageListener.Instance},Path=Message}" FontFamily="Verdana" FontSize="16" Foreground="Yellow" />
+
+    </Grid>
+</Window>

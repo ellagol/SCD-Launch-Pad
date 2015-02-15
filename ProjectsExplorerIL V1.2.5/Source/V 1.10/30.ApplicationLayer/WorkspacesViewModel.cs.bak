@@ -1,0 +1,194 @@
+﻿using System;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
+using System.Xml.Linq;
+using Infra.MVVM;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using System.IO; //To support ImageSource property that holds the Thumb of the Workspace
+using System.Windows.Media.Imaging; //To support ImageSource property that holds the Thumb of the Workspace
+
+namespace ATSVM
+{
+    public class WorkspacesViewModel : WorkspaceViewModelBase
+    {
+
+        #region  Fields
+
+        private IMessageBoxService MsgBoxService = null;
+        private MessengerService MessageMediator = null;
+
+        #endregion //Fields
+
+        #region  Constructor
+
+        public WorkspacesViewModel(ObservableCollection<WorkspaceViewModelBase> WSs)
+            : base("WorkspacesView", "")
+        {
+            //Initialize this VM
+            DisplayName = "Workspaces";
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+            //Register to recieve a message containing Employee Maintenance Parameter
+            MessageMediator.Register("RefreshWorkspacesList", (Action<ObservableCollection<WorkspaceViewModelBase>>)OnRequestRefreshWorkspacesListReceived);
+            //
+            _DoubleClickCommand = new RelayCommand<object>(ExecuteDoubleClickCommand);
+            Workspaces = new ObservableCollection<WorkspaceViewModelBase>();
+            OnRequestRefreshWorkspacesListReceived(WSs);
+        }
+
+        #endregion //Constructor
+
+        #region  Properties
+
+        private ObservableCollection<WorkspaceViewModelBase> _Workspaces;
+        public ObservableCollection<WorkspaceViewModelBase> Workspaces
+        {
+            get
+            {
+                return _Workspaces;
+            }
+            set
+            {
+                _Workspaces = value;
+                RaisePropertyChanged("Workspaces");
+            }
+        }
+
+        private WorkspaceViewModelBase _SelectedWorkspace;
+        public WorkspaceViewModelBase SelectedWorkspace
+        {
+            get
+            {
+                return _SelectedWorkspace;
+            }
+            set
+            {
+                _SelectedWorkspace = value;
+                RaisePropertyChanged("SelectedWorkspace");
+            }
+        }
+
+        #endregion //Properties
+
+        #region  Private Helpers
+
+        //Receive a message to refresh Workspaces List
+        private void OnRequestRefreshWorkspacesListReceived(ObservableCollection<WorkspaceViewModelBase> WSs)
+        {
+            Workspaces.Clear();
+            foreach (WorkspaceViewModelBase WS in WSs)
+            {
+                string WSImagePath = WS.WSId.ToString() + ".WSID.png";
+                WS.Thumb = GetWorkspaceThumb(WSImagePath);
+                if (WS.Thumb != null)
+                {
+                    Workspaces.Add(WS);
+                }
+            }
+        }
+
+        //Get Workspace Thumb from disk (as captured by the TabControl)
+        public BitmapImage GetWorkspaceThumb(string Path)
+        {
+            try
+            {
+                BitmapImage SourceImage = new BitmapImage();
+                SourceImage.BeginInit();
+                SourceImage.UriSource = new Uri(Path, UriKind.Relative);
+                SourceImage.CacheOption = BitmapCacheOption.OnLoad;
+                //SourceImage.DecodePixelHeight = 191
+                //SourceImage.DecodePixelWidth = 455
+                SourceImage.EndInit();
+                return SourceImage;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        #endregion //Private Helpers
+
+        #region  Commands
+
+        #region  Go to Workspace Command
+
+        private RelayCommand _GoCommand;
+        public RelayCommand GoCommand
+        {
+            get
+            {
+                if (_GoCommand == null)
+                {
+                    _GoCommand = new RelayCommand(ExecuteGoCommand, CanExecuteGoCommand);
+                }
+                return _GoCommand;
+            }
+        }
+
+        private bool CanExecuteGoCommand()
+        {
+            return true;
+        }
+
+        private void ExecuteGoCommand()
+        {
+            MessageMediator.NotifyColleagues("RequestGotoWorkspace", SelectedWorkspace.WSId.ToString()); //Will be returned to the MainWindow signed for this message
+        }
+
+        #endregion
+
+        #region  Mouse DoubleClick EventToCommand
+
+        private RelayCommand<object> _DoubleClickCommand;
+        public RelayCommand<object> DoubleClickCommand
+        {
+            get
+            {
+                return _DoubleClickCommand;
+            }
+            set
+            {
+                _DoubleClickCommand = value;
+            }
+        }
+
+        private void ExecuteDoubleClickCommand(object Param)
+        {
+            int I = Workspaces.IndexOf((WorkspaceViewModelBase)Param);
+            WorkspaceViewModelBase W = Workspaces[I];
+            MessageMediator.NotifyColleagues("RequestGotoWorkspace", W.WSId.ToString()); //Will be returned to the MainWindow signed for this message
+        }
+
+        #endregion
+
+        #endregion //Commands
+
+        #region  Presentation Properties
+
+        private string _DisplayName = string.Empty;
+        public override string DisplayName
+        {
+            get
+            {
+                return _DisplayName;
+            }
+            set
+            {
+                _DisplayName = value;
+            }
+        }
+
+        #endregion // Presentation Properties
+
+    }
+}

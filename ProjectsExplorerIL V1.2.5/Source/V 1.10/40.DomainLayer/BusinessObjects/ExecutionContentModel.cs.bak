@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using ATSBusinessObjects.ContentMgmtModels;
+using System.Data;
+using Infra.Domain;
+using System.IO;
+using System.ComponentModel;
+namespace ATSBusinessObjects
+{
+
+    public class ExecutionContentModel
+    {
+        public string name { get; set; }
+        public string description { get; set; }
+        public string category { get; set; }
+        public string versionName { get; set; }
+        public string versionDescription { get; set; }
+        public string versionStatus { get; set; }
+        public string ATRIndicator { get; set; }
+        public ObservableCollection<CMWhereUsedContentLinkItemModel> whereUsed;
+
+    }
+}// end of namespace ATSBusinessObjects
+
+

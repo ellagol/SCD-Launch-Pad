@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="ContentManager.ContentUpdate.UcContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             MinWidth="300" MaxWidth="500"
+             MinHeight="100" MaxHeight="440"
+             VerticalAlignment="Top"
+             DataContext="{Binding ContentsDataProvider, Source={StaticResource Locator}}" >
+    <UserControl.Resources>
+        <DataTemplate x:Key="EnvTemplate">
+            <Border>
+                <StackPanel>
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.Resources>
+            <Style TargetType="{x:Type TextBox}">
+                <Style.Triggers>
+                    <Trigger Property="Validation.HasError" Value="true">
+                        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Resources>
+            <Grid.ColumnDefinitions >
+            <ColumnDefinition Width="25*"/>
+            <ColumnDefinition Width="75*"/>
+        </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+            <TextBlock Style="{StaticResource TextBoxFieldName}" Text="Name:" Grid.Column="0" Grid.Row="0"/>
+            <TextBox Style="{StaticResource TextBoxFieldValue}" Grid.Column="1" Grid.Row="0" IsEnabled="{Binding UpdateMode}" Text="{Binding ContentProperty.Name, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+
+            <TextBlock Style="{StaticResource TextBoxFieldName}" Text="Description:" Grid.Column="0" Grid.Row="1"/>
+            <TextBox Style="{StaticResource TextBoxFieldDescription}" Grid.Column="1" Grid.Row="1" IsEnabled="{Binding UpdateMode}" Text="{Binding ContentProperty.Description, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock  Style="{StaticResource TextBoxFieldName}" Text="Category :" Grid.Column="0" Grid.Row="2"/>
+            <ComboBox Style="{StaticResource ComboBoxFieldValue}" Grid.Column="1" Grid.Row="2" IsEnabled="{Binding UpdateMode}" ItemsSource="{Binding ContentTypeList}" ItemTemplate="{StaticResource EnvTemplate}" SelectedItem="{Binding ContentProperty.Type, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock  Style="{StaticResource TextBoxFieldName}" Text="Certificate free:" Grid.Column="0" Grid.Row="3"/>
+            <CheckBox Style="{StaticResource CheckBoxFieldValue}" Grid.Column="1" Grid.Row="3" IsEnabled="{Binding UpdateMode}" IsChecked="{Binding ContentProperty.CertificateFree}" />
+        
+            <StackPanel Grid.Column="0" Grid.Row="4" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource TextBoxFieldName}" Text="Icon:"/>
+                <Image  Style="{StaticResource ImageFieldValue}" Source="{Binding Path=Text, ElementName=TextBoxIcon}"/>
+            </StackPanel>       
+            <Grid Grid.Column="1" Grid.Row="4">
+                <Grid.ColumnDefinitions >
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Style="{StaticResource TextBoxFieldValue}" x:Name="TextBoxIcon" Grid.Column="0"  IsEnabled="{Binding UpdateMode}" Text="{Binding ContentProperty.Icon, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Style="{StaticResource BrowseButton}" Grid.Column="1" Content=".." IsEnabled="{Binding UpdateMode}" HorizontalAlignment="Right" Command="{Binding BrowseIconContent}"/>
+            </Grid>
+            <Grid HorizontalAlignment="Right" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="5" IsEnabled="{Binding UpdateModeActive}" Visibility="{Binding Path=UpdateMode, Mode=OneWay,Converter={StaticResource BoolToVisibility}}">
+                <Grid.ColumnDefinitions >
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Style="{StaticResource UpdateButton}" Content="{Binding ActionName}" Grid.Column="0" Grid.Row="0" Margin="5,10" Command="{Binding ActionExecuteContent}"/>
+                <Button Style="{StaticResource UpdateButton}" Content="Cancel" Grid.Column="1" Grid.Row="0" Margin="5,10" Command="{Binding CancelExecuteContent}"/>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

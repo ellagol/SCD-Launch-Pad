@@ -1,0 +1,27 @@
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Binaries\TaskDialog.dll
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\ResourceDictionaries\Common.baml
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\CommandLink.g.cs
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\TaskDialog.g.cs
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\TaskDialog_MarkupCompile.cache
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\TaskDialog_MarkupCompile.lref
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\CommandLink.baml
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\TaskDialog.baml
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\TaskDialog.g.resources
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\TaskDialogInterop.Properties.Resources.resources
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\TaskDialog.csproj.GenerateResource.Cache
+C:\Eli\Today\MyWpfInfrastructure 0.75\Dependencies\TaskDialogWrapper\Source\TaskDialog\obj\Debug\TaskDialog.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\TaskDialogWrapper\TaskDialog.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\TaskDialog.csprojResolveAssemblyReference.cache
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\ResourceDictionaries\Common.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\CommandLink.g.cs
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\TaskDialog.g.cs
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\TaskDialog_MarkupCompile.cache
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\TaskDialog_MarkupCompile.lref
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\CommandLink.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\TaskDialog.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\TaskDialog.g.resources
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\TaskDialogInterop.Properties.Resources.resources
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\TaskDialog.csproj.GenerateResource.Cache
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\TaskDialogWrapper\TaskDialog\obj\Debug\TaskDialog.dll

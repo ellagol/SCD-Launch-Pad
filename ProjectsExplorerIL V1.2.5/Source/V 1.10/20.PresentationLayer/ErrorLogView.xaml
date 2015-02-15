@@ -1,0 +1,110 @@
+﻿<UserControl x:Class="ATSUI.ErrorLogView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:vm="clr-namespace:ATSVM;assembly=ATSVM"
+    xmlns:ctls="clr-namespace:ATSUI.CustomControls"
+    xmlns:mvvm="clr-namespace:Infra.MVVM;assembly=Infra.MVVM"
+    Style="{DynamicResource WorkspaceStyle}"
+    >
+
+    <UserControl.Resources>
+
+        <Style TargetType="ItemsControl" x:Key="LogViewerStyle">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" CanContentScroll="True" ctls:ScrollViewerExtensions.AlwaysScrollToEnd="True">
+                            <ItemsPresenter/>
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--<DataTemplate DataType="{x:Type vm:LogEntry}">
+            <Grid IsSharedSizeScope="True">-->
+                <!--<TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontFamily="Courier New" FontSize="14"/>-->
+                <!--<TextBlock Text="{Binding Message}" TextWrapping="NoWrap" FontFamily="Courier New" FontSize="14"/>
+            </Grid>
+        </DataTemplate>-->
+
+        <DataTemplate DataType="{x:Type vm:LogEntry}">
+            <Grid IsSharedSizeScope="True">
+                <!--<TextBlock Text="{Binding Message}" TextWrapping="Wrap" FontFamily="Courier New" FontSize="14"/>-->
+                <TextBox IsReadOnly="True" Text="{Binding Message}" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" MaxHeight="500" MaxWidth="1100">
+                </TextBox>
+            </Grid>
+        </DataTemplate>
+
+        <!--Black Office 2010 Gradient-->
+        <!--<Color x:Key="BackgroundC1">#FFFFFBFF</Color>-->
+        <!--<Color x:Key="BackgroundC2">#FFCECFD6</Color>-->
+
+        <!--Silver Office 2010 Gradient-->
+        <!--<Color x:Key="BackgroundC1">#FFE8ECF0</Color>-->
+        <!--<Color x:Key="BackgroundC2">#FFDADEE3</Color>-->
+
+        <!--Blue Office 2010 Gradient-->
+        <Color x:Key="BackgroundC1">#FFCFDDEE</Color>
+        <Color x:Key="BackgroundC2">#FFC2D4E8</Color>
+
+        <LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0.5" EndPoint="0,1">
+            <GradientStop Color="{DynamicResource BackgroundC1}" Offset="0"/>
+            <GradientStop Color="{DynamicResource BackgroundC2}" Offset="1"/>
+        </LinearGradientBrush>
+
+    </UserControl.Resources>
+
+    <Grid Margin="15,0,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--Window Title-->
+        <Label Grid.Row="0" Content="Data Access Layer Error Log" Style="{DynamicResource WorkspaceTitleStyle}" />
+
+        <!--Divider-->
+        <Separator Grid.Row="1" Style="{DynamicResource HorizontalSeparatorStyle}" Margin="0,0,15,0" />
+
+        <!--Window Main Section-->
+        <Grid Grid.Row="2">
+            <DockPanel Background="{StaticResource BackgroundBrush}" Margin="0,0,15,15">
+                <ItemsControl ItemsSource="{Binding Path=LogEntries}" >
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"  CanContentScroll="True" ctls:ScrollViewerExtensions.AlwaysScrollToEnd="True" >
+                                <ItemsPresenter/>
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel IsItemsHost="True"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </DockPanel>
+        </Grid>
+
+        <!--Divider-->
+        <!--<Separator Grid.Row="3" Style="{DynamicResource HorizontalSeparatorStyle}" Margin="0,0,15,0" />-->
+
+        <!--Command Buttons-->
+        <!--<StackPanel Grid.Row="4" Style="{DynamicResource WorkspaceActionsStackPanelStyle}" >
+            <Button Name="btnGo" Content=" Go " Command="{Binding GoCommand}" />
+        </StackPanel>-->
+    </Grid>
+</UserControl>

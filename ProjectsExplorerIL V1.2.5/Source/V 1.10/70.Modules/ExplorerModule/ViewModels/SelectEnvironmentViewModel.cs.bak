@@ -1,0 +1,186 @@
+﻿using System.ComponentModel.DataAnnotations;
+using Infra.MVVM;
+using System;
+using System.Collections.Generic;
+using ATSBusinessObjects;
+using System.Linq;
+
+namespace ExplorerModule
+{
+    public class SelectEnvironmentViewModel : ViewModelBase
+    {
+        #region  Data
+
+        private IMessageBoxService MsgBoxService = null;
+        private ITaskDialogService TaskDialogService = null;
+        private MessengerService MessageMediator = null;
+        private string ParentId;
+        private Type SourceItemType;
+        public static List<int> ActiveContentsSeqList;
+
+        #endregion
+
+        #region  Properties
+
+        private string _MessageText = "Set value:";
+        public string MessageText
+        {
+            get
+            {
+                return _MessageText;
+            }
+            set
+            {
+                _MessageText = value;
+                RaisePropertyChanged("MessageText");
+            }
+        }
+
+        private string _Seq;
+        
+        //[RegularExpression("[0-9]+", ErrorMessage = "Invalid characters entered."), StringLength(6, ErrorMessage = "Maximum length (6 characters) exceeded.")]
+        [ProjectInvalidName(ErrorMessage = "Priority can be set only to positive integer numbers")]
+        [StringLength(6, ErrorMessage = "Maximum length (6 characters) exceeded.")]
+        [ProjectDuplicatedPriority(ErrorMessage = "Please set unique sequence value")]        
+        public string Seq
+        {
+            get
+            {
+                return _Seq;
+            }
+            set
+            {
+                _Seq = value;
+                RaisePropertyChanged("Seq");
+            }
+        }
+
+        #endregion
+
+        #region  Constructor
+
+        public SelectEnvironmentViewModel()
+        {
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+            //Task Dialog Service
+            TaskDialogService = GetService<ITaskDialogService>();
+            //Messenger Service (to exchange messages between VMs)
+            MessageMediator = GetService<MessengerService>();
+        }
+
+        #endregion
+
+        #region  CloseOverlay Command
+
+        private RelayCommand _CloseSelectEnvironmentCommand;
+        public RelayCommand CloseSelectEnvironmentCommand
+        {
+            get
+            {
+                if (_CloseSelectEnvironmentCommand == null)
+                {
+                    _CloseSelectEnvironmentCommand = new RelayCommand(ExecuteClosePriorityPopupCommand, CanExecuteClosePriorityPopupCommand);
+                }
+                return _CloseSelectEnvironmentCommand;
+            }
+        }
+
+        private bool CanExecuteClosePriorityPopupCommand()
+        {
+            return true;
+        }
+
+        private void ExecuteClosePriorityPopupCommand()
+        {
+            if (SourceItemType.Name.Contains("NewTemplateViewModel"))
+                MessageMediator.NotifyColleagues(this.ParentId + "OnRequestPriorityPopupCloseReceived", string.Empty); //Will be returned to the NewTemplate
+            else
+                MessageMediator.NotifyColleagues(this.ParentId + "OnRequestPriorityPopupCloseClonedReceived", string.Empty); //Will be returned to the NewTemplate
+        }
+
+        #endregion
+
+        #region Update Seqence Command
+
+        private RelayCommand _UpdateSeqCommand;
+        public RelayCommand UpdateSeqCommand
+        {
+            get
+            {
+                if (_UpdateSeqCommand == null)
+                {
+                    _UpdateSeqCommand = new RelayCommand(ExecuteUpdateSeqCommand, CanExecuteUpdateSeqCommand);
+                }
+                return _UpdateSeqCommand;
+            }
+        }
+
+        private bool CanExecuteUpdateSeqCommand()
+        {
+            if (IsValid)
+                return true;
+            else
+                return false;
+        }
+
+        private void ExecuteUpdateSeqCommand()
+        {
+            int seq;
+            int.TryParse(this.Seq ,out seq);
+            
+            if (SourceItemType.Name.Contains("NewTemplateViewModel"))
+                MessageMediator.NotifyColleagues(this.ParentId + "OnRequestUpdateSeqReceived", seq); //Will be returned to the NewTemplateViewModel
+            else
+                MessageMediator.NotifyColleagues(this.ParentId + "OnRequestUpdateSeqClonedReceived", seq); //Will be returned to the CloneTemplateViewModel
+        }
+
+        #endregion
+
+
+        #region Validation
+
+        public class ProjectInvalidNameAttribute : ValidationAttribute
+        {
+            public override bool IsValid(object value)
+            {
+                if (value == null || value == "")
+                {
+                    return false;
+                }
+                string val = value.ToString();
+                if (val[0] == '0') {
+                    return false;
+                }
+
+                for (int i = 0; i < val.Length; i++) {
+                    if (val[i] < '0' || val[i] > '9') { 
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+
+        public class ProjectDuplicatedPriority : ValidationAttribute
+        {
+            public override bool IsValid(object value)
+            {
+                if (value == null || value == "")
+                {
+                    return false;
+                }
+                string val = value.ToString();
+                //List<string> stringSeqList = ActiveContentsSeqList.ConvertAll<string>(delegate(int i) { return i.ToString(); });
+                List<string> stringSeqList = ActiveContentsSeqList.ConvertAll<string>(x => x.ToString());
+                if (stringSeqList.Contains(val))
+                   return false;
+                else
+                   return true;
+            }
+        }
+
+        #endregion
+    }
+}

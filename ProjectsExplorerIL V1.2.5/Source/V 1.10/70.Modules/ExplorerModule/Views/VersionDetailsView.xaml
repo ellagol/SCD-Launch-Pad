@@ -1,0 +1,417 @@
+﻿<UserControl x:Class="ExplorerModule.VersionDetailsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mvvm="clr-namespace:Infra.MVVM;assembly=Infra.MVVM"
+    xmlns:notes="clr-namespace:NotesModule;assembly=NotesModule"               
+    xmlns:local="clr-namespace:ExplorerModule"
+    xmlns:np="NavigationPane" 
+    xmlns:dd="clr-namespace:Infra.DragDrop;assembly=Infra.DragDrop"          
+    mc:Ignorable="d"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="445" d:DesignWidth="488"
+    >
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--Metro Tab Control-->
+                <ResourceDictionary Source="pack://application:,,,/ExplorerModule;component/Resources/Themes/MetroTabStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+   
+    <Style x:Key="ContentListViewStyle" TargetType="{x:Type ListView}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+        <Setter Property="AlternationCount" Value="0" />
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <DataTemplate x:Key="SubFolderTileTemplate" DataType="{x:Type local:TreeViewNodeViewModelBase}">
+        <Border HorizontalAlignment="Stretch" BorderBrush="Transparent" BorderThickness="0" Padding="5" >
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0" Height="80" Stretch="Uniform" Source="{Binding LargeIcon}" />
+                <StackPanel Grid.Column="1" Margin="2,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" TextBlock.FontWeight="Bold" />
+                    <TextBlock Text="{Binding Description}" Margin="0,0,0,0" />
+                </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>   
+    </ResourceDictionary>
+</UserControl.Resources>
+
+    <Grid x:Name="LayoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel x:Name="ContentArea" Grid.Row="0" >
+
+            <!--Notes SideBar-->
+            <!--np:NavigationPane x:Name="navigationPane" Width="0" HorizontalAlignment="Left" IsEnabled="False" Visibility="Collapsed" />
+            <np:NavigationPaneExpander x:Name="NavigationPaneExpander" Width="200" Margin="0,0,2,1" DockPanel.Dock="Right" Orientation="Right" Header="" IsMinimized="{Binding Path=ShowNotes}"  >
+                <HeaderedContentControl Header="Notes">
+                    <Grid np:NavigationPaneExpander.CanResize="False">
+                        <notes:NotesControl DataContext="{Binding Notes}" Margin="10" />
+                    </Grid>
+                </HeaderedContentControl>
+
+            </np:NavigationPaneExpander-->
+
+            <!--Main Content Area-->
+            <ScrollViewer Grid.Row="0" CanContentScroll="True" VerticalScrollBarVisibility="Auto" 
+                          HorizontalScrollBarVisibility="Auto">
+                <TabControl SelectedIndex="{Binding Path=tabIndex, Mode=TwoWay}" Style="{DynamicResource MetroTab}">
+                    <!--Contents Tab-->
+                    <!--SubFolders TabItem-->
+                    <TabItem Header="{Binding Path=VersionName}" Style="{DynamicResource MetroTabItem}" 
+                             BorderBrush="Blue" Width="210" >
+
+                        <Grid>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- ECR Id  -->
+                            <Label Grid.Row="7" Grid.Column="0" Content="ECR Id:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="7" Grid.Column="2" Text="{Binding Path=ECRId, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="300" IsReadOnly="True" />
+                            <!-- Version Name -->
+                            <Label Grid.Row="9" Grid.Column="0" Content="Version Name:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="9" Grid.Column="2"  Text="{Binding Path=VersionName, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="300" IsReadOnly="True" />
+
+                            <!-- Version Description -->
+                            <Label Grid.Row="11" Grid.Column="0" Content="Version Release Notes:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="11" Grid.Column="2" Text="{Binding Path=VersionDescription, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="300" IsReadOnly="True" />
+
+                            <!-- Target Directory  -->
+                            <Label Grid.Row="13" Grid.Column="0" Content="Target Directory:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="13" Grid.Column="2" Text="{Binding Path=TargetPath, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="300" IsEnabled="{Binding Path=EnableSync, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" />
+                            <Button Grid.Row="13" Grid.Column="2" Name="btnShowPath" Content="Open"  Command="{Binding OpenPathExecute}" Width="60" Margin="280,0,0,0"  />
+
+                            <!-- Default Target Directory  -->
+                            <Label Grid.Row="15" Grid.Column="0" Content="Default Target Directory:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <CheckBox  Grid.Row="15" Grid.Column="2"  IsChecked ="{Binding Path=DefaultTargetPathInd, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsEnabled="{Binding Path=LockCheck, UpdateSourceTrigger=PropertyChanged}" IsHitTestVisible="False"/>
+                            
+                            <!-- Version Id -->
+                            <Label Grid.Row="17" Grid.Column="0" Content="Version Id:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="17" Grid.Column="2"  Text="{Binding Path=VersionId, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="300" IsReadOnly="True" />
+
+                            <!-- Active Contents-->
+                            <ListView x:Name="ContentsList" SelectedItem="{Binding Path=contentToAction}" Grid.Row="1" Grid.Column="0" 
+                                      Grid.ColumnSpan="3" ItemsSource="{Binding Path = activeContents}" 
+                                      HorizontalAlignment="Stretch" Margin="0,6,0,0" VerticalAlignment="Top" Background="#FF454545"
+                                       SelectionMode="Single" MinHeight="120" Width="650" MaxHeight="300"  ScrollViewer.CanContentScroll="True"  
+                                       dd:DragDrop.IsDragSource="False" dd:DragDrop.IsDropTarget="False" dd:DragDrop.DropHandler="{Binding}" dd:DragDrop.UseDefaultDragAdorner="True">
+                                <ListView.Resources>
+                                    <ContextMenu x:Key="ItemContextMenu">
+                                        <MenuItem Header="Execute" Command="{Binding DataContext.ContentCopyCommand,   RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"/>
+                                    </ContextMenu>
+                                    <Style TargetType="GridViewColumnHeader">
+                                        <Setter Property="IsEnabled" Value="True"/>
+                                        <Setter Property="TextElement.Foreground" Value="Black"/>
+                                    </Style>
+                                </ListView.Resources>
+
+
+
+                                <ListView.View>
+                                    <GridView x:Name="activeContents" AllowsColumnReorder="False" >
+
+                                        <GridViewColumn Width="30" Header=" ">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Image Source="{Binding IconFileFullPath}" Width="16" Height="16" ></Image>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                        <GridViewColumn Width="150" Header="Content" DisplayMemberBinding="{Binding name}"/>
+                                        <GridViewColumn Width="125"  Header="Content Category"  DisplayMemberBinding="{Binding contentCategory}"/>
+                                        <GridViewColumn Width="125"  Header="Content Version" DisplayMemberBinding="{Binding version}"/>
+                                        <GridViewColumn Width="85"  Header="Content Status" DisplayMemberBinding="{Binding status}"/>
+                                        <GridViewColumn Width="85"   Header="Priority" DisplayMemberBinding="{Binding seq}"/>
+                                    </GridView>
+                                </ListView.View>
+
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}" >
+                                        <Setter Property="mvvm:EventToCommand.Event" Value="MouseDoubleClick" />
+                                        <Setter Property="mvvm:EventToCommand.Command" Value="{Binding ElementName=ContentsList, Path=DataContext.ContentCopyCommand}" />
+                                        <Setter Property="mvvm:EventToCommand.CommandParameter" Value="{Binding ContentCopyCommand}" />
+
+                                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}"/>
+
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+
+                            </ListView>
+                            <ProgressBar Value="{Binding Path=Progress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Maximum="{Binding Path=ProgressMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Margin="0" MaxHeight="40" Height="40"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding Path=ProgressText}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="15" Margin="0"/>
+
+
+                        </Grid>
+                        
+                        
+                        
+
+                        <!--/ListView-->
+
+                    </TabItem>
+
+                    <!--Properties TabItem-->
+                    <TabItem Header="Version Properties" Style="{DynamicResource MetroTabItem}" BorderBrush="Red" >
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="20" />
+                                <RowDefinition Height="Auto" />
+
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Name -->
+                            <Label Grid.Row="1" Grid.Column="0" Content="Name:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Path=VersionName, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True" />
+
+                            <!-- Created On -->
+                            <Label Grid.Row="3" Grid.Column="0" Content="Created On:" Style="{DynamicResource WorkspaceLabelsStyle}" Visibility="{Binding Path=HideField, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding Path=CreationDate, StringFormat={x:Static local:ProjectDetailsViewModel.DateTimeFormat}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True" Visibility="{Binding Path=HideField, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <!-- Modified On -->
+                            <Label Grid.Row="5" Grid.Column="0" Content="Modified On:" Style="{DynamicResource WorkspaceLabelsStyle}" Visibility="{Binding Path=HideField, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox Grid.Row="5" Grid.Column="2" Text="{Binding Path=LastUpdateTime, StringFormat={x:Static local:ProjectDetailsViewModel.DateTimeFormat}, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True" Visibility="{Binding Path=HideField, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <!-- Modified By -->
+                            <Label Grid.Row="7" Grid.Column="0" Content="Modified By:" Style="{DynamicResource WorkspaceLabelsStyle}" Visibility="{Binding Path=HideField, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox Grid.Row="7" Grid.Column="2" Text="{Binding Path=LastUpdateUser, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True" Visibility="{Binding Path=HideField, UpdateSourceTrigger=PropertyChanged}"/>
+
+                            <!-- Status -->
+                            <Label Grid.Row="9" Grid.Column="0" Content="Status:" Style="{DynamicResource WorkspaceLabelsStyle}" Visibility="{Binding Path=HideField, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox Grid.Row="9" Grid.Column="2" Text="{Binding Path=VersionStatus, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True" Visibility="{Binding Path=HideField, UpdateSourceTrigger=PropertyChanged}" />
+                            
+                        </Grid>
+
+                    </TabItem>
+
+                    <!--Content TabItem-->
+                    <TabItem Header="Content" Style="{DynamicResource MetroTabItem}" BorderBrush="LimeGreen" >
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="20" />
+                                    <RowDefinition Height="Auto" />
+
+                                </Grid.RowDefinitions>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="6" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                            <TreeView  Name="ContentTreeViewStandard" Grid.Row="1" Margin="0,10,10,10" VerticalAlignment="Stretch" ItemsSource="{Binding TreeNodesLinks}" FontSize="14" Background="Transparent" BorderThickness="0" Grid.ColumnSpan="3">
+                                    <TreeView.ItemContainerStyle>
+                                        <!-- This Style binds a TreeViewItem to a TreeViewNodeViewModel -->
+                                        <Style TargetType="{x:Type TreeViewItem}">
+                                            <!--<EventSetter Event="Selected" Handler="TreeViewSelectedItemChanged" />-->
+                                            <!--<EventSetter Event="Expanded" Handler="TreeExpanded" />-->
+                                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                            <Setter Property="IsSelected" Value="{Binding IsSelectedLinkedTree, Mode=TwoWay}" />
+                                            <Setter Property="FontWeight" Value="DemiBold" />
+                                            <Setter Property="FontSize" Value="16" />
+                                            <Setter Property="Foreground" Value="DarkBlue" />
+                                            <Style.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter Property="FontWeight" Value="Bold" />
+                                                    <Setter Property="Foreground" Value="Black" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TreeView.ItemContainerStyle>
+
+                                    <TreeView.Resources>
+                                        <!--/////////////////////////////////////-->
+                                        <!-- Provide the Templates per Node Type -->
+                                        <!--/////////////////////////////////////-->
+                                        <!-- Root Node Template -->
+                                        <HierarchicalDataTemplate DataType="{x:Type local:CMTreeViewRootNodeViewModel}" ItemsSource="{Binding Children}" >
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" FontWeight="Bold" FontStyle="Italic" FontSize="20" />
+                                            </StackPanel>
+                                        </HierarchicalDataTemplate>
+
+                                        <!-- Folder Node Template -->
+                                        <HierarchicalDataTemplate DataType="{x:Type local:CMTreeViewFolderNodeViewModel}" ItemsSource="{Binding Children}" >
+                                            <StackPanel Orientation="Horizontal">
+                                            <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" />
+                                            </StackPanel>
+                                        </HierarchicalDataTemplate>
+
+                                        <!-- Content Node Template -->
+                                        <HierarchicalDataTemplate DataType="{x:Type local:CMTreeViewContentNodeViewModel}" ItemsSource="{Binding Children}" >
+                                            <StackPanel Orientation="Horizontal">
+
+                                                <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" />
+                                            </StackPanel>
+                                        </HierarchicalDataTemplate>
+
+
+                                        <!-- Version Node Template -->
+                                        <HierarchicalDataTemplate DataType="{x:Type local:CMTreeViewVersionNodeViewModel}" ItemsSource="{Binding Children}" >
+                                            <StackPanel Orientation="Horizontal">
+                                            <StackPanel.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Open in CM" Command="{Binding OpenContentVersionInCm}"/>
+                                                </ContextMenu>
+                                            </StackPanel.ContextMenu>
+                                            <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" />
+                                            </StackPanel>
+                                        </HierarchicalDataTemplate>
+                                    </TreeView.Resources>
+                                </TreeView>
+
+                            <!-- CR 3600 -->
+                            <!-- Content Name -->
+                            <!--<Label Grid.Row="3" Grid.Column="0" Content="Content Name:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding Path=ContentName, Mode=OneWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True" />-->
+
+                            <!-- Version Name -->
+                            <!--<Label Grid.Row="5" Grid.Column="0" Content="Version Name:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="5" Grid.Column="2" Text="{Binding Path=NodeName, Mode=OneWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True" />-->
+
+                            <!-- Description -->
+                            <Label Grid.Row="11" Grid.Column="0" Content="Description:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="11" Grid.Column="2" Text="{Binding Path=NodeDescription, Mode=OneWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400"  IsReadOnly="True" />
+
+                            <!-- Command Line  -->
+                            <Label Grid.Row="13" Grid.Column="0" Content="Command Line :" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="13" Grid.Column="2" Text="{Binding Path=CommandLine, Mode=OneWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True"  />
+
+
+                            <!-- Status -->
+                            <!--<Label Grid.Row="11" Grid.Column="0" Content="Status:" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="11" Grid.Column="2" Text="{Binding Path=NodeStatus, Mode=OneWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True"  />-->
+
+
+                            <!-- Content Path -->
+                            <!--<Label Grid.Row="13" Grid.Column="0" Content="Content Path " Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <TextBox Grid.Row="13" Grid.Column="2" Text="{Binding Path=ContentPath, Mode= OneWay, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsReadOnly="True"  />-->
+
+                            <!-- Files -->
+                            <!--<Label Grid.Row="15" Grid.Column="0" Content="Files" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                            <ListBox x:Name="_Files" Grid.Row="15" Grid.Column="2" ItemsSource="{Binding Files, Mode= OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="IsEnabled" Value="False"/>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>-->
+                            <!-- ListView Grid.Row="13" Grid.Column="2" ItemsSource="{Binding Files, Mode= OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="400" IsEnabled="False"/-->
+
+                        </Grid>
+                    </TabItem>
+                    <!--Certificates TabItem
+                    <TabItem Header="Certificates" Style="{DynamicResource MetroTabItem}" BorderBrush="Magenta" >
+                    </TabItem>-->
+                </TabControl>
+            </ScrollViewer>
+           
+        </DockPanel>
+
+        <!--Divider-->
+        <Separator Grid.Row="1" Style="{DynamicResource HorizontalSeparatorStyle}" Margin="0,0,15,0" />
+
+        <!--Command Buttons-->
+
+    </Grid>
+</UserControl>

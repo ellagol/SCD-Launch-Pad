@@ -1,0 +1,741 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Windows.Input;
+using System.Windows.Media.Imaging;
+using ATSBusinessLogic;
+using ATSBusinessObjects;
+using ATSBusinessObjects.ContentMgmtModels;
+using ATSDomain;
+using Infra.MVVM;
+
+namespace ExplorerModule
+{
+    public class TreeViewTemplateNodeViewModel : TreeViewNodeViewModelBase
+    {
+        Guid WSId;
+        protected MessengerService MessageMediator = new MessengerService();
+        private IMessageBoxService MsgBoxService = null;
+
+        public TreeViewTemplateNodeViewModel(Guid workspaceId, HierarchyModel Hierarchy)
+            : this(workspaceId, Hierarchy, null)
+        {
+            WSId = workspaceId;
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+        }
+
+        public TreeViewTemplateNodeViewModel(Guid workspaceId, HierarchyModel Hierarchy, TreeViewNodeViewModelBase ParentNode)
+            : base(workspaceId, Hierarchy, ParentNode)
+        {
+            //The messageMediator is registered in the ViewModelBase - Generally you have 1 mediator; Hence, the restricted access to the constructor
+            MessageMediator = GetService<MessengerService>();
+            WSId = workspaceId;
+           
+
+            //Message Box Service
+            MsgBoxService = GetService<IMessageBoxService>();
+        }
+
+        public override string NodeData
+        {
+            get
+            {
+                StringBuilder SB = new StringBuilder(this.Name);
+                if (this.Hierarchy.SelectedStep.Trim().Length > 0)
+                {
+                    SB.Append(" - " + this.Hierarchy.SelectedStep);
+                }
+                return SB.ToString();
+            }
+        }
+
+        public override void Refresh()
+        {
+            this.Children.Clear();
+            this.LoadChildren();
+            RaisePropertyChanged("NodeData");
+        }
+
+        public override void LoadChildren()
+        {
+        }
+
+
+        //Sends a message to the MainWindow with the required information to display a details view of the currently selected node
+        protected override void DisplayDetailsView()
+        {
+            MessageMediator.NotifyColleagues(WorkSpaceId + "ShowNewTemplate", this); //Will be returned to the Explorer Main signed for this message
+        }
+
+        //Sends a message to the MainWindow with the required information to save a details view of the currently selected node
+       
+
+        #region  Context Menu Commands (Specific to this Node Type; others appear in the Base Class)
+
+
+        #region  Disable Project
+
+        public string EnableDisable
+        {
+
+            get
+            {
+                //if (!(string.IsNullOrEmpty(Hierarchy.ProjectStatus.Trim())) || (Hierarchy.ProjectStatus == "Open"))
+                if (Hierarchy.ProjectStatus.Trim() == "Disabled")
+                {
+                    return "Collapsed";
+                }
+                else
+                {
+                    return "Visible";
+                }
+
+            }
+
+        }
+
+        private RelayCommand _DisableProjectCommand;
+        public ICommand DisableProjectCommand
+        {
+            get
+            {
+                if (_DisableProjectCommand == null)
+                {
+                    _DisableProjectCommand = new RelayCommand(ExecuteDisableProjectCommand, CanExecuteDisableProjectCommand);
+                }
+                return _DisableProjectCommand;
+            }
+        }
+
+        private bool CanExecuteDisableProjectCommand()
+        {
+            return Domain.IsPermitted("113");
+        }
+
+        private void ExecuteDisableProjectCommand()
+        {
+            try
+            {
+
+                Domain.PersistenceLayer.BeginTransWithIsolation(IsolationLevel.Serializable);
+                // (1) Check last Update
+                string updateCheck = HierarchyBLL.LastUpadateCheck(ref _Hierarchy);
+                if (!(String.IsNullOrEmpty(updateCheck)))
+                {
+                    Domain.PersistenceLayer.AbortTrans();
+                    Object[] ArgsList = new Object[] { 0 };
+                    ExplorerModule.ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(updateCheck), ArgsList);
+                    return;
+                }
+                if (HierarchyBLL.UpdateProjectStatus(this.Hierarchy.Id, "D") == 1)
+                {
+                    Hierarchy.ProjectStatus = "Disabled";
+                    MessageMediator.NotifyColleagues(WorkSpaceId + "UpdateNode", this.Hierarchy); //Register to recieve a message asking for node refresh
+
+                    RaisePropertyChanged("EnableDisable");
+                    RaisePropertyChanged("EnableResume");
+                    MessageMediator.NotifyColleagues(WorkSpaceId + "OnDisableTemplateReceived", this);
+                    Domain.PersistenceLayer.CommitTrans();
+                }
+            }
+            catch (Exception e)
+            {
+                Domain.PersistenceLayer.AbortTrans();
+                if (e.Message == "DB Error")
+                {
+                    Object[] ArgsList = new Object[] { 0 };
+                    ExplorerModule.ProjectsExplorerViewModel.ShowErrorAndInfoMessage(141, ArgsList);
+                }
+                else
+                {
+                    Object[] ArgsList = new Object[] { 0 };
+                    ExplorerModule.ProjectsExplorerViewModel.ShowErrorAndInfoMessage(105, ArgsList);
+                }
+            }
+        }
+
+        #endregion  Disable Project
+
+        #region  Clone Project
+
+        private RelayCommand _CloneProjectCommand;
+        public ICommand CloneProjectCommand
+        {
+            get
+            {
+                if (_CloneProjectCommand == null)
+                {
+                    _CloneProjectCommand = new RelayCommand(ExecuteCloneProjectCommand, CanExecuteCloneProjectCommand);
+                }
+                return _CloneProjectCommand;
+            }
+        }
+
+        private bool CanExecuteCloneProjectCommand()
+        {
+            //return Domain.IsPermitted("119");
+            return true;
+        }
+
+
+        private void ExecuteCloneProjectCommand()
+        {
+            try
+            {
+                if (!Domain.IsPermitted("150"))
+                {
+                    ProjectsExplorerViewModel.ShowErrorAndInfoMessage(106, new object[] { 0 });
+                    return;
+                }
+                this.Parent.IsExpandedTree = true;
+                this.Parent.IsSelectedTree = true;
+                this.Hierarchy.TreeHeader = (Domain.Environment + VersionBLL.getParentName(Parent.Hierarchy.Id.ToString()));
+                MessageMediator.NotifyColleagues(WorkSpaceId + "ShowCloneTemplate", this);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0} Exception caught.", e); // TODO: Log error
+            }
+
+
+        }
+
+
+
+        #endregion  Clone Project
+
+        #region Collapse Versions
+
+        private RelayCommand _CollapseVersionsCommand;
+        public ICommand CollapseVersionsCommand
+        {
+            get
+            {
+                if (_CollapseVersionsCommand == null)
+                {
+                    _CollapseVersionsCommand = new RelayCommand(ExecuteCollapseVersionsCommand, CanExecuteCollapseVersionsCommand);
+                }
+                return _CollapseVersionsCommand;
+            }
+        }
+
+        private bool CanExecuteCollapseVersionsCommand()
+        {
+            //if there is childrens to this node. --> children exists only if show version applied.
+            if (this.Children.Count > 0)
+            {
+                return Domain.IsPermitted("119");
+            }
+            else
+                return false;
+        }
+
+        private void ExecuteCollapseVersionsCommand()
+        {
+            Children = new ObservableCollection<TreeViewNodeViewModelBase>();
+
+        }
+
+        #endregion
+
+        #region  Show Versions
+
+        private RelayCommand _ShowVersionsCommand;
+        public ICommand ShowVersionsCommand
+        {
+            get
+            {
+                if (_ShowVersionsCommand == null)
+                {
+                    _ShowVersionsCommand = new RelayCommand(ExecuteShowVersionsCommand, CanExecuteShowVersionsCommand);
+                }
+                return _ShowVersionsCommand;
+            }
+        }
+
+        private bool CanExecuteShowVersionsCommand()
+        {
+
+            return Domain.IsPermitted("119");
+        }
+
+        private void ExecuteShowVersionsCommand()
+        {
+            try
+            {
+                this.Children.Clear();
+                //Get All Versions for project
+                ObservableCollection<VersionModel> allVersions;
+               
+                allVersions = VersionBLL.GetVersion(Hierarchy.Id); //Case Project is regular
+                long Hid = Hierarchy.Id;
+
+                HierarchyModel hm = Hierarchy;
+                VersionModel vCur = Hierarchy.VM;
+
+                //Add versions to the hierarchy tree
+                foreach (VersionModel V in allVersions)
+                {
+                    hm.VM = V;
+                    TreeViewTemplateVersionNodeViewModel toAdd = new TreeViewTemplateVersionNodeViewModel(WSId, hm);
+                    if (toAdd.Hierarchy.VM.VersionStatus == "A")
+                    {
+                        toAdd.Icon = new BitmapImage(new Uri(string.Format("pack://application:,,,/ExplorerModule;component/Resources/Icons/32x32/{0}.png", "Version"), UriKind.RelativeOrAbsolute));
+                    }
+                    else
+                    {
+                        toAdd.Icon = new BitmapImage(new Uri(string.Format("pack://application:,,,/ExplorerModule;component/Resources/Icons/32x32/{0}.png", "VersionDis"), UriKind.RelativeOrAbsolute));
+                    }
+
+                    if (Children.Count < allVersions.Count) //For disable duplicate add of version
+                        Children.Add(toAdd);
+                }
+                Hierarchy.VM = vCur;
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0} Exception caught.", e); // TODO: Log error
+            }
+
+
+        }
+
+        #endregion  Show Versions
+
+        #region  Resume Project
+
+        public string EnableResume
+        {
+
+            get
+            {
+                if (Hierarchy.ProjectStatus.Trim() == "Open")
+                {
+                    return "Collapsed";
+                }
+                else
+                {
+                    return "Visible";
+                }
+
+            }
+        }
+
+
+
+        private RelayCommand _ResumeProjectCommand;
+        public ICommand ResumeProjectCommand
+        {
+            get
+            {
+                if (_ResumeProjectCommand == null)
+                {
+                    _ResumeProjectCommand = new RelayCommand(ExecuteResumeProjectCommand, CanExecuteResumeProjectCommand);
+                }
+                return _ResumeProjectCommand;
+            }
+        }
+
+        private bool CanExecuteResumeProjectCommand()
+        {
+            return Domain.IsPermitted("115");
+        }
+
+        private void ExecuteResumeProjectCommand()
+        {
+            try
+            {
+                Domain.PersistenceLayer.BeginTransWithIsolation(IsolationLevel.Serializable);
+                // (1) Check last Update
+                string updateCheck = HierarchyBLL.LastUpadateCheck(ref _Hierarchy);
+                if (!(String.IsNullOrEmpty(updateCheck)))
+                {
+                    Domain.PersistenceLayer.AbortTrans();
+                    Object[] ArgsList = new Object[] { 0 };
+                    ExplorerModule.ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(updateCheck), ArgsList);
+                    return;
+                }
+                Domain.ErrorHandling Status = TemplateBLL.IsStepAvailable(_Hierarchy, _Hierarchy.ParentId);
+                if (Status.messsageId != string.Empty)
+                {
+                    Domain.PersistenceLayer.AbortTrans();
+                    ExplorerModule.ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.messsageId), Status.messageParams);
+                    return;
+                }
+
+                if (HierarchyBLL.UpdateProjectStatus(this.Hierarchy.Id, "O") == 1)
+                {
+                    Hierarchy.ProjectStatus = "Open";
+                    MessageMediator.NotifyColleagues(WorkSpaceId + "UpdateNode", this.Hierarchy); //Register to recieve a message asking for node refresh
+                    RaisePropertyChanged("EnableResume");
+                    RaisePropertyChanged("EnableDisable");
+                    
+                    Domain.PersistenceLayer.CommitTrans();
+                }
+            }
+            catch (Exception e)
+            {
+                Domain.PersistenceLayer.AbortTrans();
+                if (e.Message == "DB Error")
+                {
+                    Object[] ArgsList = new Object[] { 0 };
+                    ExplorerModule.ProjectsExplorerViewModel.ShowErrorAndInfoMessage(141, ArgsList);
+                }
+                else
+                {
+                    Object[] ArgsList = new Object[] { 0 };
+                    ExplorerModule.ProjectsExplorerViewModel.ShowErrorAndInfoMessage(105, ArgsList);
+                }
+            }
+        }
+        #endregion  Resume Project
+
+        #region  Rapid Execution
+
+        private RelayCommand _RapidExecutionCommand;
+        public ICommand RapidExecutionCommand
+        {
+            get
+            {
+                if (_RapidExecutionCommand == null)
+                {
+                    _RapidExecutionCommand = new RelayCommand(ExecuteRapidExecutionCommand, CanExecuteRapidExecutionCommand);
+                }
+                return _RapidExecutionCommand;
+            }
+        }
+        private bool CanExecuteRapidExecutionCommand()
+        {
+            if (Domain.IsPermitted("130"))
+            {
+                if (!Hierarchy.IsNew && !Hierarchy.VM.IsNew && !Hierarchy.IsCloned && !Hierarchy.IsClonedRelated && !Hierarchy.IsClonedRelatedSplit && !Hierarchy.IsClonedRelatedUpdate)
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+
+        private void ExecuteRapidExecutionCommand()
+        {
+            try
+            {
+                if (!CanExecuteRapidExecutionCommand())
+                    return;
+                MessageMediator.NotifyColleagues(WorkSpaceId + "OnTemplateRapidExecutionStartReceived", this);
+
+                ContentExecutionBLL.ErrorHandling luStatus = new ContentExecutionBLL.ErrorHandling();
+                //Last Update and permission check
+                luStatus = ContentExecutionBLL.PriorValidations(_Hierarchy, "130");
+                if (!(String.IsNullOrEmpty(luStatus.errorId)))
+                {
+                    MessageMediator.NotifyColleagues(this.WorkSpaceId + "OnTemplateIsCanceledNodeReceived", this);
+                    ExplorerModule.ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(luStatus.errorId), luStatus.errorParams);
+                    return;
+                }
+
+                ContentBLL contentBLL;
+                //Check project contents associated to active version
+                //If group related
+                if(Hierarchy.GroupId == -1)
+                    contentBLL = new ContentBLL(Hierarchy.Id);
+                else
+                    contentBLL = new ContentBLL(Hierarchy.GroupId);
+                activeVersionCMs = contentBLL.getActiveContents(Hierarchy.ActiveVersion);
+
+                //If no contents are associated to active project version - error 150 
+                if (activeVersionCMs.Count == 0)
+                {
+                    ProjectsExplorerViewModel.ShowErrorAndInfoMessage(150, new object[] { 0 });
+                    return;
+                }
+
+                //If exist - contentToAction is contentVersion with sequence = 1;
+                //contentToAction = activeVersionCMs.Where(x => x.seq == 1).FirstOrDefault();
+
+                int minContentSeqNo = activeVersionCMs.Min(x => x.seq);
+                contentToAction = activeVersionCMs.Where(x => x.seq == minContentSeqNo).FirstOrDefault();
+                
+                //If there is no content with sequence 1 – issue error 151 
+                if (contentToAction.Equals(null))
+                {
+                    ProjectsExplorerViewModel.ShowErrorAndInfoMessage(151, new object[] { 0 });
+                    return;
+                }
+
+
+                //Execute in the same manner as regular execution
+                Thread ContentExecutionThread = new Thread(new ThreadStart(ContentExecution));
+                ContentExecutionThread.Start();
+
+            }
+            catch (Exception e)
+            {
+                //If there is no content with sequence 1 – issue error 151 
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                ProjectsExplorerViewModel.ShowErrorAndInfoMessage(151, new object[] { 0 });
+                return;
+            }
+        }
+
+        #region Data
+        private ContentModel contentToAction;
+        ObservableCollection<ContentModel> activeVersionCMs;
+        private String targetPath;
+        #endregion Data
+
+        #region Main content excecute command
+
+        private void ContentExecution()
+        {
+            int errorId = -1;
+            ContentExecutionBLL.ErrorHandling Status = new ContentExecutionBLL.ErrorHandling();
+
+            try
+            {
+            //Get contents, folder and version tree from API
+            Dictionary<int, CMFolderModel> outFolders = new Dictionary<int, CMFolderModel>();
+            Dictionary<int, CMContentModel> outContents = new Dictionary<int, CMContentModel>();
+            Dictionary<int, CMVersionModel> outVersions = new Dictionary<int, CMVersionModel>();
+
+                //Performance
+                //Get CM sub tree
+                Status = ContentExecutionBLL.GetCMSubTree(activeVersionCMs, out outFolders, out outContents, out outVersions);
+                #region Handle Get CM sub tree errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), Status.errorParams);
+                return;
+            }
+                #endregion
+
+                //Perform all required validations prior to execution
+                Status = ContentExecutionBLL.validations(outContents, outVersions, contentToAction, Hierarchy);
+                #region Handle validations errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    if (Status.errorId == "107")
+                    {
+                        if (MsgBoxService.ShowOkCancel(Status.errorParams[0].ToString(), DialogIcons.Question) != DialogResults.OK)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            bool temp = ATSDomain.Domain.IsPermitted("126");
+                            if (Status.errorId == "107" && !Domain.IsPermitted("126"))
+                            {
+                                ProjectsExplorerViewModel.ShowErrorAndInfoMessage(106, new object[] { 0 });
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), new object[] { 0 });
+                        return;
+                    }
+                }
+                #endregion
+
+                Status = ContentExecutionBLL.userCertificatesValidations(Hierarchy);
+                #region Handle validations errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    if (Status.errorId == "170")
+                    {
+                        if (MsgBoxService.ShowOkCancel(Status.errorParams[0].ToString(), DialogIcons.Question) != DialogResults.OK)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            bool temp = ATSDomain.Domain.IsPermitted("126");
+                            if (Status.errorId == "170" && !Domain.IsPermitted("133"))
+                            {
+                                ProjectsExplorerViewModel.ShowErrorAndInfoMessage(106, new object[] { 0 });
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), new object[] { 0 });
+                        return;
+                    }
+                }
+                #endregion
+
+                //Start new thread for copying files and copy files to local directory
+           ThreadStart threadStart = new ThreadStart(IncrementProgressCounter);
+            Thread t = new Thread(threadStart);
+            t.Start();
+                Status = ContentExecutionBLL.prepareLocalDirectoryToExecution(outVersions, outContents, threadStart,
+                                                                                 activeVersionCMs,
+                                                                                 contentToAction,
+                                                                                 Hierarchy);
+                #region Handle files copy errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), Status.errorParams);
+                    return;
+        }
+
+        #endregion
+
+                //Execute file
+                IncrementProgressCounter(10);
+                HierarchyModel updatedHierarchy = Hierarchy;
+                updatedHierarchy.VM.Contents = activeVersionCMs;
+                Status = ContentExecutionBLL.ExecuteContentVersionAndSaveInfo(updatedHierarchy, outVersions, outContents, contentToAction.id);
+                #region Handle execution errors if any
+                if (Status.errorId != string.Empty)
+                {
+                    ProjectsExplorerViewModel.ShowErrorAndInfoMessage(Convert.ToInt32(Status.errorId), Status.errorParams);
+                    ProgressText = "0 %";
+                    MessageMediator.NotifyColleagues(WorkSpaceId + "OnTemplateProgressTextReceived", this);
+                    return;
+                }
+                #endregion
+
+                //Record Execute History
+                Status = ContentExecutionBLL.recordExecutionHistory(Hierarchy.VM.VersionId);
+                #region Handle save history errors if any
+
+                if (Status.errorId != string.Empty)
+                {
+                    String logMessage = "Failed to save record in ExecutionHistory table";
+                    Domain.SaveGeneralErrorLog(logMessage);
+                }
+                #endregion
+                    }
+                    catch (Exception ex)
+                    {
+                        String logMessage = ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                        Domain.SaveGeneralErrorLog(logMessage);
+                ProjectsExplorerViewModel.ShowErrorAndInfoMessage(105, new object[] { 0 });
+            }
+        }
+
+        #endregion
+
+        #region Progress Bar
+        #region Fields
+
+        // Property variables
+        private float p_Progress = 0;
+        private int p_ProgressMax = 10;
+        private String p_ProgressText = "";
+        private float totalProgress = 0f;
+        #endregion
+
+        #region Data Properties
+
+        // The progress of an image processing job.
+        // The setter for this property also sets the ProgressMessage property.
+        public float Progress
+        {
+            get { return p_Progress; }
+
+            set
+            {
+                RaisePropertyChanged("Progress");
+                p_Progress = value;
+                RaisePropertyChanged("Progress");
+            }
+        }
+
+        public String ProgressText
+        {
+            get { return p_ProgressText; }
+
+            set
+            {
+                RaisePropertyChanged("ProgressText");
+                p_ProgressText = value;
+                RaisePropertyChanged("ProgressText");
+            }
+        }
+
+        //The maximum progress value.
+        public int ProgressMax
+        {
+            get { return p_ProgressMax; }
+
+            set
+            {
+                RaisePropertyChanged("ProgressMax");
+                p_ProgressMax = value;
+                RaisePropertyChanged("ProgressMax");
+            }
+        }
+
+
+        #endregion
+
+        #region Internal Methods
+
+
+        //Clears the view model.
+        internal void ClearViewModel()
+        {
+            MessageMediator.NotifyColleagues(WorkSpaceId + "OnTemplateClearViewModelReceived", this);
+        }
+
+        // Advances the progress counter for the Progress dialog.
+        public void IncrementProgressCounter(float incrementClicks)
+        {
+            incrementClicks = (int)(incrementClicks * 10);
+
+            totalProgress = incrementClicks;
+            if (totalProgress > 99)
+            {
+                totalProgress = 100;
+                Progress = p_ProgressMax;
+                ProgressText = "100 %";
+                FileSystemBLL.filesCompleted = 0;
+            }
+            else if (totalProgress < 0)
+            {
+                totalProgress = 0;
+
+                ProgressText = 0 + "%";
+            }
+            else
+            {
+                // Increment counter
+                this.Progress = incrementClicks / 10;
+                ProgressText = totalProgress + "%";
+            }
+
+            MessageMediator.NotifyColleagues(WorkSpaceId + "OnTemplateProgressTextReceived", this);
+
+            // Update progress message
+            float progress = (p_Progress);
+            float progressMax = (p_ProgressMax);
+            float f = (progress / progressMax);
+            float percentComplete = Single.IsNaN(f) ? 0 : (f);
+        }
+
+        public void IncrementProgressCounter()
+        {
+            MessageMediator.NotifyColleagues(WorkSpaceId + "OnTemplateRapidExecutionReceived", this);
+        }
+        #endregion
+
+        #endregion
+
+        #endregion  Rapid Execution
+
+        #endregion
+
+    }
+
+} //end of root namespace

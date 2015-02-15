@@ -1,0 +1,969 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using ATSBusinessObjects.ContentMgmtModels;
+using ATSDomain;
+using TraceExceptionWrapper;
+
+namespace ATSBusinessLogic.ContentMgmtBLL
+{
+    public class CMContentsReaderBLL
+    {
+        #region Data
+
+        private Dictionary<String, CMContentTypeModel> ContentTypeList { get; set; }
+        private Dictionary<String, CMContentStatusModel> ContentStatusList { get; set; }
+        private Dictionary<String, CMUserGroupTypeModel> UserGroupTypeList { get; set; }
+
+        public static List<int> listOfUsedContentVersionsPE = new List<int>();
+        //performance#1
+        public static List<int> listOfUsedContentVersionsCM = new List<int>();
+
+        //Performance#2
+        public static DataTable ContentVersionsDataTable = new DataTable();
+
+        //Performance#3
+        public static DataTable ContentVersionLinkedTable = new DataTable();
+
+        //Performance#4
+        public static DataTable ContentVersionFilesTable = new DataTable();
+
+        //Performance#5
+        public static string rootPathFS = string.Empty;
+
+        //Performance#7
+        public static DataTable FolderUserGoupTypesDataTable = new DataTable();
+
+        #endregion
+
+        #region Constructor
+
+        public CMContentsReaderBLL()
+        {
+            ContentTypeList = null;
+            ContentStatusList = null;
+        }
+
+        #endregion
+
+        #region Methods
+
+        //internal Dictionary<int, CMContentModel> GetContentsList(List<int> contentsID, bool fullData)
+        //{
+        //    UpdateReferenceList();
+        //    return GetContentsDictionaryByIDPerf(contentsID, null, fullData);
+        //}
+
+        public Dictionary<int, List<CMVersionKey>> GetContentVersionLinksWithLock()
+        {
+            int version;
+            int versionLink;
+            int versionLinkParentContent = 0;
+            DataTable dt = CMTreeNodeBLL.GetVersionLinksWithLock();
+            Dictionary<int, List<CMVersionKey>> versionLinks = new Dictionary<int, List<CMVersionKey>>();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                version = (int)row["CVVL_id_ContentVersion_Parent"];
+                versionLink = (int)row["CVVL_id_ContentVersion_Link"];
+                versionLinkParentContent = (int)row["CV_id_Content"];
+
+                if(versionLinks.ContainsKey(version))
+                    versionLinks[version].Add(new CMVersionKey() { ContentID = versionLinkParentContent, VersionID = versionLink });
+                else
+                    versionLinks.Add(version, new List<CMVersionKey>() { new CMVersionKey() { ContentID = versionLinkParentContent, VersionID = versionLink } });
+            }
+
+            return versionLinks;
+        }
+
+
+        internal List<CMTreeNode> GetContentsTree(bool fullData, out Dictionary<int, CMFolderModel> folders, out Dictionary<int, CMContentModel> contents, out Dictionary<int, CMVersionModel> versions)
+        {
+            UpdateReferenceList();
+            
+            versions = new Dictionary<int, CMVersionModel>();
+            List<CMTreeNode> foldersRoot = new List<CMTreeNode>();
+          
+            //Performenace#7
+            FolderUserGoupTypesDataTable.Clear();
+            FolderUserGoupTypesDataTable = CMTreeNodeBLL.GetFolderUserGroupTypesDataTable();
+            folders = GetFoldersDictionary();
+
+            DateTime t = DateTime.Now;
+            int MS = t.Millisecond;
+            string sMS = MS.ToString();
+            Console.WriteLine(t + "." + sMS + " start GetContentsDictionaryByID");
+
+            //Performance#2
+            ContentVersionsDataTable.Clear();
+            ContentVersionsDataTable = CMTreeNodeBLL.GetContentVersionsDataTable();
+            //end#2
+
+            //Performance#3
+            ContentVersionLinkedTable.Clear();
+            ContentVersionLinkedTable = CMTreeNodeBLL.GetContentVersionSubVersionsDataTable();
+            //end#3
+
+            //Performance#4
+            ContentVersionFilesTable.Clear();
+            ContentVersionFilesTable = CMTreeNodeBLL.GetContentVersionFilesDataTable();
+
+            contents = GetContentsDictionaryByIDPerf(null, versions, fullData);
+
+            AddFoldersToFoldersRootTree(folders, foldersRoot);
+ 
+            AddContentsToFoldersRootTree(folders, contents);
+            t = DateTime.Now;
+            MS = t.Millisecond;
+            sMS = MS.ToString();
+            Console.WriteLine(t + "." + sMS + " end AddContentsToFoldersRootTree");
+         
+            if (Domain.CallingAppName != Domain.AppName) //if explorer is calling
+            {
+                t = DateTime.Now;
+                MS = t.Millisecond;
+                sMS = MS.ToString();
+                Console.WriteLine(t + "." + sMS + " start CMUpdatePermissionBLL");
+                listOfUsedContentVersionsPE.Clear();
+                VersionBLL.GetListOfUsedContentVersionsPE(ref listOfUsedContentVersionsPE);
+
+                //perfornance#1
+                listOfUsedContentVersionsCM.Clear();
+                CMVersionBLL.GetListOfUsedContentVersionsCM(ref listOfUsedContentVersionsCM);
+                //end#1
+
+                (new CMUpdatePermissionBLL(folders, contents, versions)).UpdateTreeNodeRecursive(foldersRoot);
+                t = DateTime.Now;
+                MS = t.Millisecond;
+                sMS = MS.ToString();
+                Console.WriteLine(t + "." + sMS + " end CMUpdatePermissionBLL");
+            }
+            
+            return foldersRoot;
+        }
+
+        //Performance for execution
+        internal List<CMTreeNode> GetContentsSubTree(List<int> contentIds, out Dictionary<int, CMFolderModel> folders, out Dictionary<int, CMContentModel> contents, out Dictionary<int, CMVersionModel> versions)
+        {
+            UpdateReferenceList();
+
+            versions = new Dictionary<int, CMVersionModel>();
+            List<CMTreeNode> foldersRoot = new List<CMTreeNode>();
+            contents = new Dictionary<int, CMContentModel>();
+
+            folders = GetFoldersDictionary();
+
+            DateTime t = DateTime.Now;
+            int MS = t.Millisecond;
+            string sMS = MS.ToString();
+            Console.WriteLine(t + "." + sMS + " start GetContentsDictionaryByID");
+            contents = GetContentsDictionaryByID(contentIds, versions, true);
+
+            AddFoldersToFoldersRootTree(folders, foldersRoot);
+
+            AddContentsToFoldersRootTree(folders, contents);
+            t = DateTime.Now;
+            MS = t.Millisecond;
+            sMS = MS.ToString();
+            Console.WriteLine(t + "." + sMS + " end AddContentsToFoldersRootTree");
+
+            return foldersRoot;
+        }
+
+        //CR 4046
+        internal List<CMTreeNode> GetContentsSubTree(List<int> contentIds, List<int> versionIds, out Dictionary<int, CMFolderModel> folders, out Dictionary<int, CMContentModel> contents, out Dictionary<int, CMVersionModel> versions)
+        {
+            UpdateReferenceList();
+
+            versions = new Dictionary<int, CMVersionModel>();
+            List<CMTreeNode> foldersRoot = new List<CMTreeNode>();
+            contents = new Dictionary<int, CMContentModel>();
+
+            folders = GetFoldersDictionary(contentIds);
+
+            contents = GetContentsDictionaryByID(contentIds, versionIds, versions, true);
+
+            AddFoldersToFoldersRootTree(folders, foldersRoot);
+
+            AddContentsToFoldersRootTree(folders, contents);
+
+            return foldersRoot;
+        }
+
+        public void UpdateReferenceList()
+        {
+            if (ContentStatusList == null)
+                ContentStatusList = new CMContentStatusReaderBLL().GetStatusList();
+
+            if (ContentTypeList == null)
+                ContentTypeList = new CMContentTypesReaderBLL().GetTypesList();
+
+            if (UserGroupTypeList == null)
+                UserGroupTypeList = CMUserGroupTypesReaderBLL.GetUserGroupTypes();
+        }
+
+        public void AddFoldersToFoldersRootTree(Dictionary<int, CMFolderModel> folders, List<CMTreeNode> foldersRoot)
+        {
+            bool existFolder;
+            CMFolderModel folderTemp;
+            CMFolderModel currentFolder;
+            
+            foreach (var folder in folders)
+            {
+                currentFolder = folder.Value;
+
+                if (currentFolder.ParentID == 0)
+                {
+                    foldersRoot.Add(folder.Value);
+                }
+                else 
+                {
+                    existFolder = folders.TryGetValue(currentFolder.ParentID, out folderTemp);
+
+                    if (!existFolder)
+                        throw new TraceException("1", false, null, "Content manager");
+
+                    folderTemp.Nodes.Add(currentFolder);
+                }
+            }
+        }
+
+        public void AddContentsToFoldersRootTree(Dictionary<int, CMFolderModel> folders, Dictionary<int, CMContentModel> contents)
+        {
+
+            bool existFolder;
+            CMFolderModel folderTemp;
+            CMContentModel currentContent;
+
+            foreach (var content in contents)
+            {
+                currentContent = content.Value;
+
+                existFolder = folders.TryGetValue(currentContent.ParentID, out folderTemp);
+
+                if (!existFolder)
+                    throw new TraceException("2", false, null, "Content manager");
+
+                folderTemp.Nodes.Add(currentContent);
+            }
+        }
+
+        public Dictionary<int, CMFolderModel> GetFoldersDictionary()
+        {
+            CMFolderModel folderTemp;
+            DataTable foldersDataTable = CMTreeNodeBLL.GetFoldersDataTable();
+            Dictionary<int, CMFolderModel> folders = new Dictionary<int, CMFolderModel>();
+
+            foreach (DataRow row in foldersDataTable.Rows)
+            {
+                folderTemp = CreateFolderFromDataRow(row);
+                folderTemp.UserGroupTypePermission = GetFolderUserGroupTypePerf(folderTemp.ID);
+                folders.Add(folderTemp.ID,folderTemp);
+            }
+
+            return folders;
+        }
+
+        public Dictionary<int, CMFolderModel> GetFoldersDictionary(List<int> contentIds)
+        {
+            CMFolderModel folderTemp;
+            DataTable foldersDataTable = CMTreeNodeBLL.GetFoldersDataTable(contentIds);
+            Dictionary<int, CMFolderModel> folders = new Dictionary<int, CMFolderModel>();
+            if (foldersDataTable != null)
+            {
+                foreach (DataRow row in foldersDataTable.Rows)
+                {
+                    folderTemp = CreateFolderFromDataRow(row);
+                    folderTemp.UserGroupTypePermission = GetFolderUserGroupTypePerf(folderTemp.ID);
+                    folders.Add(folderTemp.ID, folderTemp);
+                }
+            }
+
+            return folders;
+        }
+
+        public Dictionary<String, CMFolderUserGroupTypeModel> GetFolderUserGroupType(int folderID)
+        {
+            CMFolderUserGroupTypeModel userGroupType;
+            DataTable foldersDataTable = CMTreeNodeBLL.GetFolderUserGroupTypesDataTable(folderID);
+            Dictionary<String, CMFolderUserGroupTypeModel> folderUserGroupTypes = new Dictionary<String, CMFolderUserGroupTypeModel>();
+
+            foreach (DataRow row in foldersDataTable.Rows)
+            {
+                userGroupType = CreateFolderUserGroupTypesFromDataRow(row);
+                folderUserGroupTypes.Add(userGroupType.UserGroupType.ID, userGroupType);
+            }
+            return folderUserGroupTypes;
+        }
+
+        public Dictionary<String, CMFolderUserGroupTypeModel> GetFolderUserGroupTypePerf(int folderID)
+        {
+            CMFolderUserGroupTypeModel userGroupType;
+            if (CMContentsReaderBLL.FolderUserGoupTypesDataTable == null ||
+                CMContentsReaderBLL.FolderUserGoupTypesDataTable.Rows == null ||
+                CMContentsReaderBLL.FolderUserGoupTypesDataTable.Rows.Count == 0)
+            {
+                CMContentsReaderBLL.FolderUserGoupTypesDataTable = CMTreeNodeBLL.GetFolderUserGroupTypesDataTable();
+            }
+
+            DataTable foldersDataTable = CMContentsReaderBLL.FolderUserGoupTypesDataTable.Clone();
+            string selectCondition = "CTUGT_id_ContentTree=" + folderID.ToString();
+
+            DataRow[] temp = CMContentsReaderBLL.FolderUserGoupTypesDataTable.Select(selectCondition);
+            if (temp != null && temp.Length > 0)
+            {
+                foldersDataTable = temp.CopyToDataTable();
+            }
+            
+            Dictionary<String, CMFolderUserGroupTypeModel> folderUserGroupTypes = new Dictionary<String, CMFolderUserGroupTypeModel>();
+
+            foreach (DataRow row in foldersDataTable.Rows)
+            {
+                userGroupType = CreateFolderUserGroupTypesFromDataRow(row);
+                folderUserGroupTypes.Add(userGroupType.UserGroupType.ID, userGroupType);
+            }
+            return folderUserGroupTypes;
+        }
+
+        public Dictionary<int, CMContentModel> GetContentsDictionaryByIDPerf(List<int> contentsID, Dictionary<int, CMVersionModel> versions, bool fullData)
+        {
+            CMContentModel contentTemp;
+
+            DataTable contentsDataTable = CMTreeNodeBLL.GetContentsDataTableByID(contentsID);
+            Dictionary<int, CMContentModel> contents = new Dictionary<int, CMContentModel>();
+            DateTime t = DateTime.Now;
+            int MS = t.Millisecond;
+            string sMS = MS.ToString();
+            Console.WriteLine(t + "." + sMS + " start foreach (DataRow row in contentsDataTable.Rows");
+            //Performance#5
+            rootPathFS = CMTreeNodeBLL.getRootPath();
+            //end#5
+
+            foreach (DataRow row in contentsDataTable.Rows)
+            {
+                contentTemp = CreateContentFromDataRow(row);
+                UpdateContentsVersionsPerf(contentTemp, versions, fullData);
+                contents.Add(contentTemp.ID, contentTemp);
+            }
+            t = DateTime.Now;
+            MS = t.Millisecond;
+            sMS = MS.ToString();
+            Console.WriteLine(t + "." + sMS + " start foreach (KeyValuePair<int, CMVersionModel> contentVersion in versions)");
+            if (versions != null)
+            {
+                foreach (KeyValuePair<int, CMVersionModel> contentVersion in versions)
+                    UpdateContentVersionSubVersionsPerf(contentVersion.Value, versions, contents);
+            }
+            t = DateTime.Now;
+            MS = t.Millisecond;
+            sMS = MS.ToString();
+            Console.WriteLine(t + "." + sMS + " end");
+            return contents;
+        }
+
+        //CR4046
+        public Dictionary<int, CMContentModel> GetContentsDictionaryByID(List<int> contentsID, List<int> versionsID, Dictionary<int, CMVersionModel> versions, bool fullData)
+        {
+            CMContentModel contentTemp;
+            Dictionary<int, CMContentModel> contents = new Dictionary<int, CMContentModel>();
+
+            if (contentsID != null && contentsID.Count > 0)
+            {
+                DataTable contentsDataTable = CMTreeNodeBLL.GetContentsDataTableByID(contentsID);
+
+                //Performance#5
+                rootPathFS = CMTreeNodeBLL.getRootPath();
+                //end#5
+
+                foreach (DataRow row in contentsDataTable.Rows)
+                {
+                    contentTemp = CreateContentFromDataRow(row);
+                    UpdateContentsVersions(contentTemp, versionsID, versions, fullData);
+                    contents.Add(contentTemp.ID, contentTemp);
+                }
+                if (versions != null)
+                {
+                    foreach (KeyValuePair<int, CMVersionModel> contentVersion in versions)
+                        UpdateContentVersionSubVersions(contentVersion.Value, versions, contents);
+                } 
+            }
+            return contents;
+        }
+
+        public Dictionary<int, CMContentModel> GetContentsDictionaryByID(List<int> contentsID, Dictionary<int, CMVersionModel> versions, bool fullData)
+        {
+            CMContentModel contentTemp;
+
+            DataTable contentsDataTable = CMTreeNodeBLL.GetContentsDataTableByID(contentsID);
+            Dictionary<int, CMContentModel> contents = new Dictionary<int, CMContentModel>();
+            //Performance#5
+            rootPathFS = CMTreeNodeBLL.getRootPath();
+            //end#5
+
+            foreach (DataRow row in contentsDataTable.Rows)
+            {
+                contentTemp = CreateContentFromDataRow(row);
+                UpdateContentsVersions(contentTemp, versions, fullData);
+                contents.Add(contentTemp.ID, contentTemp);
+            }
+            if (versions != null)
+            {
+                foreach (KeyValuePair<int, CMVersionModel> contentVersion in versions)
+                    UpdateContentVersionSubVersions(contentVersion.Value, versions, contents);
+            }
+            return contents;
+        }
+
+        private void UpdateContentsVersionsPerf(CMContentModel content, Dictionary<int, CMVersionModel> versions, bool fullData)
+        {
+            CMVersionModel contentVersionTemp;
+
+
+            //Performance#2. Uncomment second line to reverse
+            DataTable contentVersionsDataTable = CMTreeNodeBLL.GetContentVersionsDataTableByContentIDPerf(content.ID);
+            //DataTable contentVersionsDataTable = CMTreeNodeBLL.GetContentVersionsDataTableByContentID(content.ID);
+
+            foreach (DataRow row in contentVersionsDataTable.Rows)
+            {
+                contentVersionTemp = CreateContentVersionFromDataRow(row);
+
+                if (fullData || (contentVersionTemp.Status.ID != "Edit"))
+                {
+                    //Performance#4
+                    UpdateContentVersionFilesPerf(contentVersionTemp);
+                    content.Versions.Add(contentVersionTemp.ID, contentVersionTemp);
+
+                    if(versions != null)
+                        versions.Add(contentVersionTemp.ID, contentVersionTemp);                
+                }
+            }
+        }
+
+        private void UpdateContentsVersions(CMContentModel content, Dictionary<int, CMVersionModel> versions, bool fullData)
+        {
+            CMVersionModel contentVersionTemp;
+
+            DataTable contentVersionsDataTable = CMTreeNodeBLL.GetContentVersionsDataTableByContentID(content.ID);
+
+            foreach (DataRow row in contentVersionsDataTable.Rows)
+            {
+                contentVersionTemp = CreateContentVersionFromDataRow(row);
+
+                if (fullData || (contentVersionTemp.Status.ID != "Edit"))
+                {
+                    //Performance#4
+                    UpdateContentVersionFilesPerf(contentVersionTemp);
+                    content.Versions.Add(contentVersionTemp.ID, contentVersionTemp);
+
+                    if (versions != null)
+                        versions.Add(contentVersionTemp.ID, contentVersionTemp);
+                }
+            }
+        }
+
+        //CR 4046
+        private void UpdateContentsVersions(CMContentModel content, List<int> versionIds, Dictionary<int, CMVersionModel> versions, bool fullData)
+        {
+            CMVersionModel contentVersionTemp;
+
+            DataTable contentVersionsDataTable = CMTreeNodeBLL.GetContentVersionsDataTableByContentID(content.ID);
+
+            foreach (DataRow row in contentVersionsDataTable.Rows)
+            {
+                if (versionIds.Contains((int)row["CV_ID"]))
+                {
+                    contentVersionTemp = CreateContentVersionFromDataRow(row);
+
+                    if (fullData || (contentVersionTemp.Status.ID != "Edit"))
+                    {
+                        //Performance#4
+                        UpdateContentVersionFilesPerf(contentVersionTemp);
+                        content.Versions.Add(contentVersionTemp.ID, contentVersionTemp);
+
+                        if (versions != null)
+                            versions.Add(contentVersionTemp.ID, contentVersionTemp);
+                    }
+                }
+            }
+        }
+
+        public void UpdateContentVersionSubVersionsPerf(CMVersionModel contentVersion, Dictionary<int, CMVersionModel> versions, Dictionary<int, CMContentModel> contents)
+        {
+            int contentVersionSubVersion;
+            CMContentVersionSubVersionModel subVersion;
+
+            //Performance#3 - uncomment to reverse
+            DataTable contentVersionsSubVersionsDataTable = CMTreeNodeBLL.GetContentVersionSubVersionsByContentVersionIDPerf(contentVersion.ID);
+            //DataTable contentVersionsSubVersionsDataTable = CMTreeNodeBLL.GetContentVersionSubVersionsByContentVersionID(contentVersion.ID);
+            //end #3
+
+            foreach (DataRow row in contentVersionsSubVersionsDataTable.Rows)
+            {
+                subVersion = new CMContentVersionSubVersionModel();
+
+                contentVersionSubVersion = (int)row["CVVL_id_ContentVersion_Link"];
+                subVersion.Order = (int)row["CVVL_ChildNumber"];
+
+                if (versions.ContainsKey(contentVersionSubVersion))
+                {
+                    subVersion.ContentSubVersion = versions[contentVersionSubVersion];
+                    subVersion.Content = contents[subVersion.ContentSubVersion.ParentID];
+                    contentVersion.ContentVersions.Add(contentVersionSubVersion, subVersion);
+                }
+            }
+        }
+
+        public void UpdateContentVersionSubVersions(CMVersionModel contentVersion, Dictionary<int, CMVersionModel> versions, Dictionary<int, CMContentModel> contents)
+        {
+            int contentVersionSubVersion;
+            CMContentVersionSubVersionModel subVersion;
+
+            DataTable contentVersionsSubVersionsDataTable = CMTreeNodeBLL.GetContentVersionSubVersionsByContentVersionID(contentVersion.ID);
+
+
+            foreach (DataRow row in contentVersionsSubVersionsDataTable.Rows)
+            {
+                subVersion = new CMContentVersionSubVersionModel();
+
+                contentVersionSubVersion = (int)row["CVVL_id_ContentVersion_Link"];
+                subVersion.Order = (int)row["CVVL_ChildNumber"];
+
+                if (versions.ContainsKey(contentVersionSubVersion))
+                {
+                    subVersion.ContentSubVersion = versions[contentVersionSubVersion];
+                    subVersion.Content = contents[subVersion.ContentSubVersion.ParentID];
+                    contentVersion.ContentVersions.Add(contentVersionSubVersion, subVersion);
+                }
+            }
+        }
+
+
+        public void UpdateContentVersionFiles(CMVersionModel contentVersion)
+        {
+            CMContentFileModel contentFileTemp;
+
+            DataTable contentFilesDataTable = CMTreeNodeBLL.GetContentVersionFilesDataTable(contentVersion.ID);
+
+            foreach (DataRow row in contentFilesDataTable.Rows)
+            {
+                contentFileTemp = CreateContentVersionFileFromDataRow(row, contentVersion);
+                contentVersion.Files.Add(contentFileTemp.ID,contentFileTemp);
+            }
+        }
+
+        public void UpdateContentVersionFilesPerf(CMVersionModel contentVersion)
+        {
+            CMContentFileModel contentFileTemp;
+
+            //Performance#4
+            //DataTable contentFilesDataTable = CMTreeNodeBLL.GetContentVersionFilesDataTable(contentVersion.ID);
+            DataTable contentFilesDataTable = CMTreeNodeBLL.GetContentVersionFilesDataTablePerf(contentVersion.ID);
+
+            foreach (DataRow row in contentFilesDataTable.Rows)
+            {
+                contentFileTemp = CreateContentVersionFileFromDataRow(row, contentVersion);
+                contentVersion.Files.Add(contentFileTemp.ID,contentFileTemp);
+            }
+        }   
+
+        private static CMFolderModel CreateFolderFromDataRow(DataRow row)
+        {
+            string prefix = string.Empty;
+            string startValue = string.Empty;
+            string increment = string.Empty;
+
+            if (row["CT_DefaultVNIncrement"] != DBNull.Value)
+            {
+                increment = (string)row["CT_DefaultVNIncrement"];
+            }
+            else
+            {
+                increment = string.Empty;
+            }
+
+            if (row["CT_DefaultVNPrefix"] != DBNull.Value)
+            {
+                prefix = (string)row["CT_DefaultVNPrefix"];
+            }
+            else
+            {
+                prefix = string.Empty;
+            }
+
+            if (row["CT_DefaultVNStartValue"] != DBNull.Value)
+            {
+                startValue = (string)row["CT_DefaultVNStartValue"];
+            }
+            else
+            {
+                startValue = string.Empty;
+            }
+
+            CMFolderModel folder = new CMFolderModel
+                {
+                    ID = (int)row["CT_ID"],
+                    Name = (string)row["CT_Name"],
+                    ParentID = (int)row["CT_ParentID"],
+                    ChildID = (int)row["CT_ChildNumber"],
+                    Description = (string)row["CT_Description"],
+                    LastUpdateTime = (DateTime)row["CT_LastUpdateTime"],
+                    LastUpdateUser = (string)row["CT_LastUpdateUser"],
+                    LastUpdateComputer = (string)row["CT_LastUpdateComputer"],
+                    LastUpdateApplication = (string)row["CT_LastUpdateApplication"],
+                    DefaultVNStartValue = startValue,
+                    DefaultVNPrefix = prefix,
+                    DefaultVNIncrement = increment,
+                    Nodes = new List<CMTreeNode>(),
+                    UserGroupTypePermission = new Dictionary<string, CMFolderUserGroupTypeModel>()
+                };
+
+            return folder;
+        }
+
+        private CMFolderUserGroupTypeModel CreateFolderUserGroupTypesFromDataRow(DataRow row)
+        {
+            if(UserGroupTypeList == null)
+            {
+                 UserGroupTypeList = CMUserGroupTypesReaderBLL.GetUserGroupTypes();
+            }
+
+            CMFolderUserGroupTypeModel folderUserGroupType = new CMFolderUserGroupTypeModel
+            {
+                UserGroupType = UserGroupTypeList[(string)row["CTUGT_id_UserGroupType"]]                
+            };
+            folderUserGroupType.UserGroupType.Checked = true;
+
+            //LastUpdateUtil.UpdateObjectByDataReader(folderUserGroupType, row);
+            return folderUserGroupType;
+        }
+
+        private CMContentModel CreateContentFromDataRow(DataRow row)
+        {
+            bool existContentType;
+            CMContentTypeModel contentType;
+            string CerFree = null;
+
+            
+            CMContentModel content = new CMContentModel
+                {
+                    ID = (int)row["CO_ID"],
+                    Name = (string)row["CO_Name"],
+                    ParentID = (int)row["CO_id_ContentTree"],
+                    Description = (string)row["CO_Description"],
+                    IconPath = (string)row["CO_Icon"],                  
+                    ChildID = (int)row["CO_ChildNumber"],
+                    LastUpdateTime = (DateTime)row["CO_LastUpdateTime"],
+                    LastUpdateUser = (string)row["CO_LastUpdateUser"],
+                    LastUpdateComputer = (string)row["CO_LastUpdateComputer"],
+                    LastUpdateApplication = (string)row["CO_LastUpdateApplication"],
+                    Versions = new Dictionary<int, CMVersionModel>()
+                };
+
+            CerFree = (string)row["CO_CertificateFree"];
+            switch (CerFree)
+            {
+                case "YES":
+                    content.CertificateFree = true;
+                    break;
+
+                case "NOT":
+                    content.CertificateFree = false;
+                    break;
+            }
+
+            existContentType = ContentTypeList.TryGetValue((string)row["CO_id_ContentType"], out contentType);
+            if (!existContentType)
+                throw new TraceException("3", false, null, "Content manager");
+
+            content.ContentType = contentType;
+            content.Id_ContentType = (string)row["CO_id_ContentType"];
+
+            return content;
+        }
+
+        private CMVersionModel CreateContentVersionFromDataRow(DataRow row)
+        {
+            bool existContentStatus;
+            CMContentStatusModel contentStatus;
+            string Ecr = string.Empty;
+            if (!(row["CV_ECR"] is System.DBNull))
+            {
+                Ecr = (string)row["CV_ECR"];
+            }
+
+            string Desc = string.Empty;
+            if (!(row["CV_Description"] is System.DBNull))
+            {
+                Desc = (string)row["CV_Description"];
+            }
+
+            string DocId = string.Empty;
+            if (!(row["CV_DocumentID"] is System.DBNull))
+            {
+                DocId = (string)row["CV_DocumentID"];
+            }
+
+            string CommLine = string.Empty;
+            if (!(row["CV_CommandLine"] is System.DBNull))
+            {
+                CommLine = (string)row["CV_CommandLine"];
+            }
+
+            string LockWithDecs = string.Empty;
+            if (!(row["CV_LockWithDescription"] is System.DBNull))
+            {
+                LockWithDecs = (string)row["CV_LockWithDescription"];
+            }
+
+            string PdmDocVer = string.Empty;
+            if (!(row["CV_PDMDocVersion"] is System.DBNull))
+            {
+                PdmDocVer = (string)row["CV_PDMDocVersion"];
+            }
+
+            string ConfManLink = string.Empty;
+            if (!(row["CV_ConfManagementLink"] is System.DBNull))
+            {
+                ConfManLink = (string)row["CV_ConfManagementLink"];
+            }
+
+            CMVersionModel contentVersion = new CMVersionModel
+                {
+                    ID = (int)row["CV_ID"],
+                    Name = (string)row["CV_Name"],
+                    ECR = Ecr,
+                    DocumentID = DocId,
+                    PDMDocumentVersion = PdmDocVer,
+                    Description = Desc,
+                    ChildID = (int)row["CV_ChildNumber"],
+                    RunningString = CommLine,
+                    LockWithDescription = LockWithDecs,
+                    LastUpdateTime = (DateTime)row["CV_LastUpdateTime"],
+                    LastUpdateUser = (string)row["CV_LastUpdateUser"],
+                    LastUpdateComputer = (string)row["CV_LastUpdateComputer"],
+                    LastUpdateApplication = (string)row["CV_LastUpdateApplication"],
+                    Files = new Dictionary<int, CMContentFileModel>(),
+                    ContentVersions = new Dictionary<int, CMContentVersionSubVersionModel>(),
+                    ParentID = (int)row["CV_id_Content"],
+                    ConfigurationManagementLink = ConfManLink, 
+                    Path = new ATSBusinessObjects.ContentMgmtModels.CMVersionModel.PathFS
+                        {
+                            Name = (string)row["CV_Path"],
+                            //Type = (string)row["CV_id_PathType"]
+                            //Type = DBprovider.GetStringParam(row, "PathType") == "Full" ? PathType.Full : PathType.Relative
+                        }
+                };
+
+            existContentStatus = ContentStatusList.TryGetValue((string)row["CV_id_ContentVersionStatus"], out contentStatus);
+          
+            if (!existContentStatus)
+                throw new TraceException("3", false, null, "Content manager");
+
+            contentVersion.id_ContentVersionStatus = (string)row["CV_id_ContentVersionStatus"];
+            contentVersion.Status.Icon = contentStatus.Icon;
+            contentVersion.Status.ID = contentStatus.ID;
+            contentVersion.Status.Name = contentStatus.Name;
+            //LastUpdateUtil.UpdateObjectByDataReader(contentVersion, row);
+
+            return contentVersion;
+        }
+
+        private CMContentFileModel CreateContentVersionFileFromDataRow(DataRow row, CMVersionModel contentVersion)
+        {
+            CMContentFileModel contentFile = new CMContentFileModel
+                {
+                    ID = (int)row["CVF_ID"],
+                    FileName = (string)row["CVF_Name"],
+                    FileRelativePath = (string)row["CVF_Path"],
+                };
+
+            if (row["CVF_Size"] == DBNull.Value)
+            {
+                contentFile.FileSize = "0";
+            }
+            else
+            {
+                contentFile.FileSize = ((Int64)row["CVF_Size"]).ToString();
+            }
+
+            if (row["CVF_FileLastWriteTime"] == DBNull.Value)
+            {
+                contentFile.FileLastWriteTime = DateTime.MinValue;
+            }
+            else
+            {
+                contentFile.FileLastWriteTime = (DateTime)row["CVF_FileLastWriteTime"];
+            }
+
+            if (contentVersion.Path.Type == ATSBusinessObjects.ContentMgmtModels.CMVersionModel.PathType.Full)
+                contentFile.FileFullPath = "";
+            //Performance#5 - uncomment to reverse
+            //else
+            //    contentFile.FileFullPath = CMTreeNodeBLL.getRootPath() + "\\";
+            else
+            {
+                if (string.IsNullOrEmpty(rootPathFS) || string.IsNullOrWhiteSpace(rootPathFS))
+                {
+                    rootPathFS = CMTreeNodeBLL.getRootPath();
+                }
+                contentFile.FileFullPath = rootPathFS + "\\";
+            }
+            //end#5
+            contentFile.FileFullPath += contentVersion.Path.Name + "\\";
+
+            if (contentFile.FileRelativePath != "")
+                contentFile.FileFullPath += contentFile.FileRelativePath + "\\";
+
+            contentFile.FileFullPath += contentFile.FileName;
+
+            //LastUpdateUtil.UpdateObjectByDataReader(contentFile, row);
+            return contentFile;
+        }
+
+        #endregion
+
+        #region Import
+
+        internal List<CMTreeNode> GetContentsTreeFromXml(string parentFolderPath, out Dictionary<int, CMFolderModel> folders, out Dictionary<int, CMContentModel> contents, out Dictionary<int, CMVersionModel> versions)
+        {
+            UpdateReferenceList();
+
+            versions = new Dictionary<int, CMVersionModel>();
+            List<CMTreeNode> foldersRoot = new List<CMTreeNode>();
+
+            folders = GetFoldersDictionaryFromXml(parentFolderPath);
+
+            DataTable ContentVersionsDataTable = CMTreeNodeBLL.GetContentVersionsDataTableFromXml(parentFolderPath);
+
+            DataTable ContentVersionLinkedTable = CMTreeNodeBLL.GetContentVersionSubVersionsDataTableFromXml(parentFolderPath);
+
+            DataTable ContentVersionFilesTable = CMTreeNodeBLL.GetContentVersionFilesDataTableFromXml(parentFolderPath);
+
+            contents = GetContentsDictionaryByIDFromXml(parentFolderPath, ContentVersionsDataTable, ContentVersionFilesTable, versions);
+
+            AddFoldersToFoldersRootTree(folders, foldersRoot);
+
+            AddContentsToFoldersRootTree(folders, contents);
+
+            return foldersRoot;
+        }
+
+
+        public Dictionary<int, CMContentModel> GetContentsDictionaryByIDFromXml(string parentFolderPath, 
+                                                                                DataTable versionsTable, 
+                                                                                DataTable versionsFilesTable, 
+                                                                                Dictionary<int, CMVersionModel> versions)
+        {
+            CMContentModel contentTemp;
+
+            DataTable contentsDataTable = FileSystemBLL.ImportDataFromXml(parentFolderPath, ImportProjectBLL.archiveCMFolderName, ImportProjectBLL.cmContentDetailsXmlFileName);
+            Dictionary<int, CMContentModel> contents = new Dictionary<int, CMContentModel>();
+
+            //rootPathFS = CMTreeNodeBLL.getRootPath();
+            rootPathFS = string.Empty;
+            if (contentsDataTable != null)
+            {
+                foreach (DataRow row in contentsDataTable.Rows)
+                {
+                    contentTemp = CreateContentFromDataRow(row);
+                    UpdateContentsVersionsFromXml(versionsTable, versionsFilesTable, contentTemp, versions);
+                    contents.Add(contentTemp.ID, contentTemp);
+                }
+                if (versions != null)
+                {
+                    foreach (KeyValuePair<int, CMVersionModel> contentVersion in versions)
+                        UpdateContentVersionSubVersionsPerf(contentVersion.Value, versions, contents);
+                }
+            }
+            return contents;
+        }
+
+        public Dictionary<String, CMFolderUserGroupTypeModel> GetFolderUserGroupTypeFromXml(int folderID, DataTable userGroupTypesDataTable)
+        {
+            CMFolderUserGroupTypeModel userGroupType;
+
+            DataTable foldersDataTable = userGroupTypesDataTable.Clone();
+            string selectCondition = "CTUGT_id_ContentTree=" + folderID.ToString();
+
+            DataRow[] temp = CMContentsReaderBLL.FolderUserGoupTypesDataTable.Select(selectCondition);
+            if (temp != null && temp.Length > 0)
+            {
+                foldersDataTable = temp.CopyToDataTable();
+            }
+            
+            Dictionary<String, CMFolderUserGroupTypeModel> folderUserGroupTypes = new Dictionary<String, CMFolderUserGroupTypeModel>();
+
+            foreach (DataRow row in foldersDataTable.Rows)
+            {
+                userGroupType = CreateFolderUserGroupTypesFromDataRow(row);
+                folderUserGroupTypes.Add(userGroupType.UserGroupType.ID, userGroupType);
+            }
+            return folderUserGroupTypes;
+        }
+
+        public Dictionary<int, CMFolderModel> GetFoldersDictionaryFromXml(string parentFolderPath)
+        {
+            CMFolderModel folderTemp;
+            DataTable foldersDataTable = FileSystemBLL.ImportDataFromXml(parentFolderPath, ImportProjectBLL.archiveCMFolderName, ImportProjectBLL.cmContentTreeXmlFileName);
+            Dictionary<int, CMFolderModel> folders = new Dictionary<int, CMFolderModel>();
+            DataTable userGroupTypesDataTable = FileSystemBLL.ImportDataFromXml(parentFolderPath, ImportProjectBLL.archiveCMFolderName, ImportProjectBLL.cmContentTreeUserGroupTypeXmlFileName);
+            foreach (DataRow row in foldersDataTable.Rows)
+            {
+                folderTemp = CreateFolderFromDataRow(row);
+                folderTemp.UserGroupTypePermission = GetFolderUserGroupTypeFromXml(folderTemp.ID, userGroupTypesDataTable);
+                folders.Add(folderTemp.ID, folderTemp);
+            }
+
+            return folders;
+        }
+
+        private void UpdateContentsVersionsFromXml(DataTable contentVersionsDataTableFull, DataTable contentVersionsFilesDataTableFull, CMContentModel content, Dictionary<int, CMVersionModel> versions)
+        {
+            CMVersionModel contentVersionTemp;
+            DataTable contentVersionsDataTable = contentVersionsDataTableFull.Clone();
+
+            string selectCondition = "CV_id_Content=" + content.ID.ToString();
+
+            DataRow[] temp = contentVersionsDataTableFull.Select(selectCondition);
+            if (temp != null && temp.Length > 0)
+            {
+                contentVersionsDataTable = temp.CopyToDataTable();
+            }
+
+            foreach (DataRow row in contentVersionsDataTable.Rows)
+            {
+                contentVersionTemp = CreateContentVersionFromDataRow(row);
+
+                UpdateContentVersionFilesXml(contentVersionTemp, contentVersionsFilesDataTableFull);
+                content.Versions.Add(contentVersionTemp.ID, contentVersionTemp);
+
+                if (versions != null)
+                        versions.Add(contentVersionTemp.ID, contentVersionTemp);
+            }
+        }
+
+        public void UpdateContentVersionFilesXml(CMVersionModel contentVersion, DataTable contentVersionsFilesDataTable)
+        {
+            CMContentFileModel contentFileTemp;
+            // Populate dataTable for contentVersionID
+            DataTable contentFilesDataTable = CMContentsReaderBLL.ContentVersionFilesTable.Clone();
+            // Populate the collection
+
+            string selectCondition = "CVF_id_ContentVersion=" + contentVersion.ID.ToString();
+            DataRow[] temp = CMContentsReaderBLL.ContentVersionFilesTable.Select(selectCondition);
+            if (temp != null && temp.Length > 0)
+            {
+                contentFilesDataTable = temp.CopyToDataTable();
+            }
+
+            foreach (DataRow row in contentFilesDataTable.Rows)
+            {
+                contentFileTemp = CreateContentVersionFileFromDataRow(row, contentVersion);
+                contentVersion.Files.Add(contentFileTemp.ID, contentFileTemp);
+            }
+        }   
+
+        #endregion
+    }
+}

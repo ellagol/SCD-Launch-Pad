@@ -1,0 +1,622 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using ATSBusinessLogic.ContentMgmtBLL;
+using ATSBusinessObjects;
+using ATSBusinessObjects.ContentMgmtModels;
+using ATSDomain;
+using System.Text;
+using System.Data;
+using System.Net.Mail;
+using System.Net;
+using System.Linq;
+using System.Threading;
+using System.DirectoryServices;
+
+namespace ATSBusinessLogic
+{
+    public class ExportProjectToEnvBLL
+    {
+
+        #region Data
+
+        public static string progressBarTitle = string.Empty;
+        public static string targetEnvEmailDistributionList = string.Empty;
+
+        #endregion
+
+        #region Main
+
+        public static ATSDomain.Domain.ErrorHandling ValidateBeforeExport(HierarchyModel importedProject, string targetConnString, string targetEnvName)
+        {
+            ATSDomain.Domain.ErrorHandling Status = new ATSDomain.Domain.ErrorHandling();
+            try
+            {
+                string projectStep = HierarchyBLL.GetStepCodeByName(importedProject.SelectedStep);
+                string treeHeader = string.Empty;
+                HierarchyBLL.GetProjectFullPathByProjectId(importedProject.Id, out treeHeader);
+                importedProject.TreeHeader = treeHeader;
+
+                int sourceTreePathLength = importedProject.TreeHeader.Length - importedProject.Name.Length -1;
+                string sourceTreePath = string.Empty;
+                if (sourceTreePathLength > 0)
+                {
+                    sourceTreePath = importedProject.TreeHeader.Substring(0, sourceTreePathLength);
+                }
+
+                Domain.DomainInitForAPI(targetConnString);
+                HierarchyModel targetProject = HierarchyBLL.GetHierarchyModelByCodeAndStep(importedProject.Code, projectStep.Trim());
+                if (Status.messsageId != string.Empty || targetProject.Id <= 0)
+                {
+                    Domain.DomainInitForAPI(Domain.DbConnString);
+                    return Status;
+                }
+
+                long duplicateNameId = 0;
+                HierarchyBLL.GetNodeIdByFullPath(importedProject.TreeHeader, out duplicateNameId);
+                if (duplicateNameId > 1 && duplicateNameId != targetProject.Id)
+                {
+                    Status.messsageId = "244";
+                    Status.messageParams[0] = importedProject.Name;
+                    Status.messageParams[1] = sourceTreePath;
+
+                    Domain.DomainInitForAPI(Domain.DbConnString);
+                    return Status;
+                }
+                Domain.DomainInitForAPI(Domain.DbConnString);
+
+                int targetTreePathLength = targetProject.TreeHeader.Length - targetProject.Name.Length -1;
+                string targetTreePath = string.Empty;
+                if (targetTreePathLength > 0)
+                {
+                    targetTreePath = targetProject.TreeHeader.Substring(0, targetTreePathLength);
+                }
+                if (sourceTreePath != targetTreePath)
+                {
+                    Status.messsageId = "240";
+                    Status.messageParams[0] = importedProject.Code;
+                    Status.messageParams[1] = importedProject.SelectedStep;
+                    if (targetTreePath == string.Empty)
+                    {
+                        Status.messageParams[2] = "Root";
+                    }
+                    else
+                    {
+                        Status.messageParams[2] = targetTreePath;
+                    }
+                    if (sourceTreePath == string.Empty)
+                    {
+                        Status.messageParams[3] = "Root";
+                    }
+                    else
+                    {
+                        Status.messageParams[3] = sourceTreePath;
+                    }
+
+                    return Status;
+                }
+
+                return Status;
+            }
+            catch (Exception ex)
+            {
+                String logMessage = ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                Status.messsageId = "105";
+
+                Domain.DomainInitForAPI(Domain.DbConnString);
+                return Status;
+            }
+        }
+
+        public static ATSDomain.Domain.ErrorHandling ExportImportProjectToEnv(HierarchyModel projectModel, 
+                                                                            string fsParentFolderFullPath, string packageName,
+                                                                            string connectionString,
+                                                                            string targetEnvironmentName,
+                                                                            ThreadStart t)
+        {
+            ATSDomain.Domain.ErrorHandling Status = new ATSDomain.Domain.ErrorHandling();
+            string archiveFileFullPath = fsParentFolderFullPath + "\\" + packageName;
+
+            try
+            {                
+                Status = ExportProjectBLL.ExportProjectFromSourceEnv(projectModel, fsParentFolderFullPath, packageName, t);
+                if (Status.messsageId != string.Empty) 
+                {
+                    FileSystemBLL.DeleteDirectoryRecursive(fsParentFolderFullPath);
+                    return Status;
+                }
+
+                HierarchyModel targetProject = new HierarchyModel();
+                Status = ImportProjectBLL.ImportProjectToTargetEnv(archiveFileFullPath, connectionString, targetEnvironmentName,
+                                                                    projectModel.Id, t, out targetProject);
+                if (Status.messsageId != string.Empty && Status.messsageId != "241" && Status.messsageId != "242") //Failed 
+                {
+                    FileSystemBLL.DeleteDirectoryRecursive(fsParentFolderFullPath);
+                    return Status;
+                }
+
+                FileSystemBLL.DeleteDirectoryRecursive(fsParentFolderFullPath);
+                if (Status.messsageId != "241" && Status.messsageId != "242") //Not only move or rename 
+                {
+                    Thread sendEmailThread = new Thread(() => SendExportToEnvNotificationEmail(projectModel, targetProject, targetEnvironmentName));
+                    sendEmailThread.Start();
+                }
+
+                if (Status.messsageId == "240")
+                {
+                    Status.messsageId = "245";
+                }
+
+                return Status;
+            }
+            catch (Exception ex)
+            {
+                String logMessage = ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                Status.messsageId = "105";
+
+                //Housekeeping - delete archive folder if any
+                FileSystemBLL.DeleteDirectoryRecursive(fsParentFolderFullPath);
+                return Status;
+            }
+        }
+
+        public static ATSDomain.Domain.ErrorHandling GetAvailableUserEnvironments(out ObservableCollection<UserEnvironmentsModel> userEnvs)
+        {
+            ATSDomain.Domain.ErrorHandling Status = new ATSDomain.Domain.ErrorHandling();
+            userEnvs = new ObservableCollection<UserEnvironmentsModel>();
+            StringBuilder SB = new StringBuilder();
+
+            SB.Append(" select EN_Id, User_Id, EN_Name, User_Name, EN_ConnectionString ");
+            SB.Append(" from LinkView_Users u ");
+            SB.Append(" join View_UserEnvironments on User_Id = UE_id_Users ");
+            SB.Append(" join View_Environments on EN_Id = UE_id_Environments ");
+            SB.Append(" where USER_NAME = '" + Domain.User + "' ");
+            SB.Append(" and EN_Name <> '" + Domain.Environment + "' ");
+
+            DataTable UserEnvs = Domain.PersistenceLayer.FetchDataTable(SB.ToString(), System.Data.CommandType.Text, null);
+            foreach (DataRow dr in UserEnvs.Rows)
+            {
+                UserEnvironmentsModel env = new UserEnvironmentsModel();
+                env.environmentId = (int)dr["EN_Id"];
+                env.userId = (int)dr["User_Id"];
+                env.environmentName = (string)dr["EN_Name"];
+                env.userName = (string)dr["User_Name"];
+
+                string cmdConnectionString = (string)dr["EN_ConnectionString"];
+                int DataSourceIdx = cmdConnectionString.IndexOf("Data Source=");
+                string subStrDataSource = cmdConnectionString.Substring(DataSourceIdx, cmdConnectionString.Length - DataSourceIdx - 1);
+                env.connectionString = subStrDataSource;
+                userEnvs.Add(env);
+            }
+
+            return Status;
+
+ 
+        }
+
+        public static ATSDomain.Domain.ErrorHandling GetMessageText(int messageId, object[] messageParams, out string messageText)
+        {
+            ATSDomain.Domain.ErrorHandling Status = new ATSDomain.Domain.ErrorHandling();
+            string messageWithParams = string.Empty;
+            messageText = string.Empty;
+            StringBuilder SB = new StringBuilder();
+
+            SB.Append("SELECT Description FROM PE_Messages where id=" + messageId.ToString());
+            object messageObj = Domain.PersistenceLayer.FetchDataValue(SB.ToString(), System.Data.CommandType.Text, null);
+            if (messageObj != null)
+            {
+                messageWithParams = messageObj.ToString();
+                messageText = SetDescriptionParameters(messageWithParams, messageParams);
+                if (messageText == string.Empty)
+                {
+                    Status.messsageId = "Invalid Message format";
+                    Status.messageParams[0] = messageId.ToString();
+                    Status.messageParams[1] = messageWithParams;
+                }
+            }
+            else
+            {
+                Status.messsageId = "228";
+                Status.messageParams[0] = messageId.ToString();
+                Status.messageParams[1] = "PE_Messages";
+            }
+            return Status;
+        }
+
+        private static string SetDescriptionParameters(string MessageDescription, object[] ArgList)
+        {
+            try
+            {
+                string MsgDescriptionWithParam = String.Format(MessageDescription, ArgList);
+
+                return MsgDescriptionWithParam;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        public static Domain.ErrorHandling CreateMemoNote(string memoNoteText, string noteType,
+                                                                       Boolean specialInd, long projectId)
+        {
+            ATSDomain.Domain.ErrorHandling Status = new ATSDomain.Domain.ErrorHandling();
+            try
+            {
+                NotesModel note = new NotesModel();
+                note.HierarchyId = projectId;
+                note.NoteStatus = NoteStatusTypes.A;
+                note.NoteText = memoNoteText;
+                note.NoteTitle = "Memo";
+                note.NoteType = noteType;
+                note.SpecialInd = specialInd;
+                note.CreatedBy = Domain.User;
+
+                long noteId = NoteBLL.AddNewNote(ref note);
+                if (noteId < 0)
+                {
+                    String logMessage = "Failed to create memo note. Note Type " + noteType;
+                    Domain.SaveGeneralWarningLog(logMessage);
+                }
+                return Status;
+            }
+            catch (Exception ex)
+            {
+                String logMessage = "Failed to create memo note. Note Type " + noteType;
+                logMessage = logMessage + "\n" + ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralWarningLog(logMessage);
+                return Status;
+            }
+        }
+
+        static string GetEmailMessageText(HierarchyModel sourceProject, HierarchyModel targetProject, string targetEnvironmentName)
+        {
+            string messageBodyText = string.Empty;
+            try
+            {
+                object[] messageBodyParams = new object[20];
+                messageBodyParams[0] = sourceProject.Name;
+                messageBodyParams[1] = sourceProject.VM.VersionName;
+                if (!string.IsNullOrEmpty(sourceProject.Code) && !string.IsNullOrWhiteSpace(sourceProject.Code))
+                {
+                    messageBodyParams[2] = sourceProject.Code;
+                }
+                else
+                {
+                    messageBodyParams[2] = "Empty";
+                }
+                if (!string.IsNullOrEmpty(sourceProject.SelectedStep) && !string.IsNullOrWhiteSpace(sourceProject.SelectedStep))
+                {
+                    messageBodyParams[3] = sourceProject.SelectedStep;
+                }
+                else
+                {
+                    messageBodyParams[3] = "Empty";
+                }                
+                messageBodyParams[4] = Domain.Environment;
+                messageBodyParams[5] = targetEnvironmentName;
+                string userFullName = GetUserFNameAndLNameFromLDAP(Domain.User);
+                if (string.IsNullOrEmpty(userFullName) || string.IsNullOrWhiteSpace(userFullName))
+                {
+                    messageBodyParams[6] = Domain.User;
+                }
+                else
+                {
+                    messageBodyParams[6] = userFullName;
+                }
+                messageBodyParams[7] = sourceProject.VM.Description;
+                if (!string.IsNullOrEmpty(sourceProject.VM.EcrId) && !string.IsNullOrWhiteSpace(sourceProject.VM.EcrId))
+                {
+                    messageBodyParams[8] = sourceProject.VM.EcrId;
+                }
+                else
+                {
+                    messageBodyParams[8] = "Empty";
+                }
+
+                if (!string.IsNullOrEmpty(sourceProject.Description) && !string.IsNullOrWhiteSpace(sourceProject.Description))
+                {
+                    messageBodyParams[9] = sourceProject.Description;
+                }
+                else
+                {
+                    messageBodyParams[9] = "Empty";
+                }
+
+                if (!string.IsNullOrEmpty(sourceProject.TreeHeader) && !string.IsNullOrWhiteSpace(sourceProject.TreeHeader))
+                {
+                    messageBodyParams[10] = sourceProject.TreeHeader;
+                }
+                else
+                {
+                    messageBodyParams[10] = "Not available";
+                }
+
+                messageBodyParams[11] = sourceProject.VM.VersionId;
+                messageBodyParams[12] = targetProject.VM.VersionId;
+
+                GetMessageText(234, messageBodyParams, out messageBodyText);
+                if (messageBodyText == string.Empty)
+                {
+                    String logMessage = "Failed to retrieve email message body. MessageId 234, PE_Messages table.";
+                    Domain.SaveGeneralWarningLog(logMessage);
+                }
+                return messageBodyText;
+            }
+            catch (Exception ex)
+            {
+                String logMessage = "Failed to retrieve email message body. MessageId 234, PE_Messages table.";
+                logMessage = logMessage + "\n" + ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralWarningLog(logMessage);
+                return messageBodyText;
+            }
+        }
+
+        static string GetEmailSubjectText(HierarchyModel sourceProject, HierarchyModel targetProject, string targetEnvironmentName)
+        {
+            string mailSubjectText = string.Empty;
+            try
+            {
+                object[] mailSubjectParams = new object[20];
+                mailSubjectParams[0] = sourceProject.Name;
+                mailSubjectParams[1] = sourceProject.VM.VersionName;
+                if (!string.IsNullOrEmpty(sourceProject.Code) && !string.IsNullOrWhiteSpace(sourceProject.Code))
+                {
+                    mailSubjectParams[2] = sourceProject.Code;
+                }
+                else
+                {
+                    mailSubjectParams[2] = "Empty";
+                }
+                if (!string.IsNullOrEmpty(sourceProject.SelectedStep) && !string.IsNullOrWhiteSpace(sourceProject.SelectedStep))
+                {
+                    mailSubjectParams[3] = sourceProject.SelectedStep;
+                }
+                else
+                {
+                    mailSubjectParams[3] = "Empty";
+                }
+                mailSubjectParams[4] = Domain.Environment;
+                mailSubjectParams[5] = targetEnvironmentName;
+                string userFullName = GetUserFNameAndLNameFromLDAP(Domain.User);
+                if (string.IsNullOrEmpty(userFullName) || string.IsNullOrWhiteSpace(userFullName))
+                {
+                    mailSubjectParams[6] = Domain.User;
+                }
+                else
+                {
+                    mailSubjectParams[6] = userFullName;
+                }
+
+                mailSubjectParams[7] = sourceProject.VM.Description;
+
+                if (!string.IsNullOrEmpty(sourceProject.VM.EcrId) && !string.IsNullOrWhiteSpace(sourceProject.VM.EcrId))
+                {
+                    mailSubjectParams[8] = sourceProject.VM.EcrId;
+                }
+                else
+                {
+                    mailSubjectParams[8] = "Empty";
+                }
+
+                if (!string.IsNullOrEmpty(sourceProject.Description) && !string.IsNullOrWhiteSpace(sourceProject.Description))
+                {
+                    mailSubjectParams[9] = sourceProject.Description;
+                }
+                else
+                {
+                    mailSubjectParams[9] = "Empty";
+                }
+
+                if (!string.IsNullOrEmpty(sourceProject.TreeHeader) && !string.IsNullOrWhiteSpace(sourceProject.TreeHeader))
+                {
+                    mailSubjectParams[10] = sourceProject.TreeHeader;
+                }
+                else
+                {
+                    mailSubjectParams[10] = "Not available";
+                }
+
+                mailSubjectParams[11] = sourceProject.VM.VersionId;
+                mailSubjectParams[12] = targetProject.VM.VersionId;
+
+                GetMessageText(239, mailSubjectParams, out mailSubjectText);
+                if (mailSubjectText == string.Empty)
+                {
+                    String logMessage = "Failed to retrieve email message subject. MessageId 239, PE_Messages table.";
+                    Domain.SaveGeneralWarningLog(logMessage);
+                }
+                return mailSubjectText;
+            }
+            catch (Exception ex)
+            {
+                String logMessage = "Failed to retrieve email message subject. MessageId 239, PE_Messages table.";
+                logMessage = logMessage + "\n" + ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralWarningLog(logMessage);
+                return mailSubjectText;
+            }
+        }
+
+        static void GetEmailParameters(HierarchyModel sourceProject, HierarchyModel targetProject,
+                                        string targetEnvName, out object[] emailParameters)
+        {
+            emailParameters = new object[20];
+            try
+            {
+                emailParameters[0] = Domain.PE_SystemParameters["AdminSMTPAddress"];
+                string emailRecipients = targetEnvEmailDistributionList; //Complete To list
+                emailRecipients = emailRecipients.Replace(';', ',');
+                emailParameters[1] = emailRecipients.Split(',').FirstOrDefault(); //To
+
+                //remove first recipient because he is already in To
+                int indexOfComma = emailRecipients.IndexOf(',');
+                if (indexOfComma > 0)
+                {
+                    emailRecipients = emailRecipients.Substring(indexOfComma + 1);
+                }
+                else
+                {
+                    emailRecipients = string.Empty;
+                }
+
+                emailParameters[2] = emailRecipients;
+                emailParameters[3] = Domain.PE_SystemParameters["AdminSMTPServer"];
+                string mailSubject = GetEmailSubjectText(sourceProject, targetProject, targetEnvName); //Mail subject
+                if (string.IsNullOrEmpty(mailSubject) || string.IsNullOrWhiteSpace(mailSubject))
+                {
+                    emailParameters[4] = "Import project notification"; //Title
+                }
+                else
+                {
+                    emailParameters[4] = mailSubject;
+                }
+
+                emailParameters[5] = GetEmailMessageText(sourceProject, targetProject, targetEnvName); //Message body
+                emailParameters[6] = Domain.PE_SystemParameters["AdminSMTPUser"];
+                emailParameters[7] = Domain.PE_SystemParameters["AdminSMTPPassword"];
+                emailParameters[8] = GetUserEmailAddressFromLDAP(Domain.User); //CC
+            }
+            catch (Exception ex)
+            {
+                String logMessage = "Failed to send email.";
+                logMessage = logMessage + "\n" + ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralWarningLog(logMessage);
+            }
+        }
+
+        static void SendEmail(object[] emailParameters) //0-From, 1-To, 2-additional recepients comma separated string
+        {                                               //3-SMTP Host, 4-Email Subject, 5-Email Body, 6-UserName, 7-Password
+            try
+            {
+                string fromAddress = (string)emailParameters[0];
+                string toAddress = (string)emailParameters[1];
+                string multipleRecipients = (string)emailParameters[2];
+                string clientHost = (string)emailParameters[3];
+                string mailSubject = (string)emailParameters[4];
+                string mailBody = (string)emailParameters[5];
+                string userName = (string)emailParameters[6];
+                string password = (string)emailParameters[7];
+                string ccAddress = (string)emailParameters[8];
+
+                SmtpClient client = new SmtpClient();
+                MailMessage mail = new MailMessage(fromAddress, toAddress);
+
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.UseDefaultCredentials = false;
+                client.EnableSsl = false;
+                if (!string.IsNullOrWhiteSpace(multipleRecipients) && !string.IsNullOrEmpty(multipleRecipients))
+                {
+                    mail.To.Add(multipleRecipients);
+                }
+                mail.Subject = mailSubject;
+
+                mail.IsBodyHtml = true;
+                mail.Body = mailBody;
+
+                if (ccAddress != string.Empty)
+                {
+                    mail.CC.Add(ccAddress);
+                }
+                client.Host = clientHost;
+
+                client.Credentials = new NetworkCredential(userName, password);
+
+                client.Send(mail);
+            }
+            catch (Exception ex)
+            {
+                String logMessage = "Failed to send email.";
+                logMessage = logMessage + "\n" + ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralWarningLog(logMessage);
+            }
+        }
+
+        static void SendExportToEnvNotificationEmail(HierarchyModel sourceProject, HierarchyModel targetProject,
+                                                        string targetEnvName) //0-From, 1-To, 2-additional recepients comma separated string
+        {                                               //3-SMTP Host, 4-Email Subject, 5-Email Body, 6-UserName, 7-Password
+            try
+            {
+                object[] emailParameters = new object[20];
+                GetEmailParameters(sourceProject, targetProject, targetEnvName, out emailParameters);
+                SendEmail(emailParameters);
+            }
+            catch (Exception ex)
+            {
+                String logMessage = "Failed to send email.";
+                logMessage = logMessage + "\n" + ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralWarningLog(logMessage);
+            }
+        }
+
+        static string GetUserEmailAddressFromLDAP(string userName)
+        {
+            string emailAddress = string.Empty;
+            try
+            {
+                string strLdapDir = Domain.PE_SystemParameters["LDAPDirectoryConnString"];
+                var LdapDir = new DirectoryEntry(strLdapDir);
+                var LdapDirSearcher = new DirectorySearcher(LdapDir);
+                LdapDirSearcher.Filter = string.Format("(&(sAMAccountName={0}))", userName);
+                var allEmails = LdapDirSearcher.FindAll();
+                if (allEmails != null && allEmails.Count == 1)
+                {
+                    emailAddress = allEmails[0].Properties["mail"][0].ToString();
+                }
+                else
+                {
+                    String logMessage = "Failed to send CC email to user " + userName + ".";
+                    Domain.SaveGeneralWarningLog(logMessage);
+                }
+                return emailAddress;
+            }
+            catch (Exception ex)
+            {
+                String logMessage = "Failed to send CC email to user " + userName + ".";
+                logMessage = logMessage + "\n" + ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralWarningLog(logMessage);
+                return string.Empty;
+            }
+        }
+
+        static string GetUserFNameAndLNameFromLDAP(string userName)
+        {
+            string firstName = string.Empty;
+            string lastName = string.Empty;
+
+            string nameCombined = string.Empty;
+            try
+            {
+                string strLdapDir = Domain.PE_SystemParameters["LDAPDirectoryConnString"];
+                var LdapDir = new DirectoryEntry(strLdapDir);
+                var LdapDirSearcher = new DirectorySearcher(LdapDir);
+                LdapDirSearcher.Filter = string.Format("(&(sAMAccountName={0}))", userName);
+                var allUsersData = LdapDirSearcher.FindAll();
+                if (allUsersData != null && allUsersData.Count == 1)
+                {
+                    firstName = allUsersData[0].Properties["givenName"][0].ToString();
+                    lastName = allUsersData[0].Properties["sn"][0].ToString();
+
+                    nameCombined = firstName + " " + lastName;
+                }
+                else
+                {
+                    String logMessage = "Failed to retrieve user's first name and last name from LDAP " + userName + ".";
+                    Domain.SaveGeneralWarningLog(logMessage);
+                }
+                return nameCombined;
+            }
+            catch (Exception ex)
+            {
+                String logMessage = "Failed to send CC email to user " + userName + ".";
+                logMessage = logMessage + "\n" + ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralWarningLog(logMessage);
+                return string.Empty;
+            }
+        }
+        
+        #endregion
+    }
+}

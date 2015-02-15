@@ -1,0 +1,92 @@
+﻿<UserControl x:Class="ExplorerModule.EnvironmentDetailsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:mvvm="clr-namespace:Infra.MVVM;assembly=Infra.MVVM"
+    xmlns:local="clr-namespace:ExplorerModule"
+    xmlns:np="NavigationPane"         
+    >
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+
+            <ResourceDictionary.MergedDictionaries>
+                <!--Metro Tab Control-->
+                <ResourceDictionary Source="pack://application:,,,/ExplorerModule;component/Resources/Themes/MetroTabStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="ContentListViewStyle" TargetType="{x:Type ListView}">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+                <Setter Property="AlternationCount" Value="0" />
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <DataTemplate x:Key="SubFolderTileTemplate" DataType="{x:Type local:TreeViewNodeViewModelBase}">
+                <Border HorizontalAlignment="Stretch" BorderBrush="Transparent" BorderThickness="0" Padding="5" >
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Image Grid.Column="0" Height="80" Stretch="Uniform" Source="{Binding LargeIcon}" />
+                        <StackPanel Grid.Column="1" Margin="2,0" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Name}" TextBlock.FontWeight="Bold" />
+                            <TextBlock Text="{Binding Description}" Margin="0,0,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel x:Name="LayoutRoot">
+        <!--Contents Tab-->
+        <ScrollViewer Grid.Row="0" CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <TabControl Style="{DynamicResource MetroTab}">
+                <TabItem Header="{Binding Path=Name}" Style="{DynamicResource MetroTabItem}" BorderBrush="Blue" >
+                    <ListView x:Name="SubFoldersList" ItemsSource="{Binding Path=SubFolders}" ItemTemplate="{StaticResource SubFolderTileTemplate}" Style="{StaticResource ContentListViewStyle}" Margin="0,30,0,0" >
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListViewItem}" >
+                                <Setter Property="mvvm:EventToCommand.Event" Value="MouseDoubleClick" />
+                                <Setter Property="mvvm:EventToCommand.Command" Value="{Binding ElementName=SubFoldersList, Path=DataContext.DoubleClickCommand}" />
+                                <Setter Property="mvvm:EventToCommand.CommandParameter" Value="{Binding}" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                </TabItem>
+                <!--Properties TabItem-->
+                <TabItem Header="Environment Details" Style="{DynamicResource MetroTabItem}" BorderBrush="Red" >
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="6" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Name -->
+                        <Label Grid.Row="1" Grid.Column="0" Content="_Name:" Target="{Binding ElementName=NameTxt}" Style="{DynamicResource WorkspaceLabelsStyle}" />
+                        <TextBox x:Name="NameTxt" Grid.Row="1" Grid.Column="2" IsEnabled="False" Text="{Binding Path=Name, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="300" />
+
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </ScrollViewer>
+    </DockPanel>
+
+</UserControl>

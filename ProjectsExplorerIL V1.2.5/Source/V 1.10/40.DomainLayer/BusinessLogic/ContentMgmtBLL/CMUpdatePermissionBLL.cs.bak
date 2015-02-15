@@ -1,0 +1,242 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ATSBusinessObjects.ContentMgmtModels;
+using ATSBusinessLogic;
+using ATSDomain;
+
+namespace ATSBusinessLogic.ContentMgmtBLL
+{
+    public class CMUpdatePermissionBLL
+    {
+        #region Data
+
+        private String UserGroupType { get; set; }
+        private Dictionary<int, CMFolderModel> Folders { get; set; }
+        private Dictionary<int, CMContentModel> Contents { get; set; }
+        private Dictionary<int, CMVersionModel> Versions { get; set; }
+
+        private bool ApplicationPermissionUpdateUserGroup { get; set; }
+        private bool ApplicationPermissionUpdateCheckouted { get; set; }
+        private bool ApplicationPermissionChangeRetirement { get; set; }
+        private bool ApplicationPermissionUpdateAllUserGroups { get; set; }
+
+        #endregion
+
+        #region Constructor
+
+        public CMUpdatePermissionBLL(Dictionary<int, CMFolderModel> folders, Dictionary<int, CMContentModel> contents, Dictionary<int, CMVersionModel> versions)
+        {
+            Folders = folders;
+            Contents = contents;
+            Versions = versions;
+            UserGroupType = CMTreeNodeBLL.GetUserGroupType();
+            List<String> applicationPermission = CMSecurityBLL.GetApplicationPermission(Domain.User);
+
+            ApplicationPermissionUpdateCheckouted = applicationPermission.Contains("UpdateEditor");
+            ApplicationPermissionUpdateUserGroup = applicationPermission.Contains("Update user group");
+            ApplicationPermissionChangeRetirement = applicationPermission.Contains("ChangeRetirement");
+            ApplicationPermissionUpdateAllUserGroups = applicationPermission.Contains("Update all user groups");
+        }
+
+        public CMUpdatePermissionBLL(){}
+
+        public CMUpdatePermissionBLL(Dictionary<int, CMVersionModel> versions)
+        {
+            Versions = versions;
+        }
+
+        #endregion
+
+        #region Methods
+
+        public void UpdateTreeNodeRecursive(List<CMTreeNode> treeNodesList)
+        {
+            foreach (CMTreeNode treeNode in treeNodesList)
+                UpdateTreeNodeRecursive(treeNode);
+        }
+
+        public void UpdateTreeNodeRecursive(CMTreeNode treeNode)
+        {
+            UpdateTreeNode(treeNode);
+
+            switch (treeNode.TreeNodeType)
+            {
+                case TreeNodeObjectType.Folder:
+                    foreach (CMTreeNode node in ((CMFolderModel)treeNode).Nodes)
+                        UpdateTreeNodeRecursive(node);
+                    break;
+
+                case TreeNodeObjectType.Content:
+                    foreach (KeyValuePair<int, CMVersionModel> node in ((CMContentModel)treeNode).Versions)
+                        UpdateTreeNodeRecursive(node.Value);
+                    break;
+            }
+        }
+
+        public void UpdateTreeNode(CMTreeNode treeNode)
+        {
+            UpdateTreeNodePermission(treeNode);
+        }
+
+        private void UpdateTreeNodePermission(CMTreeNode node)
+        {
+            if (!ApplicationPermissionUpdateAllUserGroups)
+            {
+                CMFolderModel parentFolder = TreeNodeParentFolder(node);
+                Dictionary<String, CMFolderUserGroupTypeModel> userGroupTypePermission = GetUserGroupTypePermission(parentFolder);
+
+                if (!userGroupTypePermission.ContainsKey(UserGroupType))
+                {
+                    node.Permission = new Dictionary<String, bool>();
+                    return;
+                }
+            }
+
+            switch (node.TreeNodeType)
+            {
+                case TreeNodeObjectType.Folder:
+                    GetContentTreesPermission(node);
+                    break;
+                case TreeNodeObjectType.Content:
+                    GetContentPermission(node);
+                    break;
+                case TreeNodeObjectType.ContentVersion:
+                    GetContentVersionPermission((CMVersionModel)node);
+                    break;
+            }
+        }
+
+        private Dictionary<String, CMFolderUserGroupTypeModel> GetUserGroupTypePermission(CMFolderModel folder)
+        {
+            while (folder != null)
+            {
+                if (folder.UserGroupTypePermission.Count > 0)
+                    return folder.UserGroupTypePermission;
+
+                folder = folder.ParentID == 0 ? null : Folders[folder.ParentID];
+            }
+
+            return new Dictionary<String, CMFolderUserGroupTypeModel>();
+        }
+
+        private CMFolderModel TreeNodeParentFolder(CMTreeNode node)
+        {
+
+            switch (node.TreeNodeType)
+            {
+                case TreeNodeObjectType.Folder:
+                    return (CMFolderModel)node;
+
+                case TreeNodeObjectType.Content:
+                    return node.ParentID == 0 ? null : Folders[node.ParentID];
+
+                case TreeNodeObjectType.ContentVersion:
+                    int folderID = Contents[node.ParentID].ParentID;
+                    return folderID == 0 ? null : Folders[folderID];
+            }
+
+            return null;
+        }
+
+        public void GetContentPermission(CMTreeNode node)
+        {
+            Dictionary<String, bool> objectPermission = new Dictionary<String, bool> { { "Add", true }, { "Update", true }, { "Delete", true } };
+
+            if (ApplicationPermissionUpdateUserGroup)
+            {
+                objectPermission.Add("UpdateProperty", true);
+            }
+            node.Permission = objectPermission;
+        }
+
+        public void GetContentTreesPermission(CMTreeNode node)
+        {
+            Dictionary<String, bool> objectPermission = new Dictionary<String, bool> { { "Add", true }, { "Update", true }, { "Delete", true } };
+
+            if (ApplicationPermissionUpdateUserGroup)
+            {
+                objectPermission.Add("UpdateUserGroup", true);
+                objectPermission.Add("UpdateProperty", true);
+            }
+
+            node.Permission = objectPermission;
+        }
+
+        public void GetContentVersionPermission(CMVersionModel node)
+        {
+            Dictionary<String, bool> objectPermission = new Dictionary<String, bool>();
+          
+            if (node.Path.Type == ATSBusinessObjects.ContentMgmtModels.CMVersionModel.PathType.Full)
+            {
+                node.Permission = objectPermission;
+                return;
+            }
+
+            if (!String.IsNullOrEmpty(node.LockWithDescription) && node.LastUpdateUser != Domain.User && node.LastUpdateUser != "")
+            {
+                if (ApplicationPermissionUpdateCheckouted)
+                {
+                    objectPermission.Add("Update", true);
+                    objectPermission.Add("UpdateEditor", true);
+                }
+
+                node.Permission = objectPermission;
+                return;
+            }
+
+            //performance#1
+            
+            // uncomment to reverse
+            //if (!CMContentsReaderBLL.listOfUsedContentVersions.Contains(node.ID) && !ContentVersionLinked(node)) 
+            //    objectPermission.Add("Delete", true);
+
+            if (!CMContentsReaderBLL.listOfUsedContentVersionsPE.Contains(node.ID) && !CMContentsReaderBLL.listOfUsedContentVersionsCM.Contains(node.ID))
+                objectPermission.Add("Delete", true);
+
+            //end#1
+
+            if (node.id_ContentVersionStatus != "Ret")
+            {
+                objectPermission.Add("Update", true);
+                objectPermission.Add("UpdateProperty", true);
+
+                objectPermission.Add("UpdateStatus", true);
+
+                if (node.id_ContentVersionStatus == "Edit")
+                {
+                    objectPermission.Add("UpdateEditor", true);
+                    objectPermission.Add("UpdateData", true);
+                }
+            }
+            else
+            {
+                if (ApplicationPermissionChangeRetirement)
+                {
+                    objectPermission.Add("Update", true);
+                    objectPermission.Add("UpdateStatus", true);
+                }
+            }
+
+            node.Permission = objectPermission;
+        }
+
+        private bool ContentVersionLinked(CMVersionModel node)
+        {
+
+            foreach (KeyValuePair<int, CMVersionModel> contentVersion in Versions)
+            {
+                foreach (KeyValuePair<int, CMContentVersionSubVersionModel> contentVersionSubVersion in contentVersion.Value.ContentVersions)
+                {
+                    if (contentVersionSubVersion.Value.ContentSubVersion.ID == node.ID)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
+    }    
+}

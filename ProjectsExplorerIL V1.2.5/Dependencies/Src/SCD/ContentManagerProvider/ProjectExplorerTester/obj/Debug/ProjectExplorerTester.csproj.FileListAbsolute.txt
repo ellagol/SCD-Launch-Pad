@@ -1,0 +1,8 @@
+C:\Users\au_yoren\Desktop\ContentManagerProvider\ProjectExplorerTester\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\au_yoren\Desktop\ContentManagerProvider\ProjectExplorerTester\obj\Debug\ProjectExplorerTester.dll
+C:\Users\au_yoren\Desktop\ContentManagerProvider\ProjectExplorerTester\obj\Debug\ProjectExplorerTester.pdb
+C:\Projects\Modernization\DLLs\ProjectExplorerTester.dll
+C:\Projects\Modernization\DLLs\ProjectExplorerTester.pdb
+C:\p\ContentManagerProvider\ProjectExplorerTester\obj\Debug\ResolveAssemblyReference.cache
+C:\p\ContentManagerProvider\ProjectExplorerTester\obj\Debug\ProjectExplorerTester.dll
+C:\p\ContentManagerProvider\ProjectExplorerTester\obj\Debug\ProjectExplorerTester.pdb

@@ -1,0 +1,204 @@
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\bin\Debug\NavigationPane.dll.config
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\bin\Debug\NavigationPane.dll
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\bin\Debug\NavigationPane.pdb
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\bin\Debug\it\NavigationPane.resources.dll
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\bin\Debug\fr\NavigationPane.resources.dll
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\Common.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.g.cs
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.cache
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.lref
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Resources\Buttons.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Metro\Blue.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Common.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Common.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\WindowsLive\Live.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPaneCommon.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPane.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Black.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Blue.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Silver.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Black.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Blue.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Silver.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\Generic.baml
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.g.resources
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.resources
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.it.resources
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.fr.resources
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.csproj.GenerateResource.Cache
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\it\NavigationPane.resources.dll
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\fr\NavigationPane.resources.dll
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.dll
+C:\Eli\Today\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.pdb
+C:\Eli\Today\OutlookSidePane\NavigationPane\bin\Debug\NavigationPane.dll.config
+C:\Eli\Today\OutlookSidePane\NavigationPane\bin\Debug\NavigationPane.dll
+C:\Eli\Today\OutlookSidePane\NavigationPane\bin\Debug\NavigationPane.pdb
+C:\Eli\Today\OutlookSidePane\NavigationPane\bin\Debug\it\NavigationPane.resources.dll
+C:\Eli\Today\OutlookSidePane\NavigationPane\bin\Debug\fr\NavigationPane.resources.dll
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\Common.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.g.cs
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.cache
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.lref
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Resources\Buttons.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Metro\Blue.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Common.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Common.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\WindowsLive\Live.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPaneCommon.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPane.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Black.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Blue.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Silver.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Black.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Blue.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Silver.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\Themes\Generic.baml
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.g.resources
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.resources
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.it.resources
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.fr.resources
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.csproj.GenerateResource.Cache
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\it\NavigationPane.resources.dll
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\fr\NavigationPane.resources.dll
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.dll
+C:\Eli\Today\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.pdb
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\bin\Debug\NavigationPane.dll.config
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\bin\Debug\NavigationPane.dll
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\bin\Debug\NavigationPane.pdb
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\bin\Debug\it\NavigationPane.resources.dll
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\bin\Debug\fr\NavigationPane.resources.dll
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\Common.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.g.cs
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.cache
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.lref
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Resources\Buttons.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Metro\Blue.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Common.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Common.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\WindowsLive\Live.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPaneCommon.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPane.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Black.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Blue.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Silver.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Black.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Blue.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Silver.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\Themes\Generic.baml
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.g.resources
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.resources
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.it.resources
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.fr.resources
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.csproj.GenerateResource.Cache
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\it\NavigationPane.resources.dll
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\fr\NavigationPane.resources.dll
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.dll
+C:\Eli\Today\SideBar\OutlookSidePane\NavigationPane\obj\Debug\NavigationPane.pdb
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\bin\Debug\NavigationPane.dll.config
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\bin\Debug\NavigationPane.dll
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\bin\Debug\NavigationPane.pdb
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\bin\Debug\it\NavigationPane.resources.dll
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\bin\Debug\fr\NavigationPane.resources.dll
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\Common.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.g.cs
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\GeneratedInternalTypeHelper.g.cs
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.cache
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.lref
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Resources\Buttons.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\Metro\Blue.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Common.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Common.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\WindowsLive\Live.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPaneCommon.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPane.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Black.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Blue.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Silver.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Black.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Blue.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Silver.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\Themes\Generic.baml
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\NavigationPane.g.resources
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.resources
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.it.resources
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.fr.resources
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\NavigationPane.csproj.GenerateResource.Cache
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\it\NavigationPane.resources.dll
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\fr\NavigationPane.resources.dll
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\NavigationPane.dll
+D:\Eli\Dev\WPF\Samples\OutlookNavigationPane\OutlookNavigationPaneEli\NavigationPane\obj\Debug\NavigationPane.pdb
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\NavigationPane.dll.config
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\NavigationPane.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\NavigationPane.pdb
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\it\NavigationPane.resources.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\fr\NavigationPane.resources.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\Common.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.g.cs
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.cache
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.lref
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Resources\Buttons.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Metro\Blue.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Common.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Common.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\WindowsLive\Live.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPaneCommon.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPane.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Black.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Blue.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Silver.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Black.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Blue.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Silver.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\Generic.baml
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.g.resources
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.resources
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.it.resources
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.fr.resources
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.csproj.GenerateResource.Cache
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\it\NavigationPane.resources.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\fr\NavigationPane.resources.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.dll
+C:\Eli\Today\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.pdb
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\NavigationPane.dll.config
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\NavigationPane.dll
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\NavigationPane.pdb
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\it\NavigationPane.resources.dll
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Bin\Controls\OutlookNavigationPane\fr\NavigationPane.resources.dll
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\Common.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.g.cs
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\GeneratedInternalTypeHelper.g.cs
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.cache
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane_MarkupCompile.lref
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Controls\NavigationPaneOptions.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Resources\Buttons.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Metro\Blue.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Common.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Common.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\WindowsLive\Live.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPaneCommon.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\NavigationPane.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Black.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Blue.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2007\Silver.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Black.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Blue.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\NavigationPane\Office2010\Silver.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\Themes\Generic.baml
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.g.resources
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.resources
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.it.resources
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.Properties.NPR.fr.resources
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.csproj.GenerateResource.Cache
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\it\NavigationPane.resources.dll
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\fr\NavigationPane.resources.dll
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.dll
+G:\Eli\Backups\2013-10-16\ADTS - AutomatedDetectorsTesingSystem\Dependencies\Src\Controls\OutlookNavigationPane\NavigationPane\obj\Debug\NavigationPane.pdb

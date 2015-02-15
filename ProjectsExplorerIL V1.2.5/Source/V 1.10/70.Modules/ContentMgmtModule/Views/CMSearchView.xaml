@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="ContentMgmtModule.CMSearchView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mvvm="clr-namespace:Infra.MVVM;assembly=Infra.MVVM"           
+      xmlns:local="clr-namespace:ContentMgmtModule">
+
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="6" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="20" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="18" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="16" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Search Term -->
+        <Label Grid.Row="1" Grid.Column="0" Content="Search Term:" Style="{DynamicResource WorkspaceLabelsStyle}" Foreground="White" FontSize="14" />
+        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Path=SearchTerm, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="404" MaxLength="30" />
+
+        <!-- Search On -->
+        <Label Grid.Row="3" Grid.Column="0" Content="Search On:" Style="{DynamicResource WorkspaceLabelsStyle}" Foreground="White" FontSize="14" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+
+        <Grid Grid.Row="3" Grid.Column="2" >
+            <Grid.ColumnDefinitions >
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="59*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions >
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="14" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <CheckBox Grid.Row="0" Grid.Column="0" Content="Folder Name" VerticalAlignment="Center" IsChecked="{Binding Path=SearchOnFolderName}" Margin="-20,0,0,0" Foreground="White" FontSize="14"  />
+            <CheckBox Grid.Row="0" Grid.Column="2" Content="Content Name" VerticalAlignment="Center" IsChecked="{Binding Path=SearchOnContentName}" Margin="40,0,0,0" Foreground="White" FontSize="14"  />
+            <CheckBox Grid.Row="0" Grid.Column="4" Content="Version Name" VerticalAlignment="Center" IsChecked="{Binding Path=SearchOnVersionName}" Margin="40,0,0,0" Foreground="White" FontSize="14"  />
+
+            <CheckBox Grid.Row="2" Grid.Column="0" Content="File Name" VerticalAlignment="Center" IsChecked="{Binding Path=SearchOnFileName}" Margin="-20,0,0,0" Foreground="White" FontSize="14"  />
+            <CheckBox Grid.Row="2" Grid.Column="2" Content="User" VerticalAlignment="Center" IsChecked="{Binding Path=SearchOnUser}" Margin="40,0,0,0" Foreground="White" FontSize="14" IsEnabled="True"  />
+
+        </Grid>
+
+        <Button  Grid.Row="1" Grid.Column="3" Width="80" Content=" Search " Command="{Binding CMSearchCommand}" HorizontalAlignment="Right" />
+        <Button  Grid.Row="5" Grid.Column="5" Width="90" Content=" Select All " Command="{Binding SelectAllParametersCommand}" HorizontalAlignment="Right" />
+        <Button  Grid.Row="5" Grid.Column="7" Width="90" Content=" Clear " Command="{Binding ClearAllParametersCommand}" HorizontalAlignment="Right" />
+
+    </Grid>
+</UserControl>

@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<User>
+  <Section Name="Login">
+    <Key Name="User" Value="" />
+    <Key Name="Password" Value="" />
+  </Section>
+</User>

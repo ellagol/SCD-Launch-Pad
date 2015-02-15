@@ -1,0 +1,40 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <Color x:Key="NormalTextForegroundColor">Yellow</Color>
+    <SolidColorBrush x:Key="NormalTextForegroundBrush" Color="{StaticResource NormalTextForegroundColor}"></SolidColorBrush>
+    
+    <Color x:Key="SplashScreenColor">#FF406793</Color>
+    <SolidColorBrush x:Key="SplashScreenBrush" Color="{StaticResource SplashScreenColor}"></SolidColorBrush>
+
+    <!--If changing the below, remember to change also relevant values in MainWindowViewModel-->
+    <Color x:Key="RibbonBackgroundColor">#FFDFE9F5</Color>
+    <SolidColorBrush x:Key="RibbonBackgroundBrush" Color="{StaticResource RibbonBackgroundColor}"></SolidColorBrush>
+
+    <LinearGradientBrush x:Key="BackgroundBrush"  StartPoint=".78,0" EndPoint=".22, 1">
+        <GradientStop Color="#FF385f8b" Offset="0"/>
+        <GradientStop Color="#FF7596bb" Offset=".46"/>
+        <GradientStop Color="#FF385f8b" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="WorkspacesBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FF7596BB" Offset=".2"></GradientStop>
+        <GradientStop Color="#FF385F8B" Offset="0"></GradientStop>
+    </LinearGradientBrush>
+
+    <ImageBrush x:Key="DesktopBackgroundImageBrush" ImageSource="Wallpaper01.jpg" Stretch="Fill" />
+    
+    <LinearGradientBrush x:Key="WindowBackgroundBrush"  StartPoint="0,0" EndPoint="0, 1">
+        <GradientStop Color="#FF385f8b" Offset="0"/>
+        <GradientStop Color="#FF7596bb" Offset=".46"/>
+        <GradientStop Color="#FF385f8b" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="PopupBackgroundBrush" StartPoint=".78,0" EndPoint=".22, 1">
+        <GradientStop Color="#FFCACDCE" Offset="0"/>
+        <GradientStop Color="#FFD4D6D5" Offset=".46"/>
+        <GradientStop Color="#FFC6CFD6" Offset="1"/>
+    </LinearGradientBrush>
+
+</ResourceDictionary>

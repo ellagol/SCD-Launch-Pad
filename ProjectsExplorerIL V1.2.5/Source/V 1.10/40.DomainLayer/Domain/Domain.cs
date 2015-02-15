@@ -1,0 +1,485 @@
+﻿using System;
+using System.Collections.Specialized;
+using System.Data;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.ServiceModel;
+using System.Text;
+using Infra.Configuration;
+using Infra.DAL;
+using System.Collections.Generic;
+
+
+namespace ATSDomain
+{
+    public class Domain : Infra.Domain.Domain
+    {
+        #region  Domain Data
+
+        //XML Configuration
+        public static XmlConfigSource AppConfigParams; //Reference to the Application level Configuration Parameters
+        public static XmlConfigSource UserConfigParams; //Reference to the User level Configuration Parameters
+
+        //This is set by the Boostrapper upon parsing the CommandLine args
+        public static string User { get; set; }
+        public static string Environment { get; set; }
+        public static string DbConnString { get; set; }
+
+        //Project Explorer version - for the about popup
+        public static string PE_Version { get; set; }
+
+        //User Privileges, filled by the coinstructor of this class
+        public static StringCollection UserPrivileges { get; set; }
+        public static ListDictionary UserPrivileges1 { get; set; }
+
+        //External (SCD) ConnectionStrings, filled by the coinstructor of this class
+        //public static string CMConnectionString { get; set; }
+        //public static string RMConnectionString { get; set; }
+
+        //Fix 1869
+        static string shortDateFormat = string.Empty;
+        static string longTimeFormat = string.Empty;
+
+        public static Dictionary<string, string> PE_SystemParameters = new Dictionary<string, string>();
+
+        public static string DateTimeFormat
+        {
+            get
+            {
+                string _DateTimeFormat = shortDateFormat + " " + longTimeFormat;
+                if (_DateTimeFormat.Trim() != null)
+                {
+                    return _DateTimeFormat;
+                }
+                else
+                {
+                    return "dd/mm/yyyy H:mm:ss";
+                }
+            }
+        }
+
+        public static string Workstn
+        {
+            get
+            {
+                return System.Environment.MachineName;
+            }
+        }
+
+        public static string AppName
+        {
+            get
+            {
+                return "Explorer";
+            }
+        }
+
+        private static string _CallingAppName = "";
+        public static string CallingAppName
+        {
+            get
+            {
+                return _CallingAppName;
+            }
+            set
+            {
+                _CallingAppName = value;
+            }
+        }
+
+        //Contents Tree data
+
+
+
+        #endregion
+
+        #region  Domain Initialization
+
+        //This is (typically) called from the constructor of the MainWindowVM or from the Bootstrapper
+        public static new void DomainInit()
+        {
+            try
+            {
+                PE_Version = "1.2.5";
+
+                //Build directory for DAL Log
+                string dPath = AppDomain.CurrentDomain.BaseDirectory + "DataAccessServiceLog";
+                if (!Directory.Exists(dPath))
+                    Directory.CreateDirectory(dPath);
+
+                //Initialize Application Configuration Parameters Reader/Writer
+                AppConfigParams = new XmlConfigSource(AppDomain.CurrentDomain.BaseDirectory + "AppSettings\\ApplicationSettings.xml");
+
+                //Set Environment Topology
+                string DbE = Convert.ToString(AppConfigParams.GetConfigParam("DAL", "DbEngine", "String", "", false));
+                switch (DbE)
+                {
+                    case "SqlServer":
+                        CurrentDbEngine = DbEngine.SqlServer;
+                        break;
+                    case "SqlServerCE":
+                        CurrentDbEngine = DbEngine.SqlServerCE;
+                        break;
+                    default:
+                        CurrentDbEngine = DbEngine.SqlServer;
+                        break;
+                }
+
+                string Arch = Convert.ToString(AppConfigParams.GetConfigParam("DAL", "Architecture", "String", "", false));
+                switch (Arch)
+                {
+                    case "ClientServer":
+                        CurrentArchitecture = Architecture.ClientServer;
+                        break;
+                    case "Tiered":
+                        CurrentArchitecture = Architecture.Tiered;
+                        break;
+                    default:
+                        CurrentArchitecture = Architecture.ClientServer; //Per SCD, they want every station connecting to the server without a service layer
+                        break;
+                }
+
+                //Fix 1869
+                try
+                {
+                    shortDateFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+                    longTimeFormat = CultureInfo.CurrentCulture.DateTimeFormat.LongTimePattern;
+                }
+                catch
+                {
+                    shortDateFormat = string.Empty;
+                    longTimeFormat = string.Empty;
+                }
+
+                //Set DAL Properties
+                DatabaseParamPrefix = "@";
+                DatabaseCmdTimeout = "1";
+
+                //Set ConnectionString and Instantiate the PersistenceLayer
+                if (CurrentDbEngine == DbEngine.SqlServer)
+                {
+                    DatabaseSupportsBatchQueries = true;
+                    if (CurrentArchitecture == Architecture.ClientServer)
+                    {
+                        //C\S Implementation can use Windows Authentication (if the server was configured this way)
+                        //For SCD, we will NOT get the ConnectionString from the xml; rather it was set by the Bootstrapper
+                        //DatabaseConnectionString = Convert.ToString(AppConfigParams.GetConfigParam("SqlServer", "ConnectionStringClientServer", "String", "", false));
+                        //Un-Comment the line below, and reference Infra.DAL.SqlServer and Infra.DAL.DataAccessServiceBase from the project
+                        PersistenceLayer = new SqlServerDAL();
+                    }
+                    else if (CurrentArchitecture == Architecture.Tiered)
+                    {
+                        //Tier Implementation uses Sql Server Authentication, since the Service might be running from another account
+                        //For SCD, we will NOT get the ConnectionString from the xml; rather it was set by the Bootstrapper
+                        //DatabaseConnectionString = Convert.ToString(AppConfigParams.GetConfigParam("SqlServer", "ConnectionStringTiered", "String", "", false));
+                        //Since this is a shared class, no app.config is read; channel initialized "manually"
+                        var TCPBinding = new NetTcpBinding();
+                        TCPBinding.Name = "MyNetTcpBinding";
+                        TCPBinding.MaxReceivedMessageSize = 100000000;
+                        TCPBinding.ReceiveTimeout = new System.TimeSpan(0, 10, 0);
+                        TCPBinding.SendTimeout = new System.TimeSpan(0, 10, 0);
+                        TCPBinding.Security.Mode = SecurityMode.None;
+                        TCPBinding.ReliableSession.Enabled = true;
+                        TCPBinding.ReliableSession.InactivityTimeout = new System.TimeSpan(0, 1, 0);
+                        TCPBinding.ReliableSession.Ordered = true;
+                        var ChannelFactory = new ChannelFactory<IDataAccess>(TCPBinding);
+                        PersistenceLayer = ChannelFactory.CreateChannel(new EndpointAddress(Convert.ToString(AppConfigParams.GetConfigParam("DAL", "EndPointAddress", "String", "", false))));
+                    }
+                }
+                else if (CurrentDbEngine == DbEngine.SqlServerCE)
+                {
+                    DbConnString = "Data Source=" + AppDomain.CurrentDomain.BaseDirectory + "AppLocalData\\" + "ATSce.sdf";
+                    DatabaseSupportsBatchQueries = false;
+                    //Un-Comment the line below, and reference Infra.DAL.SqlServerCe and Infra.DAL.DataAccessServiceBase from the project
+                    PersistenceLayer = new SqlServerCeDAL();
+                }
+
+                //Set PersistenceLayer Properties
+                if (PersistenceLayer != null)
+                {
+                    //PersistenceLayer.SetConnectionString(DatabaseConnectionString);
+                    PersistenceLayer.SetConnectionString(DbConnString);
+                    PersistenceLayer.SetCmdTimeout(DatabaseCmdTimeout);
+                    PersistenceLayer.SetParamPrefix(DatabaseParamPrefix);
+                    PersistenceLayer.SetSupportsBatchQueries(DatabaseSupportsBatchQueries);
+                }
+
+                //Set External SCD databases Connection Strings
+                //CMConnectionString = (string)PersistenceLayer.FetchDataValue("SELECT Value FROM PE_SystemParameters WHERE Variable = 'CMConnectionString'", System.Data.CommandType.Text, null);
+                //RMConnectionString = (string)PersistenceLayer.FetchDataValue("SELECT Value FROM PE_SystemParameters WHERE Variable = 'RMConnectionString'", System.Data.CommandType.Text, null);
+
+                //Collect user's permissions
+                FetchUserPermissions();
+
+                //Get PE system parameters
+                getPESystemParameters();
+
+            }
+            catch (Exception ex)
+            {
+                String logMessage = ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region Permissions
+
+        static void FetchUserPermissions()
+        {
+            UserPrivileges = new StringCollection();
+
+            var SB = new StringBuilder(string.Empty);
+            SB.Append("SELECT PP.PrivilegeCode, up.SubSystem FROM ATS_ProfilePrivilege PP ");
+            SB.Append("JOIN ATS_UserProfile UP ON UP.ProfileId=PP.ProfileId ");
+            SB.Append("JOIN ATS_Privilege P on P.SubSystem = UP.SubSystem AND P.PrivilegeCode = PP.PrivilegeCode ");
+            SB.Append("WHERE UP.UserId = '" + User + "'");
+            DataTable Priviliges = PersistenceLayer.FetchDataTable(SB.ToString(), System.Data.CommandType.Text, null);
+            foreach (DataRow Element in Priviliges.Rows)
+            {
+                UserPrivileges.Add((string)Element["SubSystem"] + (string)Element["PrivilegeCode"]);
+            }
+        }
+
+        public static Boolean IsPermitted(string Privilege, string subsystem = "PE")
+        {
+            string subsystemPrivilege = subsystem + Privilege;
+
+            if ((subsystem == "PE" && UserPrivileges.Contains("PE999")) || (subsystem == "UCM" && UserPrivileges.Contains("UCM299")))
+            {
+                return true;
+            }
+            else
+            {
+                if (UserPrivileges.Contains(subsystemPrivilege))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        #endregion
+
+        #region  Domain Initialization for API calls
+
+        public static void DomainInitForAPI(string ConnStr)
+        {
+            try
+            {
+                PersistenceLayer = new SqlServerDAL();
+                PersistenceLayer.SetConnectionString(ConnStr);
+                PersistenceLayer.SetCmdTimeout("1");
+                PersistenceLayer.SetParamPrefix("@");
+                PersistenceLayer.SetSupportsBatchQueries(true);
+            }
+            catch (Exception ex)
+            {
+                String logMessage = ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region Error Log
+
+        public static void SaveGeneralErrorLog(string error)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(String.Concat(Enumerable.Repeat("-.", 80)) + "\n");
+            sb.Append("Date / Time..: " + DateTime.Now.ToString() + "\n");
+            sb.Append("Error........: " + error + "\n");
+
+            StreamWriter objReader = null;
+            try
+            {
+                string dPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\DataAccessServiceLog";
+                objReader = new StreamWriter(dPath + "\\Errorlog.txt", true);
+                objReader.WriteLine(sb.ToString());
+                objReader.Close();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        public static void SaveGeneralWarningLog(string error)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(String.Concat(Enumerable.Repeat("-.", 80)) + "\n");
+            sb.Append("Date / Time..: " + DateTime.Now.ToString() + "\n");
+            sb.Append("Warning ........: " + error + "\n");
+
+            StreamWriter objReader = null;
+            try
+            {
+                string dPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\DataAccessServiceLog";
+                objReader = new StreamWriter(dPath + "\\Errorlog.txt", true);
+                objReader.WriteLine(sb.ToString());
+                objReader.Close();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+
+        #endregion        
+
+        #region Messages
+
+        public static string GetMessageDescriptionById(string messageId)
+        {
+            try
+            {
+                var SB = new StringBuilder(string.Empty);
+                SB.Append("SELECT Description FROM PE_Messages where id= " + messageId);
+                string warningMessage = (string)Domain.PersistenceLayer.FetchDataValue(SB.ToString(), CommandType.Text, null);
+                return warningMessage;
+            }
+            catch (Exception ex)
+            {
+                String logMessage = ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                return string.Empty;
+            }
+        }
+
+        #endregion
+
+        #region ErrorHandler
+
+        public class ErrorHandling
+        {
+            public string messsageId = string.Empty;
+            public object[] messageParams = new string[10];
+        }
+        #endregion
+
+        #region SystemParameters
+
+        static void getPESystemParameters()
+        {
+            try
+            {
+                var SBsystemParameters = new StringBuilder(string.Empty);
+
+                SBsystemParameters.Append("SELECT * FROM PE_SystemParameters");
+
+                // Fetch the DataTable from the database
+                DataTable ResTbl = Infra.Domain.Domain.PersistenceLayer.FetchDataTable(SBsystemParameters.ToString(), CommandType.Text, null);
+                // Populate the collection
+                if (ResTbl != null)
+                {
+                    foreach (DataRow DataRow in ResTbl.Rows)
+                    {
+                        if (!PE_SystemParameters.ContainsKey((string)DataRow["Variable"]))
+                        {
+                            PE_SystemParameters.Add((string)DataRow["Variable"], (string)DataRow["Value"]);
+                        }
+                        else
+                        {
+                            String logMessage = "Parameter " + (string)DataRow["Variable"] + "appears more than once in PE_SystemParameters table.";
+                            SaveGeneralErrorLog(logMessage);
+
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                SaveGeneralErrorLog(logMessage);
+            }
+        }
+
+        public static DataTable PESystemParameters()
+        {
+            try
+            {
+                var SBsystemParameters = new StringBuilder(string.Empty);
+
+                SBsystemParameters.Append("SELECT * FROM PE_SystemParameters");
+
+                // Fetch the DataTable from the database
+                DataTable ResTbl = Infra.Domain.Domain.PersistenceLayer.FetchDataTable(SBsystemParameters.ToString(), CommandType.Text, null);
+
+                if (ResTbl != null)
+                {
+                    return ResTbl;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                SaveGeneralErrorLog(logMessage);
+                return null;
+            }
+        }
+
+        public static DataTable CMSystemParameters()
+        {
+            try
+            {
+                var SBsystemParameters = new StringBuilder(string.Empty);
+
+                SBsystemParameters.Append("SELECT * FROM SystemParameters");
+
+                // Fetch the DataTable from the database
+                DataTable ResTbl = Domain.PersistenceLayer.FetchDataTable(SBsystemParameters.ToString(), CommandType.Text, null);
+                // Populate the collection
+                if (ResTbl != null)
+                {
+                    return ResTbl;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception e)
+            {
+                String logMessage = e.Message + "\n" + "Source: " + e.Source + "\n" + e.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                return null;
+            }
+        }
+
+        public static string getPESystemParameters(string variable)
+        {
+            string paramValue = string.Empty;
+            var Target = new StringBuilder(string.Empty);
+            try
+            {
+
+                var SysPathQry = new StringBuilder(string.Empty);
+                SysPathQry.Append("select Value from PE_SystemParameters where Variable='" + variable + "'");
+
+                paramValue = (string)Domain.PersistenceLayer.FetchDataValue(SysPathQry.ToString(), System.Data.CommandType.Text, null);
+                return paramValue;
+
+            }
+            catch (Exception ex)
+            {
+                String logMessage = ex.Message + "\n" + "Source: " + ex.Source + "\n" + ex.StackTrace;
+                Domain.SaveGeneralErrorLog(logMessage);
+                return paramValue;
+            }
+        }
+
+        #endregion
+
+    }
+}

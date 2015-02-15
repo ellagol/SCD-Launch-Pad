@@ -1,0 +1,322 @@
+﻿<UserControl x:Class="ExplorerModule.ProjectsExplorerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dd="clr-namespace:Infra.DragDrop;assembly=Infra.DragDrop"          
+    xmlns:mvvm="clr-namespace:Infra.MVVM;assembly=Infra.MVVM"
+    xmlns:local="clr-namespace:ExplorerModule"
+    xmlns:bo="clr-namespace:ATSBusinessObjects;assembly=ATSBusinessObjects"             
+    >
+    
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--Metro Tab Control-->
+                <ResourceDictionary Source="pack://application:,,,/ExplorerModule;component/Resources/Themes/MetroTabStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--Converters-->
+            <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <!--Black Office 2010 Gradient-->
+            <!--<Color x:Key="BackgroundC1">#FFFFFBFF</Color>-->
+            <!--<Color x:Key="BackgroundC2">#FFCECFD6</Color>-->
+
+            <!--Silver Office 2010 Gradient-->
+            <!--<Color x:Key="BackgroundC1">#FFE8ECF0</Color>-->
+            <!--<Color x:Key="BackgroundC2">#FFDADEE3</Color>-->
+
+            <!--Blue Office 2010 Gradient-->
+            <Color x:Key="BackgroundC1">#FFCFDDEE</Color>
+            <Color x:Key="BackgroundC2">#FFC2D4E8</Color>
+
+            <LinearGradientBrush x:Key="BackgroundBrush" StartPoint="0,0.5" EndPoint="0,1">
+                <GradientStop Color="{DynamicResource BackgroundC1}" Offset="0"/>
+                <GradientStop Color="{DynamicResource BackgroundC2}" Offset="1"/>
+            </LinearGradientBrush>
+
+            <DataTemplate DataType="{x:Type local:EnvironmentDetailsViewModel}">
+                <local:EnvironmentDetailsView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:FolderDetailsViewModel}">
+                <local:FolderDetailsView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:ProjectDetailsViewModel}">
+                <local:ProjectDetailsView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:VersionDetailsViewModel}">
+                <local:VersionDetailsView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:BulkUpdateViewModel}">
+                <local:BulkUpdateView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:NewTemplateViewModel}">
+                <local:NewTemplateView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:CloneTemplateViewModel}">
+                <local:CloneTemplateView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:TemplateVersionDetailsViewModel}">
+                <local:TemplateVersionDetailsView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:SelectEnvironmentViewModel}">
+                <local:SelectEnvironmentView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type local:ProgressBarViewModel}">
+                <local:ProgressBarView />
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <!--Wrapping the LayoutRoot grid with a border that will be used to determine Workspace actual Width and Height for the Overlay-->
+    <Border x:Name="DummyWorkspaceSize" BorderBrush="Transparent" BorderThickness="0" Padding="0,0,0,0">
+        <Grid x:Name="VisualRoot" Background="{StaticResource BackgroundBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="370" MinWidth="300" MaxWidth="800" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="35" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="1" BorderBrush="LightBlue" BorderThickness="1" CornerRadius="8" Margin="1" Background="LightBlue">
+                    <!--ToolBarTray ToolBarTray.IsLocked="True" Background="LightBlue" HorizontalAlignment="Left" VerticalAlignment="Center"-->
+                    <ToolBar Background="LightBlue"  HorizontalAlignment="Stretch"  VerticalAlignment="Center"  VerticalContentAlignment="Center" >
+                            <Button ToolTip="Refresh" VerticalAlignment="Center" Command="{Binding RefreshCommand}">
+                                    <Image Source ="pack://application:,,,/ExplorerModule;component/Resources/Icons/32x32/Refresh.png"/>
+                                </Button>
+                            </ToolBar>
+                        <!--/ToolBarTray-->
+                    </Border>
+
+                <TreeView Name="ExplorerTreeViewStandard" Grid.Row="2" Margin="0,10,10,10" VerticalAlignment="Stretch" ItemsSource="{Binding TreeNodes}" FontSize="14" Background="Transparent" BorderThickness="0"
+                                  dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}" dd:DragDrop.UseDefaultDragAdorner="True">
+                    <TreeView.ItemContainerStyle>
+                        <!-- This Style binds a TreeViewItem to a TreeViewNodeViewModel -->
+                        <Style TargetType="{x:Type TreeViewItem}">
+                            <!--<EventSetter Event="Selected" Handler="TreeViewSelectedItemChanged" />-->
+                            <!--<EventSetter Event="Expanded" Handler="TreeExpanded" />-->
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                            <Setter Property="FontWeight" Value="DemiBold" />
+                            <Setter Property="FontSize" Value="16" />
+                            <Setter Property="Foreground" Value="DarkBlue" />
+                            <Setter Property="mvvm:EventToCommand.Event" Value="MouseDoubleClick" />
+                            <Setter Property="mvvm:EventToCommand.Command" Value="{Binding RapidExecutionCommand}" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="Foreground" Value="Yellow" />
+                                    <Setter Property="Background" Value="Blue" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+
+                    <TreeView.Resources>
+                        <!--/////////////////////////////////////-->
+                        <!-- Provide the Templates per Node Type -->
+                        <!--/////////////////////////////////////-->
+                        <!-- Root Node Template -->
+                        <HierarchicalDataTemplate DataType="{x:Type local:TreeViewRootNodeViewModel}" ItemsSource="{Binding Children}" >
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <!--<MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />-->
+                                        <!--<Separator />-->
+                                        <MenuItem Header="New">
+                                            <MenuItem Header="Folder" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.F}" />
+                                            <MenuItem Header="Project" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.P}" />
+                                            <MenuItem Header="Template" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.T}"/>
+                                        </MenuItem>
+                                        <Separator />
+                                        <MenuItem Header="Import from File System" Visibility="Visible" Command="{Binding ImportProjectArchive}"/>
+                                        <MenuItem Header="Paste" Visibility="{Binding Path=CanPaste, Converter={StaticResource BoolToVisibilityConverter}}" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Paste}" />
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
+                                <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" FontWeight="Bold" FontStyle="Italic" FontSize="20" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <!-- Folder Node Template -->
+                        <HierarchicalDataTemplate DataType="{x:Type local:TreeViewFolderNodeViewModel}" ItemsSource="{Binding Children}" >
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <!--<MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />-->
+                                        <!--<Separator />-->
+                                        <MenuItem Header="New">
+                                            <MenuItem Header="Folder" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.F}" />
+                                            <MenuItem Header="Project" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.P}" />
+                                            <MenuItem Header="Template" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.T}"/>
+                                        </MenuItem>
+                                        <Separator />
+                                        <MenuItem Header="Cut" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Cut}" />
+                                        <!--Copy folder disabled per bug# 1617 Dec-27-2013-->
+                                        <!--<MenuItem Header="Copy" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Copy}" />-->
+                                        <MenuItem Header="Paste" Visibility="{Binding Path=CanPaste, Converter={StaticResource BoolToVisibilityConverter}}" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Paste}" />
+                                        <Separator />
+                                        <MenuItem Header="Delete" Command="{Binding DeleteFolderCommand}" />
+                                        <!--commented for delivery 1.1.0.5-->
+                                        <Separator />
+                                        <MenuItem Header="Bulk Update" Command="{Binding BulkUpdateCommand}" />
+                                        <Separator/>
+                                        <!--<MenuItem Header="Import from FS" Visibility="Visible" Command="{Binding ImportProjectArchive}"/>-->
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
+                                <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <!-- Project Node Template -->
+                        <HierarchicalDataTemplate DataType="{x:Type local:TreeViewProjectNodeViewModel}" ItemsSource="{Binding Children}" >
+                            <StackPanel Orientation="Horizontal">
+                               
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <!--<MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />-->
+                                        <!--<Separator />-->
+                                        <MenuItem Header="Rapid Execution" Command="{Binding RapidExecutionCommand}" Visibility="{Binding Path=EnableRapidExecution, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Separator />
+                                        <!--Bug 1700-->
+                                        <!--<MenuItem Header="New Folder" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.F}" />
+                                        <MenuItem Header="New Project" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.P}" />-->
+                                        <!--<Separator />-->
+                                        <MenuItem Header="Cut" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Cut}" />
+                                        <!--Copy project disabled per bug# 1617 Dec-27-2013-->
+                                        <!--<MenuItem Header="Copy" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Copy}" />-->
+                                        <MenuItem Header="Paste" Visibility="{Binding Path=CanPaste, Converter={StaticResource BoolToVisibilityConverter}}" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Paste}" />
+                                        <Separator />
+                                        <MenuItem Header="Disable Project" Command="{Binding DisableProjectCommand}" Visibility="{Binding Path=EnableDisable, UpdateSourceTrigger=PropertyChanged}" />
+                                        <MenuItem Header="Resume Project" Command="{Binding ResumeProjectCommand}" Visibility="{Binding Path=EnableResume, UpdateSourceTrigger=PropertyChanged}" />
+                                        <MenuItem Header="Clone Project">
+                                            <MenuItem Header="Regular" Command="{Binding CloneProjectCommand}" Visibility="{Binding Path=EnableClone, UpdateSourceTrigger=PropertyChanged}" />
+                                            <MenuItem Header="Related" Command="{Binding CloneRelatedProjectCommand}"  />
+                                            <MenuItem Header="Template" Command="{Binding CloneTemplateCommand}" Visibility="{Binding Path=EnableClone, UpdateSourceTrigger=PropertyChanged}"  />
+                                        </MenuItem>
+                                        <MenuItem Header="Update Group Properties" Visibility="{Binding Path=EnableRelated, UpdateSourceTrigger=PropertyChanged}" >
+                                            <MenuItem Header="Split Project"  Command="{Binding SplitRelatedProjectCommand }"  />
+                                            <MenuItem Header="All Related Projects" Command="{Binding UpdateRelatedProjectCommand }" />
+                                        </MenuItem>
+                                                
+                                        <Separator />
+                                        <MenuItem Header="Show Versions" Command="{Binding ShowVersionsCommand}" />
+                                        <MenuItem Header="Collapse Versions" Command="{Binding CollapseVersionsCommand}" />
+                                        <!--<Separator />-->
+                                        <!--<MenuItem Header="Delete" Command="{Binding DeleteNodeCommand}" />-->
+                                        <Separator />
+                                        <MenuItem Header="Export to File System" Command="{Binding ExportProjectArchive}" Visibility="{Binding EnableExport}"/>
+                                        <MenuItem Header="Export to Environment" Command="{Binding ExportProjectToEnv}" Visibility="{Binding EnableExport}"/>
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
+                                <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" />
+                            </StackPanel>
+                            <!-- Priority Popup overlay-->
+      
+                        </HierarchicalDataTemplate>
+                        <!-- Version Node Template -->
+                        <HierarchicalDataTemplate DataType="{x:Type local:TreeViewVersionNodeViewModel}" ItemsSource="{Binding Children}" >
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                        <MenuItem Header="Rapid Execution" Command="{Binding RapidExecutionVersionCommand}" Visibility="{Binding Path=EnableRapidExecution, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Separator />   
+                                        <MenuItem Header="ReOpen" Command="{Binding ReOpenCommand}" />
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
+                                <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <!-- Template Node Template -->
+                        <HierarchicalDataTemplate DataType="{x:Type local:TreeViewTemplateNodeViewModel}" ItemsSource="{Binding Children}" >
+                            <StackPanel Orientation="Horizontal">
+
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <!--
+                                        <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />
+                                        <Separator />
+                                        -->
+                                        <MenuItem Header="Rapid Execution" Command="{Binding RapidExecutionCommand}" Visibility="{Binding Path=EnableRapidExecution, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Separator />
+                                        <!--Bug 1700-->
+                                        <!--<MenuItem Header="New Folder" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.F}" />
+                                        <MenuItem Header="New Project" Command="{Binding NewNodeCommand}" CommandParameter="{x:Static bo:NodeTypes.P}" />-->
+                                        <!--<Separator />-->
+                                        <MenuItem Header="Cut" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Cut}" />
+                                        <!--Copy project disabled per bug# 1617 Dec-27-2013-->
+                                        <!--<MenuItem Header="Copy" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Copy}" />-->
+                                        <MenuItem Header="Paste" Visibility="{Binding Path=CanPaste, Converter={StaticResource BoolToVisibilityConverter}}" Command="{Binding CutCopyPasteNodeCommand}" CommandParameter="{x:Static local:NodeOperations.Paste}" />
+                                        <Separator />
+                                        <MenuItem Header="Disable Template" Command="{Binding DisableProjectCommand}" Visibility="{Binding Path=EnableDisable, UpdateSourceTrigger=PropertyChanged}" />
+                                        <MenuItem Header="Resume Template" Command="{Binding ResumeProjectCommand}" Visibility="{Binding Path=EnableResume, UpdateSourceTrigger=PropertyChanged}" />                          
+                                        <MenuItem Header="Clone Template" Command="{Binding CloneProjectCommand}" Visibility="{Binding Path=EnableClone, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Separator />
+                                        <MenuItem Header="Show Versions" Command="{Binding ShowVersionsCommand}" />
+                                        <MenuItem Header="Collapse Versions" Command="{Binding CollapseVersionsCommand}" />
+                                        <!--<Separator />-->
+                                        <!--<MenuItem Header="Delete" Command="{Binding DeleteNodeCommand}" />-->
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
+                                <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type local:TreeViewTemplateVersionNodeViewModel}" ItemsSource="{Binding Children}" >
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.ContextMenu>
+                                    <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                        <MenuItem Header="Rapid Execution" Command="{Binding RapidExecutionVersionCommand}" Visibility="{Binding Path=EnableRapidExecution, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Separator />
+                                        <MenuItem Header="ReOpen" Command="{Binding ReOpenCommand}" />
+                                    </ContextMenu>
+                                </StackPanel.ContextMenu>
+                                <Image Width="16" Height="16" Source="{Binding NodeIcon}" VerticalAlignment="Center"  />
+                                <TextBlock Text="{Binding NodeData}" VerticalAlignment="Center" Margin="3,0,0,0" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
+
+                <Separator Grid.Row="3" Style="{DynamicResource HorizontalSeparatorStyle}" Margin="10,0,10,0" />
+
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button Content="Search" Command="{Binding SearchCommand}" Width="70" Margin="10,10,0,10" />
+                        <TextBox Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged}" Width="120" Margin="10,10,10,10" />
+                        <Button Content="Next" Command="{Binding FindCommand}" Width="60" Margin="0,10,0,10" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="+" Command="{Binding ExpandAllCommand}" Width="20" Margin="0,10,10,10" ToolTip="Expand All Nodes" />
+                        <Button Content="-" Command="{Binding CollapseAllCommand}" Width="20" Margin="0,10,10,10" ToolTip="Collapse All Nodes" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="6" Margin="0,0,0,0" ResizeBehavior="PreviousAndNext" />
+
+            <!--Content View-->
+            <ContentControl Grid.Column="2" Content="{Binding DetailsViewModel, Mode=OneWay}" Margin="10,10,10,10" />
+
+            <!-- Select Environment overlay-->
+            <ContentControl Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Content="{Binding OverlayContentViewModel, Mode=OneWay}" 
+                            Visibility="{Binding ShowPopupContent}"  Margin="0,0,0,0"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        </Grid>
+    </Border>
+</UserControl>
